@@ -1,0 +1,16 @@
+{
+  "name": "cast",
+  "version": "0.0.0",
+  "description": "Cast local videos",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kiril Vatev",
+  "license": "MIT",
+  "dependencies": {
+    "express": "~4.2.0",
+    "send": "~0.3.0",
+    "fluent-ffmpeg": "~1.7.1"
+  }
+}
