@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en" data-cast-api-enabled="true">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <title>Local Chromecast</title>
+        
+        <!--meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/-->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+        <!-- Apple web app tags -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <!-- vendor neutral web app tags -->
+        <meta name="mobile-web-app-capable" content="yes">
+
+        <!--link rel="shortcut icon" href="favicon.ico" /--> 
+        <link rel="apple-touch-icon" sizes="196x196" href="img/cupcake.png">
+        <link rel="icon" type="image/png" href="img/cupcake.png" />
+        <link rel="shortcut icon" sizes="196x196" href="img/cupcake.png">
+
+        <style>
+            html, body{
+                padding: 0px;
+                margin: 0px;
+                width: 100%;
+                font-family: sans-serif;
+                font-size: 1em;
+                background: #eee;
+                color: #555;
+            }
+            .card{
+                -moz-box-sizing: border-box;
+                     box-sizing: border-box;
+                
+                width: 90%;
+                max-width: 860px;
+                margin: 12px auto;
+                padding: 20px;
+                text-align: center;
+                background: white;
+                border: 1px solid #e5e5e5;
+                box-shadow: 0 5px 25px -12px black;
+            }
+            
+            .file{
+                display: inline-block;
+                width: 11em;
+                height: 9em;
+                text-align: center;
+                margin: 6px;
+                cursor: pointer;
+            }
+            
+            .navPart{
+                font-weight: bold;
+                cursor: pointer;
+                padding: 4px;
+                margin: 4px;
+            }
+            
+            #contentSearch{ position: relative; }
+            #contentSearch input{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                padding: 15px;
+                text-align: center;
+                border: none;
+                outline: none;
+                font-size: 1.2em;
+                
+                -moz-box-sizing: border-box;
+                     box-sizing: border-box;
+            }
+            
+            .episode{
+                font-size: .9em;
+                font-style: italic;
+                line-height: 1.5em;
+            }
+            
+            svg.video path{ fill: #555; #B0CE03; }
+            svg.folder path{ fill: #555; #CE5803; }
+            
+            @media screen and (max-width: 480px){
+                html, body{ font-size: .84em; }
+                .navPart{ 
+                    font-size: 1.2em;
+                    line-height: 1.5em;
+                }
+                svg{ 
+                    -webkit-transform: scale(0.84);
+                            transform: scale(0.84);
+                }
+            }
+            
+            #cast{
+                position: absolute;
+                top: 10px;
+                left: 10px;
+            }
+            
+            .modal_wrapper{
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: rgba(0,0,0,.8);
+                -webkit-transform: translateZ(0);
+            }
+            .modal{
+                position: absolute;
+                width: 90%;
+                max-width: 700px;
+                /* height set in JS */
+                height: 60%;
+                max-height: 700px;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                background: #eee;
+                transition: height .5s ease;
+                -webkit-transform: translateZ(0);
+            }
+            .modal:after{
+                content: attr(data-name);
+                box-sizing: border-box;
+                font-size: 2em;
+                text-align: center;
+                width: 100%;
+                display: block;
+                padding: 10px;
+                color: #eee;
+                word-wrap: break-word;
+            }
+            .modal .thumb{
+                width: 100%;   
+            }
+            .modal button{
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                box-sizing: border-box;
+                width: 50%;
+                padding: 15px 10px;;
+                margin: 0;
+                outline: none;
+                border: none;
+                background: rgba(0,0,0,.5);
+                color: white;
+                font-size: 1.5em;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            .modal button:nth-child(odd){
+                right: 0;
+                left: auto;
+                border-left: 2px solid rgba(255,255,255,.6);
+            }
+        </style>
+    </head>
+    <body>
+    
+        <div id='contentNav' class='nav card'></div>
+        <div id='contentSearch' class='card'>
+            <input placeholder='Find something...' type='search' />
+        </div>
+        <div id='contentFiles' class='card'></div>
+        <div id='contentDirs' class='card'></div>
+        
+        <script src="chromecast.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+        <script src="http://catdad.github.io/tiny.cdn/lib/request/latest/request.min.js"></script>
+        <script src="views.js"></script>
+        <script src="hash.js"></script>
+        
+        <script>
+            window.chrome && chromecast.setAppId();
+            
+//            views.Modal();
+        </script>
+    </body>
+</html>
