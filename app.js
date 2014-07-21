@@ -81,6 +81,7 @@ app.get('/virtualthumb/:dir/*', function(req, res){
 
 //public static files
 app.use(express.static(path.resolve(__dirname, 'public')));
+app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
 
 //probably requesting a directory
 app.get('*', function(req, res, next){
