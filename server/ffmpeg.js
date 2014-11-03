@@ -6,7 +6,8 @@ var fs = require('fs');
 var child_process = require('child_process');
 var path = require('path');
 
-var dir = path.resolve('.');
+// root is one up from the running dir
+var dir = path.resolve(__dirname, '..');
 
 var ffmpegPath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffmpeg.exe');
 var ffprobePath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffprobe.exe');

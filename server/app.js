@@ -15,8 +15,6 @@ var port = config.port;
 // root is one up from the running dir
 var rootDir = path.resolve(__dirname, '..');
 
-console.log(rootDir);
-
 //--------------
 // config
 //--------------
@@ -98,7 +96,6 @@ app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
 app.get('*', function(req, res, next){
     res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
 });
-
 
 
 //--------------
