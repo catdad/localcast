@@ -1,4 +1,4 @@
-/*jslint node: true */
+/* jshint node: true */
 
 var fs = require('./utils/fsPlus.js');
 var path = require('path');
@@ -6,9 +6,16 @@ var path = require('path');
 var express = require('express');
 var app = express();
 
+var proxy = require('http-proxy').createProxyServer({});
+
 var browse = require('./browse.js');
 var config = require('./config.json');
 var port = config.port;
+
+// root is one up from the running dir
+var rootDir = path.resolve(__dirname, '..');
+
+console.log(rootDir);
 
 //--------------
 // config
@@ -16,7 +23,7 @@ var port = config.port;
 
 //simple logger
 app.use(function(req, res, next){
-    console.log(req.url);
+    console.log(req.method, '-', req.url);
     next();
 });
 
@@ -26,7 +33,7 @@ app.use(function(req, res, next){
 
 app.get('/', function(req, res){
     //browse to index
-    res.sendfile(path.resolve(__dirname, 'public', 'index.html'));
+    res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
 });
 
 app.get('/dir', function(req, res){
@@ -77,15 +84,19 @@ app.get('/virtualthumb/:dir/*', function(req, res){
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
 });
 
-
+app.get('/gui*', function(req, res){
+    proxy.web(req, res, {
+        target: 'http://localhost:8050'
+    });
+});
 
 //public static files
-app.use(express.static(path.resolve(__dirname, 'public')));
+app.use(express.static(path.resolve(rootDir, 'public')));
 app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
 
 //probably requesting a directory
 app.get('*', function(req, res, next){
-    res.sendfile(path.resolve(__dirname, 'public', 'index.html'));
+    res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
 });
 
 
