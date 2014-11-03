@@ -1,7 +1,9 @@
+/* jshint node: true, -W083 */
+
 var os = require('os');
 var config = require('./config.json');
 
-var ip = undefined;
+var ip;
 
 module.exports = function(){
     //check if one was already found
@@ -30,7 +32,6 @@ module.exports = function(){
     
     //loop through everything
     for (var dev in ifaces) {
-        
         ifaces[dev].forEach(function(details){
             if (!details.internal && details.family === 'IPv4' && details.address !== '127.0.0.1') {
                 ip = details.address;

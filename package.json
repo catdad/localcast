@@ -4,13 +4,15 @@
   "description": "Cast local videos",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/app.js"
   },
   "author": "Kiril Vatev",
   "license": "MIT",
   "dependencies": {
     "express": "~4.2.0",
     "send": "~0.3.0",
-    "fluent-ffmpeg": "~1.7.1"
+    "fluent-ffmpeg": "~1.7.1",
+    "http-proxy": "~1.2.0"
   }
 }
