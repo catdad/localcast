@@ -1,7 +1,9 @@
 /* jshint node: true */
+/* global unescape */
 
 var fs = require('./utils/fsPlus.js');
 var path = require('path');
+var url = require('url');
 
 var express = require('express');
 var app = express();
@@ -12,8 +14,20 @@ var browse = require('./browse.js');
 var config = require('./config.json');
 var port = config.port;
 
+var servercast = require('./servercast.js');
+
 // root is one up from the running dir
 var rootDir = path.resolve(__dirname, '..');
+
+function parseQuery(str){
+    var query = {};
+    var temp = str.split('&');
+    temp.forEach(function(part){
+        var q = part.split('=');
+        query[q.shift()] = q.join('=');
+    });
+    return query;
+}
 
 //--------------
 // config
@@ -80,6 +94,46 @@ app.get('/virtualthumb/:dir/*', function(req, res){
     var relativePath = decodeURIComponent(req.url).replace('/virtualthumb/' + req.params.dir + '/', '').split('/');
     
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
+});
+
+//manage servercast sessions
+app.get('/session/:action', function(req, res){
+    var parsedUrl = url.parse(req.url),
+        query = parsedUrl.query ? parseQuery(parsedUrl.query) : {},
+        action = req.params.action,
+        value = query.value ? unescape(query.value) : undefined;
+    
+    // create the arguments array to send to servercast.control
+    var args = [function(err, control){
+        if (err) {
+            res.send({ 
+                success: false, 
+                error: err.message,
+                action: action,
+                value: value
+            });
+        } else {
+            res.send({ 
+                success: true, 
+                action: action, 
+                value: value 
+            });
+        }
+    }, value];
+    
+    // get the control method to call
+    var method = servercast.control[action];
+    
+    if (method) {
+        method.apply(servercast.control, args);
+    } else {
+        res.send({ 
+            success: false, 
+            error: action + ' is not valid',
+            action: action,
+            value: value
+        });
+    }
 });
 
 app.get('/gui*', function(req, res){
