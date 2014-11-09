@@ -1,8 +1,114 @@
 /*jslint browser: true, devel: true, expr: true */
-/*globals request, hash, chromecast */
+/*globals request, hash, chromecast, toast */
 
 function playVideo(resource){
     window.location.href = resource;
+}
+
+function toastControls(actions){
+    var dismissFunc,
+        dismiss = function(){
+            dismissFunc && dismissFunc();
+        },
+        action = actions.map(function(el){
+            return {
+                name: el.name,
+                onclick: function(){
+                    dismiss();
+                    el.onclick();
+                }
+            };
+        });
+    
+    dismissFunc = toast.alert({    
+        message: 'Controls: ',    
+        dismissible: false,    
+        action: action
+    });
+}
+
+function serverPlay(url, name){
+    console.log('play', url, name);
+    var uri = '/session/play';
+    
+    if (url) {
+        uri += '?value=' + encodeURIComponent(url);
+    }
+    
+    request.json(uri, function(err, data){
+        if (err) {
+            toast.error('unexpected error: ' + err.message);
+        } else if (data.success) {
+            name && toast.success('playing ' + name);
+            toastControls([
+                {
+                    name: 'pause',
+                    onclick: serverPause
+                },{
+                    name: 'mute',
+                    onclick: serverMute
+                }
+            ]);
+        } else {
+            toast.error(data.error);
+        }
+    });
+}
+function serverPause(){
+    request.json('/session/pause', function(err, data){
+        if (err) {
+            toast.error('unexpected error: ' + err.message);
+        } else if (data.success) {
+            toast.alert({
+                message: 'click to play',
+                onclick: function(){
+                    console.log(arguments);
+                    serverPlay();
+                },
+                timeout: -1
+            });
+        } else {
+            toast.error(data.error);
+        }
+    });
+}
+function serverMute(){
+    request.json('/session/mute', function(err, data){
+        if (err) {
+            toast.error('unexpected error: ' + err.message);
+        } else if (data.success) {
+            toastControls([
+                {
+                    name: 'pause',
+                    onclick: serverPause
+                },{
+                    name: 'unmute',
+                    onclick: serverUnmute
+                }
+            ]);
+        } else {
+            toast.error(data.error);
+        }
+    });
+}
+function serverUnmute(){
+    request.json('/session/unmute', function(err, data){
+        if (err) {
+            toast.error('unexpected error: ' + err.message);
+        } else if (data.success) {
+            toastControls([
+                {
+                    name: 'pause',
+                    onclick: serverPause
+                },{
+                    name: 'mute',
+                    onclick: serverMute
+                }
+            ]);
+        } else {
+            toast.error(data.error);
+        }
+    });
 }
 
 //file views
@@ -75,13 +181,19 @@ var views = {
             playVideo(resource);    
         };
         playCastButton.onclick = function(){
-            (chromecast.isAvailable()) ? 
-                    chromecast.startCast(resource, {
-                        title: name,
-                        images: [{ url: thumb }]
-                    }) : function(){
-                console.log('no chromecast available');   
-            };
+            function browserCast() {
+                chromecast.startCast(resource, {
+                    title: name,
+                    images: [{ url: thumb }]
+                });
+            }
+            
+            function serverCast() {
+                close();
+                serverPlay(resource, name);
+            }
+            
+            (chromecast.isAvailable()) ? browserCast() : serverCast();
         };
         
         modal.appendChild(playLocalButton);
