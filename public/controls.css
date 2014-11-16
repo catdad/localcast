@@ -1,0 +1,149 @@
+#page {
+    position: relative;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding-bottom: 4.2rem;
+}
+
+#controls {
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    height: 4rem;
+    transform: translateZ(0);
+    border-top: 1px solid lightgray;
+    background-color: #fdfdfd;
+
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+    
+    box-shadow: 0 15px 22px 10px black;
+    will-change: opacity;
+}
+
+#controls.disabled {
+    -webkit-filter: blur(1.5px) grayscale(60%);
+       -moz-filter: blur(1.5px) grayscale(60%);
+            filter: blur(1.5px) grayscale(60%);
+}
+#controls.disabled:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: #eee;
+    opacity: .4;
+}
+
+#controls .buttons { 
+    text-align: center;
+    margin: 4px 0;
+}
+
+#controls .button {
+    padding: 10px;
+    min-width: 32px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 50%;
+
+    background-color: transparent;
+    transition: background-color 400ms ease-in-out;
+
+    /* change the color of font icons, hell yeah */
+    color: #333;
+}
+#controls .button:hover {
+    background-color: #eee;
+}
+
+/* adjust kerning --- why, github? */
+#play.button { letter-spacing: -3px; }
+#pause.button { letter-spacing: 0px; }
+#prev.button { letter-spacing: 3px; }
+#next.button { letter-spacing: -3px; }
+#stop.button { letter-spacing: 0px; }
+#volume.button { letter-spacing: 0px; }
+
+#controls .track {
+    width: 100%;
+    height: 0px;
+    padding: 2px 0;
+    overflow: visible;
+
+    /* fix for small gap visible on IPS screens -- super annoying */
+    transform: translateY(-1px);
+}
+#controls .track .thumb {
+    background: #f26f83;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+
+    /* reposition the center of the thumb */
+    position: relative;
+    top: -7px;
+    left: -7px;
+}
+
+#controls .slider, .slider:before {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 0;
+    padding: 2px 0;
+}
+#controls .slider {
+    left: 0;
+    background: #FBD5DA;
+    transform: translateX(0px);
+    will-change: transform;
+}
+#controls .slider:before{
+    content: '';
+    background: #f26f83;
+    left: -100%;
+}
+
+#controls .track .tooltip {
+    position: absolute;
+    box-sizing: border-box;
+    width: 3rem;
+    left: -1.5rem;
+    bottom: 25px;
+    border-radius: 2px;
+    background-color: rgba(0,0,0,.5);
+    font-family: sans-serif;
+    color: #fee;
+    text-align: center;
+
+    /* hidden state params */
+    height: 0;
+    padding: 0;
+    overflow: hidden;
+    opacity: 0;
+
+    transition: opacity 800ms ease;
+}
+#controls .track .tooltip.show {
+    height: auto;
+    padding: 5px;
+    overflow: visible;
+    opacity: 1;
+}
+#controls .track .tooltip.show:after {
+    content: '';
+    position: absolute;
+    left: .9rem;
+    bottom: -10px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid rgba(0,0,0,.5);
+}

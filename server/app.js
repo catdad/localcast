@@ -48,14 +48,22 @@ app.get('/', function(req, res){
     res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
 });
 
+function send(res, err, data){
+    var nowPlaying = servercast.nowPlaying();
+    data = data || {};
+    data.nowPlaying = nowPlaying;
+    
+    res.send(err || data);
+}
+
 app.get('/dir', function(req, res){
     browse.getDirStats('', function(err, data){
-        res.send(err || data); 
+        send(res, err, data); 
     });
 });
 app.get('/virtual/:dir', function(req, res){
     browse.virtual(req.params.dir).getDirStats('', function(err, data){
-        res.send(err || data); 
+        send(res, err, data); 
     });
 });
 
@@ -63,14 +71,14 @@ app.get('/dir/*', function(req, res){
     var relativePath = decodeURIComponent(req.url).replace('/dir/', '').split('/');
     
     browse.getDirStats(path.join.apply(path, relativePath), function(err, data){
-        res.send(err || data); 
+        send(res, err, data); 
     });
 });
 app.get('/virtual/:dir/*', function(req, res){
     var relativePath = decodeURIComponent(req.url).replace('/virtual/' + req.params.dir + '/', '').split('/');
     
     browse.virtual(req.params.dir).getDirStats(path.join.apply(path, relativePath), function(err, data){
-        res.send(err || data); 
+        send(res, err, data); 
     });
 });
 
@@ -113,11 +121,17 @@ app.get('/session/:action', function(req, res){
                 value: value
             });
         } else {
-            res.send({ 
+            var response = { 
                 success: true, 
                 action: action, 
-                value: value 
-            });
+                value: value
+            };
+            
+            if (action === 'nowPlaying'){
+                response.nowPlaying = control;
+            }
+            
+            res.send(response);
         }
     }, value];
     
@@ -145,6 +159,7 @@ app.get('/gui*', function(req, res){
 //public static files
 app.use(express.static(path.resolve(rootDir, 'public')));
 app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
+app.use('/lib/octicons', express.static(path.resolve('.', 'lib/octicons')));
 
 //probably requesting a directory
 app.get('*', function(req, res, next){

@@ -1,5 +1,5 @@
 /*jslint browser: true, devel: true, expr: true */
-/*globals views, request */
+/*globals views, request, server */
 
 !function(){
     //these don't belong here
@@ -64,7 +64,9 @@
                 //populate nav
                 navDOM.appendChild( views.nav(data.path) );
                 
-                console.log('navigating');
+                if (data.nowPlaying) {
+                    server.nowPlaying(data.nowPlaying);
+                }
                 
                 window.scrollTo(0,0);
             });
