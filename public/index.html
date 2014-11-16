@@ -17,49 +17,83 @@
         <link rel="apple-touch-icon" sizes="196x196" href="img/cupcake.png">
         <link rel="icon" type="image/png" href="img/cupcake.png" />
         <link rel="shortcut icon" sizes="196x196" href="img/cupcake.png">
+        
+        <link href="lib/octicons/octicons.css" type="text/css" rel="stylesheet" />
+        <link href="controls.css" type="text/css" rel="stylesheet" />
 
+        <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700' rel='stylesheet' type='text/css'>
+        
         <style>
-            html, body{
+            html, body {
                 padding: 0px;
                 margin: 0px;
                 width: 100%;
-                font-family: sans-serif;
+                font-family: Roboto, sans-serif;
                 font-size: 1em;
                 background: #eee;
                 color: #555;
             }
-            .card{
+            
+            .card {
                 -moz-box-sizing: border-box;
                      box-sizing: border-box;
                 
                 width: 90%;
                 max-width: 860px;
                 margin: 12px auto;
-                padding: 20px;
+                padding: 15px 0;
                 text-align: center;
                 background: white;
                 border: 1px solid #e5e5e5;
                 box-shadow: 0 5px 25px -12px black;
             }
             
-            .file{
+            .file {
                 display: inline-block;
-                width: 11em;
-                height: 9em;
+                position: relative;
+                width: 8rem;
+                height: 8rem;
                 text-align: center;
-                margin: 6px;
+                margin: 6px 12px 2.2rem;
                 cursor: pointer;
             }
+            .file:before {
+                content: attr(data-title);
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                overflow: hidden;
+                position: absolute;
+                top: 6rem;
+                left: 0;
+                width: 100%;
+            }
+            .file:after {
+                content: attr(data-episode);
+                position: absolute;
+                top: 7rem;
+                width: 100%;
+                left: 0;
+                font-size: .9rem;
+                font-style: italic;
+                line-height: 1.5rem;
+            }
+            .file svg {
+                top: 0;
+                left: 0;
+                margin: 0 auto;
+                max-width: 100%;
+                max-height: 100%;
+            }
             
-            .navPart{
+            .navPart {
                 font-weight: bold;
                 cursor: pointer;
                 padding: 4px;
                 margin: 4px;
             }
             
-            #contentSearch{ position: relative; }
-            #contentSearch input{
+            #contentSearch { position: relative; }
+            #contentSearch input {
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -69,40 +103,35 @@
                 text-align: center;
                 border: none;
                 outline: none;
-                font-size: 1.2em;
+                font-size: 1.2rem;
                 
                 -moz-box-sizing: border-box;
                      box-sizing: border-box;
             }
             
-            .episode{
-                font-size: .9em;
-                font-style: italic;
-                line-height: 1.5em;
-            }
-            
-            svg.video path{ fill: #555; #B0CE03; }
-            svg.folder path{ fill: #555; #CE5803; }
+            svg.video path { fill: #555; #B0CE03; }
+            svg.folder path { fill: #555; #CE5803; }
             
             @media screen and (max-width: 480px){
-                html, body{ font-size: .84em; }
-                .navPart{ 
-                    font-size: 1.2em;
-                    line-height: 1.5em;
+                html, body { font-size: .84rem; }
+                .navPart { 
+                    font-size: 1.2rem;
+                    line-height: 1rem;
                 }
-                svg{ 
-                    -webkit-transform: scale(0.84);
-                            transform: scale(0.84);
+                
+                .file {
+                    width: 6rem;
+                    height: 6rem;
                 }
             }
             
-            #cast{
+            #cast {
                 position: absolute;
                 top: 10px;
                 left: 10px;
             }
             
-            .modal_wrapper{
+            .modal_wrapper {
                 position: fixed;
                 top: 0;
                 bottom: 0;
@@ -111,7 +140,7 @@
                 background: rgba(0,0,0,.8);
                 -webkit-transform: translateZ(0);
             }
-            .modal{
+            .modal {
                 position: absolute;
                 width: 90%;
                 max-width: 700px;
@@ -127,10 +156,10 @@
                 transition: height .5s ease;
                 -webkit-transform: translateZ(0);
             }
-            .modal:after{
+            .modal:after {
                 content: attr(data-name);
                 box-sizing: border-box;
-                font-size: 2em;
+                font-size: 2rem;
                 text-align: center;
                 width: 100%;
                 display: block;
@@ -138,10 +167,10 @@
                 color: #eee;
                 word-wrap: break-word;
             }
-            .modal .thumb{
+            .modal .thumb {
                 width: 100%;   
             }
-            .modal button{
+            .modal button {
                 position: absolute;
                 bottom: 0;
                 left: 0;
@@ -153,25 +182,52 @@
                 border: none;
                 background: rgba(0,0,0,.5);
                 color: white;
-                font-size: 1.5em;
+                font-size: 1.5rem;
                 font-weight: bold;
                 cursor: pointer;
             }
-            .modal button:nth-child(odd){
+            .modal button:nth-child(odd) {
                 right: 0;
                 left: auto;
                 border-left: 2px solid rgba(255,255,255,.6);
+            }
+            
+            .t-wrap.t-wrap {
+                bottom: 4.2rem;
+            }
+            
+            .hide {
+                display: none;
             }
         </style>
     </head>
     <body>
     
-        <div id='contentNav' class='nav card'></div>
-        <div id='contentSearch' class='card'>
-            <input placeholder='Find something...' type='search' />
+        <div id="page">
+            <div id='contentNav' class='nav card'></div>
+            <div id='contentSearch' class='card'>
+                <input placeholder='Find something...' type='search' />
+            </div>
+            <div id='contentFiles' class='card'></div>
+            <div id='contentDirs' class='card'></div>            
         </div>
-        <div id='contentFiles' class='card'></div>
-        <div id='contentDirs' class='card'></div>
+    
+        <div id="controls" class="disabled">
+            <div class="track">
+                <div class="slider">
+                    <div class="thumb"></div>
+                    <div class="tooltip"></div>
+                </div>
+            </div>
+            <div class="buttons">
+                <span id="prev" class="button mega-octicon octicon-playback-rewind hide"></span>
+                <span id="play" class="button mega-octicon octicon-playback-play"></span>
+                <span id="pause" class="button mega-octicon octicon-playback-pause hide"></span>
+                <span id="next" class="button mega-octicon octicon-playback-fast-forward hide"></span>
+                <span id="stop" class="button mega-octicon octicon-primitive-square"></span>
+                <span id="volume" class="button mega-octicon octicon-unmute"></span>
+            </div>
+        </div>
         
         <script src="../friendlyCast/src/chromecast.js"></script>
         <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
@@ -179,6 +235,8 @@
         <script src="http://catdad.github.io/tiny.cdn/lib/toast/latest/toast.min.js"></script>
         <script src="views.js"></script>
         <script src="hash.js"></script>
+        <script src="controls.js"></script>
+        <script src="servercast.js"></script>
         
         <script>
             window.chrome && chromecast.setAppId();

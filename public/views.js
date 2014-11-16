@@ -1,114 +1,8 @@
 /*jslint browser: true, devel: true, expr: true */
-/*globals request, hash, chromecast, toast */
+/*globals request, hash, chromecast, server, toast */
 
 function playVideo(resource){
     window.location.href = resource;
-}
-
-function toastControls(actions){
-    var dismissFunc,
-        dismiss = function(){
-            dismissFunc && dismissFunc();
-        },
-        action = actions.map(function(el){
-            return {
-                name: el.name,
-                onclick: function(){
-                    dismiss();
-                    el.onclick();
-                }
-            };
-        });
-    
-    dismissFunc = toast.alert({    
-        message: 'Controls: ',    
-        dismissible: false,    
-        action: action
-    });
-}
-
-function serverPlay(url, name){
-    console.log('play', url, name);
-    var uri = '/session/play';
-    
-    if (url) {
-        uri += '?value=' + encodeURIComponent(url);
-    }
-    
-    request.json(uri, function(err, data){
-        if (err) {
-            toast.error('unexpected error: ' + err.message);
-        } else if (data.success) {
-            name && toast.success('playing ' + name);
-            toastControls([
-                {
-                    name: 'pause',
-                    onclick: serverPause
-                },{
-                    name: 'mute',
-                    onclick: serverMute
-                }
-            ]);
-        } else {
-            toast.error(data.error);
-        }
-    });
-}
-function serverPause(){
-    request.json('/session/pause', function(err, data){
-        if (err) {
-            toast.error('unexpected error: ' + err.message);
-        } else if (data.success) {
-            toast.alert({
-                message: 'click to play',
-                onclick: function(){
-                    console.log(arguments);
-                    serverPlay();
-                },
-                timeout: -1
-            });
-        } else {
-            toast.error(data.error);
-        }
-    });
-}
-function serverMute(){
-    request.json('/session/mute', function(err, data){
-        if (err) {
-            toast.error('unexpected error: ' + err.message);
-        } else if (data.success) {
-            toastControls([
-                {
-                    name: 'pause',
-                    onclick: serverPause
-                },{
-                    name: 'unmute',
-                    onclick: serverUnmute
-                }
-            ]);
-        } else {
-            toast.error(data.error);
-        }
-    });
-}
-function serverUnmute(){
-    request.json('/session/unmute', function(err, data){
-        if (err) {
-            toast.error('unexpected error: ' + err.message);
-        } else if (data.success) {
-            toastControls([
-                {
-                    name: 'pause',
-                    onclick: serverPause
-                },{
-                    name: 'mute',
-                    onclick: serverMute
-                }
-            ]);
-        } else {
-            toast.error(data.error);
-        }
-    });
 }
 
 //file views
@@ -139,6 +33,12 @@ var views = {
     //string shortener
     shorten: function(str){
         return (str.length > 20) ? (str.substring(0,18) + "...") : str;
+    },
+    //episode name cleaner
+    clean: function(str){
+        var idx = str.search(/s[0-9]{2}e[0-9]{2}/i);
+        var sub = (idx > 0) ? str.substr(0, idx) : str;
+        return sub.replace(/\./g, ' ').trim();
     },
     
     //constructors
@@ -190,10 +90,10 @@ var views = {
             
             function serverCast() {
                 close();
-                serverPlay(resource, name);
+                server.playNew(resource, name);
             }
             
-            (chromecast.isAvailable()) ? browserCast() : serverCast();
+            (chromecast.isAvailable() && false) ? browserCast() : serverCast();
         };
         
         modal.appendChild(playLocalButton);
@@ -253,6 +153,8 @@ var views = {
         div.className = 'file';
         div.setAttribute('data-path', file.path);
         div.title = file.name;
+//        div.setAttribute('data-title', this.shorten( this.clean(file.name) ));
+        div.setAttribute('data-title', this.clean(file.name));
         
         //build click handler
         div.onclick = function(){
@@ -284,22 +186,18 @@ var views = {
         if (file.isVirtual) icon.style.opacity = '.4';
         if (file.isFile && file.format !== 'mp4') icon.style.opacity = '.2';
         
-        //build name field
-        var name = document.createElement("div");
-        name.innerHTML = this.shorten(file.name);
         
         //add elements to the DOM
         div.innerHTML = "";
         div.appendChild(icon);
-        div.appendChild(name);
         
         //build episode field
         if (file.isFile){
-            var episodeNumber = document.createElement('div');
-            var episode = file.name.match(/(S|s)[0-9]{2}(E|e)[0-9]{2}|[0-9]{3}/);
-            episodeNumber.innerHTML = (episode) ? episode[0] : '&nbsp;';
-            episodeNumber.className = 'episode';
-            div.appendChild(episodeNumber);
+            var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
+            if (!episode) {
+                episode = file.name.match(/[0-9]{3}/);
+            }
+            div.setAttribute('data-episode', (episode) ? episode[0] : ' ');
         }
         
         div.setAttribute('data-filter', this.splitString(file.name));

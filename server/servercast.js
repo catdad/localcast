@@ -67,11 +67,30 @@ var Control = {
     unmute: function(callback){
         playerAction('unmute', callback);
     },
+    stop: function(callback){
+        playerAction('stop', callback);
+    },
     duration: function() {
         return globalPlayer ? globalPlayer.duration : undefined;
     },
     time: function() {
         return globalPlayer ? globalPlayer.currentTimte : undefined;
+    },
+    nowPlaying: function(callback){
+        callback(undefined, (function(){
+            if (!globalPlayer) {
+                return false;
+            } else if (globalPlayer.currentSession.playerState === 'IDLE') {
+                var reason = globalPlayer.currentSession.idleReason.toLowerCase();
+                console.log('player is idle: ', reason);
+                if (reason === 'cancelled' || reason === 'finished') {
+                    return false;    
+                }
+            }
+            
+            // if the code reached here, it is a playing session
+            return globalPlayer.currentSession;
+        })());
     }
 };
 
@@ -82,5 +101,13 @@ module.exports = {
         
         playerAction('play', undefined, url);
         return this;
+    },
+    nowPlaying: function(){
+        // Ew, ugly. I should update this.
+        var np = false;
+        Control.nowPlaying(function(err, data){
+            np = data;
+        });
+        return np;
     }
 };
