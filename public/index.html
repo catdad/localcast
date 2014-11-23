@@ -113,6 +113,81 @@
             svg.video path { fill: #263238; #B0CE03; }
             svg.folder path { fill: #263238; #CE5803; }
             
+            .icon {
+/*                background-image: url(img/icons.png);*/
+                background-image: url(img/icons.dark.png);
+                background-size: 64px;
+                width: 32px;
+                height: 32px;
+                line-height: 1rem;
+                display: inline-block;
+            }
+            .icon.icon-play{ background-position: 32px 0px; }
+            .icon.icon-cast{ background-position: 0px 0px; }
+            
+            .modal_wrapper {
+                position: fixed;
+                background: rgba(0,0,0,.6);
+                -webkit-transform: translateZ(0);
+                
+                transition: all 150ms ease;
+                will-change: top, left, right, bottom, opacity;
+            }
+            .modal_wrapper.open {
+                top: 0 !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+            }
+            
+            .modal {
+                position: absolute;
+                width: 90%;
+                max-width: 500px;
+                /* height set in JS */
+                height: 0px;
+                max-height: 80%;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                background: #eee;
+                color: #263238;
+                border-radius: 3px;
+                overflow: hidden;
+                -webkit-transform: translateZ(0);
+            }
+            .modal .title {
+                box-sizing: border-box;
+                font-size: 1.6rem;
+                text-align: center;
+                width: 100%;
+                display: block;
+                padding: 10px;
+                word-wrap: break-word;
+            }
+            .modal .thumb {
+                width: 100%;   
+            }
+            .modal button {
+                box-sizing: border-box;
+                width: 100%;
+                display: block;
+                padding: 15px 10px;;
+                margin: 0;
+                outline: none;
+                border: none;
+                font-size: 1.8rem;
+                vertical-align: baseline;
+                color: inherit;
+                cursor: pointer;
+            }
+            .modal button .icon {
+                margin-right: 7px;
+                vertical-align: bottom;
+            }
+            
             @media screen and (max-width: 480px){
                 body { font-size: .84rem; }
                 .navPart {
@@ -120,73 +195,14 @@
                     line-height: 1rem;
                 }
                 
+                .modal .title { font-size: 1rem; }
+                
                 .file {
                     width: 5rem;
                     height: 5rem;
                 }
                 .file:before { top: 5em; }
                 .file:after { top: 6em; }
-            }
-            
-            .modal_wrapper {
-                position: fixed;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: rgba(0,0,0,.8);
-                -webkit-transform: translateZ(0);
-            }
-            .modal {
-                position: absolute;
-                width: 90%;
-                max-width: 700px;
-                /* height set in JS */
-                height: 60%;
-                max-height: 700px;
-                top: 0;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                margin: auto;
-                background: #eee;
-                transition: height .5s ease;
-                -webkit-transform: translateZ(0);
-            }
-            .modal:after {
-                content: attr(data-name);
-                box-sizing: border-box;
-                font-size: 2rem;
-                text-align: center;
-                width: 100%;
-                display: block;
-                padding: 10px;
-                color: #eee;
-                word-wrap: break-word;
-            }
-            .modal .thumb {
-                width: 100%;   
-            }
-            .modal button {
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                box-sizing: border-box;
-                width: 50%;
-                padding: 15px 10px;;
-                margin: 0;
-                outline: none;
-                border: none;
-                background: rgba(0,0,0,.5);
-                color: white;
-                font-size: 1.5rem;
-                font-weight: bold;
-                cursor: pointer;
-            }
-            .modal button:nth-child(odd) {
-                right: 0;
-                left: auto;
-                border-left: 2px solid rgba(255,255,255,.6);
             }
             
             .t-wrap.t-wrap {
