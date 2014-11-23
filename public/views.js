@@ -1,8 +1,26 @@
 /*jslint browser: true, devel: true, expr: true */
 /*globals request, hash, chromecast, server, toast */
 
-function playVideo(resource){
+function playVideo(resource) {
     window.location.href = resource;
+}
+
+// event name enum (includes browser-specific events)
+var eventName = {
+    animationEnd: 'animationend',
+    transitionEnd: 'transitionend'
+};
+
+var raf = window.requestAnimationFrame || function(cb){ setTimeout(cb, 16); };
+var defer = function(cb){ setTimeout(cb, 0); };
+
+function once(dom, event, cb) {
+    var listener = function(){
+        dom.removeEventListener(event, listener);
+        cb.apply(undefined, arguments);
+    };
+    
+    dom.addEventListener(event, listener);
 }
 
 //file views
@@ -40,42 +58,111 @@ var views = {
         var sub = (idx > 0) ? str.substr(0, idx) : str;
         return sub.replace(/\./g, ' ').trim();
     },
+    elem: function(type, opts) {
+        opts = opts || {};
+        var el = document.createElement(type);
+        opts.className && (el.className = opts.className);
+        opts.text && (el.appendChild( document.createTextNode(opts.text) ));
+        return el;
+    },
     
     //constructors
-    Modal: function(thumb, resource, name){
-        var wrapper = document.createElement('div');
-        var modal = document.createElement('div');
-        wrapper.className = 'modal_wrapper';
-        modal.className = 'modal';
-        modal.setAttribute('data-name', name);
-        wrapper.appendChild(modal);
+    Modal: function(thumb, resource, name, domTrigger){
+        var wrapper = views.elem('div', { className: 'modal_wrapper' }),
+            modal = views.elem('div', { className: 'modal' }),
+            container = views.elem('div'),
+            image = views.elem('img', { className: 'thumb' }),
+            title = views.elem('div', { className: 'title', text: name });
+        
+        container.appendChild(title);
+        
+        // attempt to animate opening
+        var triggerBB = domTrigger.getBoundingClientRect();
+        wrapper.style.top = triggerBB.top + 'px';
+        wrapper.style.bottom = triggerBB.bottom + 'px';
+        wrapper.style.left = triggerBB.left + 'px';
+        wrapper.style.right = triggerBB.right + 'px';
+        
+        var playLocalButton = document.createElement('button');
+        var playCastButton = document.createElement('button');
+        
+        // keep track of both events
+        var imageLoaded = false,
+            transitionEnded = false;
+        
+        // this function should be executed after image has loaded and tranition has ended
+        var imageOnLoad = function(){
+            wrapper.appendChild(modal);
+            
+            // get necessary dimensions
+            var cWidth = modal.clientWidth,
+                width = image.width,
+                height = image.height;
+            
+            // insert the image first
+            modal.appendChild(image);
+            
+            // insert the two buttons created earlier
+            container.appendChild(playLocalButton);
+            container.appendChild(playCastButton);
+            
+            modal.appendChild(container);
+            
+            var containerHeight = container.offsetHeight;
+            
+            modal.style.height = ( cWidth * height / width ) + containerHeight + 'px';
+        };
+        
+        // wrapper transition callback
+        var wrapperTransitionEnded = function(){
+            if (imageLoaded) imageOnLoad();
+            else transitionEnded = true;
+        };
         
         document.body.appendChild(wrapper);
         
-        var image = document.createElement('img');
-        image.src = thumb;
-        image.className = 'thumb';
+        // execute the transition on the next animation frame
+        raf(function(){
+            // add callback for when the animation ends
+            once(wrapper, eventName.transitionEnd, wrapperTransitionEnded);
+            
+            // Chrome on Android won't trigger a transition if this is executed without a timeout,
+            // don't know why...
+            defer(function(){
+                wrapper.classList.add('open');
+            });
+        });
         
+        // add an onload callback and a source to the image
         image.onload = function(){
-            modal.style.height = image.clientHeight + 'px';  
+            if (transitionEnded) imageOnLoad();
+            else imageLoaded = true;
         };
-        
-        modal.appendChild(image);
+        image.src = thumb;
         
         function close(){
             this.closeModal = undefined;
             document.body.removeChild(wrapper);   
         }
         
+        // close Modal if clicking on the black space
         wrapper.onclick = function(ev){
-            console.log(ev);
             if (ev.target === wrapper) close();
         };
         
-        var playLocalButton = document.createElement('button');
-        playLocalButton.innerHTML = 'Play';
-        var playCastButton = document.createElement('button');
-        playCastButton.innerHTML = 'Cast';
+        // build the play and cast buttons
+        playLocalButton.className = 'play';
+        playCastButton.className = 'cast';
+        
+        var playIcon = views.elem('span', { className: 'icon icon-play' }),
+            playText = document.createTextNode('Play');
+        var castIcon = views.elem('span', { className: 'icon icon-cast' }),
+            castText = document.createTextNode('Cast');
+        
+        playLocalButton.appendChild(playIcon);
+        playLocalButton.appendChild(playText);
+        playCastButton.appendChild(castIcon);
+        playCastButton.appendChild(castText);
         
         playLocalButton.onclick = function(){
             playVideo(resource);    
@@ -95,9 +182,6 @@ var views = {
             
             (chromecast.isAvailable() && false) ? browserCast() : serverCast();
         };
-        
-        modal.appendChild(playLocalButton);
-        modal.appendChild(playCastButton);
     },
     
     nav: function(path, sep){
@@ -153,7 +237,6 @@ var views = {
         div.className = 'file';
         div.setAttribute('data-path', file.path);
         div.title = file.name;
-//        div.setAttribute('data-title', this.shorten( this.clean(file.name) ));
         div.setAttribute('data-title', this.clean(file.name));
         
         //build click handler
@@ -172,7 +255,7 @@ var views = {
                 stateObj.resource = stateObj.resource;
 //                hash.push(stateObj, true);
                 
-                views.Modal(file.thumb, file.resource, file.name);
+                views.Modal(file.thumb, file.resource, file.name, div);
             }
             else if (file.isVirtual){
                 stateObj.resource = file.path;
@@ -185,7 +268,6 @@ var views = {
         
         if (file.isVirtual) icon.style.opacity = '.4';
         if (file.isFile && file.format !== 'mp4') icon.style.opacity = '.2';
-        
         
         //add elements to the DOM
         div.innerHTML = "";
