@@ -79,14 +79,20 @@ var server = function(){
         if (url) {
             uri += '?value=' + encodeURIComponent(url);
         }
+        
+        var clearToast;
 
         request.json(uri, function(err, data){
+            clearToast && clearToast();
+            
             // check if there was a server error
             if (serverError(err, data)) { return; }
             
             name && toast.success('playing ' + name);
             nowPlaying();
         });
+        
+        clearToast = toast.log('Just a moment...', -1);
     }
     function play(){
         console.log('got play request');
