@@ -9,12 +9,14 @@ var express = require('express');
 var app = express();
 
 var proxy = require('http-proxy').createProxyServer({});
+var qr = require('qr-image');
 
 var browse = require('./browse.js');
 var config = require('./config.json');
 var port = config.port;
 
 var servercast = require('./servercast.js');
+var ip = require('./ip.js');
 
 // root is one up from the running dir
 var rootDir = path.resolve(__dirname, '..');
@@ -161,6 +163,25 @@ app.use(express.static(path.resolve(rootDir, 'public')));
 app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
 app.use('/lib/octicons', express.static(path.resolve('.', 'lib/octicons')));
 
+// generate links to the home page inside the local network
+app.get('/link', function(req, res){
+    var format = (req.query.f || 'png').toLowerCase(),
+        address = 'http://' + ip() + ':' + port;
+    
+    if (format === 'json') {
+        res.send({ url: address });
+        return;
+    }
+    
+    if (format !== 'pdf' && format !== 'svg') {
+        format = 'png';
+    }
+    
+    var code = qr.image(address, { type: format });
+    res.type(format);
+    code.pipe(res);
+});
+
 //probably requesting a directory
 app.get('*', function(req, res, next){
     res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
@@ -172,4 +193,4 @@ app.get('*', function(req, res, next){
 //--------------
 
 app.listen(port);
-console.log('port', port);
+console.log('listening at', ip() + ':' + port);
