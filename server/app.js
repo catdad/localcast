@@ -12,7 +12,7 @@ var proxy = require('http-proxy').createProxyServer({});
 var qr = require('qr-image');
 
 var browse = require('./browse.js');
-var config = require('./config.json');
+var config = require('./config.js');
 var port = config.port;
 
 var servercast = require('./servercast.js');
