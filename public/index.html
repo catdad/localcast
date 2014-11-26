@@ -130,14 +130,16 @@
                 background: rgba(0,0,0,.6);
                 -webkit-transform: translateZ(0);
                 
+                opacity: 0;
                 transition: all 80ms ease-out;
-                will-change: top, left, right, bottom;
+                will-change: top, left, right, bottom, opacity;
             }
             .modal_wrapper.open {
                 top: 0 !important;
                 bottom: 0 !important;
                 left: 0 !important;
                 right: 0 !important;
+                opacity: 1;
                 transition: all 180ms ease-in;
             }
             .modal_wrapper .loading {
@@ -165,7 +167,7 @@
             
             .modal {
                 position: absolute;
-                width: 90%;
+                width: 94%;
                 max-width: 500px;
                 /* height set in JS */
                 height: 0px;
