@@ -6,9 +6,16 @@ function playVideo(resource) {
 }
 
 // event name enum (includes browser-specific events)
+var fake = document.createElement('div'),
+    getName = function(prop){
+        return fake.style[prop.toLowerCase()] !== undefined ? prop.toLowerCase() + 'end' :
+               fake.style['Webkit' + prop] !== undefined ? 'webkit' + prop + 'End' :
+               fake.style['O' + prop] !== undefined ? 'o' + prop + 'End' :
+               fake.style['Moz' + prop] !== undefined ? 'moz' + prop + 'End' : prop.toLowerCase() + 'end';
+    };
 var eventName = {
-    animationEnd: 'animationend',
-    transitionEnd: 'transitionend'
+    animationEnd: getName('Animation'),
+    transitionEnd: getName('Transition')
 };
 
 var raf = window.requestAnimationFrame || function(cb){ setTimeout(cb, 16); };
@@ -27,7 +34,7 @@ function once(dom, event, cb) {
 var views = {
     //icon router
     img: function(type){
-        var temp = document.createElement('div');
+        var temp = views.elem('div');
         
         switch (type){
             case "folder":
@@ -67,7 +74,7 @@ var views = {
     },
     
     //constructors
-    Modal: function(thumb, resource, name, domTrigger){
+    Modal: function(thumb, resource, name, domTrigger) {
         var wrapper = views.elem('div', { className: 'modal_wrapper' }),
             modal = views.elem('div', { className: 'modal' }),
             container = views.elem('div'),
@@ -79,9 +86,9 @@ var views = {
         // attempt to animate opening
         var triggerBB = domTrigger.getBoundingClientRect();
         wrapper.style.top = triggerBB.top + 'px';
-        wrapper.style.bottom = triggerBB.bottom + 'px';
         wrapper.style.left = triggerBB.left + 'px';
-        wrapper.style.right = triggerBB.right + 'px';
+        wrapper.style.bottom = window.innerHeight - triggerBB.top - triggerBB.height + 'px';
+        wrapper.style.right = window.innerWidth - triggerBB.left - triggerBB.width + 'px';
         
         var playLocalButton = document.createElement('button');
         var playCastButton = document.createElement('button');
@@ -91,7 +98,11 @@ var views = {
             transitionEnded = false;
         
         // this function should be executed after image has loaded and tranition has ended
-        var imageOnLoad = function(){
+        var imageOnLoad = function() {
+            while(wrapper.firstChild) { 
+                wrapper.removeChild(wrapper.firstChild);
+            }
+            
             wrapper.appendChild(modal);
             
             // get necessary dimensions
@@ -110,43 +121,67 @@ var views = {
             
             var containerHeight = container.offsetHeight;
             
-            modal.style.height = ( cWidth * height / width ) + containerHeight + 'px';
+            // let's animate the height transition as well
+            raf(function() {
+                modal.style.height = ( cWidth * height / width ) + containerHeight + 'px';
+            });
         };
         
         // wrapper transition callback
-        var wrapperTransitionEnded = function(){
+        var wrapperTransitionEnded = function() {
             if (imageLoaded) imageOnLoad();
-            else transitionEnded = true;
+            else {
+                transitionEnded = true;
+                // add spinner while the image loads
+                wrapper.appendChild(views.elem('div', { className: 'loading' }));
+            }
         };
         
         document.body.appendChild(wrapper);
         
         // execute the transition on the next animation frame
-        raf(function(){
+        raf(function() {
             // add callback for when the animation ends
             once(wrapper, eventName.transitionEnd, wrapperTransitionEnded);
             
             // Chrome on Android won't trigger a transition if this is executed without a timeout,
             // don't know why...
-            defer(function(){
+            defer(function() {
                 wrapper.classList.add('open');
             });
         });
         
         // add an onload callback and a source to the image
-        image.onload = function(){
+        image.onload = function() {
             if (transitionEnded) imageOnLoad();
             else imageLoaded = true;
         };
         image.src = thumb;
         
-        function close(){
-            this.closeModal = undefined;
-            document.body.removeChild(wrapper);   
+        // function to initiate the modal closing process
+        function close() {
+            // when the modal is done closing, hide it
+            once(modal, eventName.transitionEnd, function(ev){
+                // stop this event from triggering the wrapper transition end as well
+                ev.preventDefault();
+                ev.stopPropagation();
+                
+                modal.style.visibility = 'hidden';
+                // remove the open class to animate
+                wrapper.classList.remove('open');
+            });
+            
+            // when the wrapper is done animating, remove it
+            once(wrapper, eventName.transitionEnd, function(){
+                document.body.removeChild(wrapper);  
+            });
+            
+            // start the remove animation
+            modal.classList.add('remove'); 
         }
         
         // close Modal if clicking on the black space
-        wrapper.onclick = function(ev){
+        wrapper.onclick = function(ev) {
             if (ev.target === wrapper) close();
         };
         
@@ -191,8 +226,7 @@ var views = {
         var that = this;
         //generate links for nav
         var linker = function(href, display){
-            var span = document.createElement("span");
-            span.className = 'navPart';
+            var span = views.elem("span", { className: 'navPart' });
             
             span.onclick = function(){ 
                 hash.push({
@@ -204,14 +238,15 @@ var views = {
             span.innerHTML = display;
             return span;
         };
+        
         //generate nav separators
         var separator = function(){
-            var s = document.createElement("span");
+            var s = views.elem("span");
             s.innerHTML = "  &raquo;  ";
             return s;
         };
 
-        var dom = document.createElement('div');
+        var dom = views.elem('div');
         
         if (path) {
             path.split(sep).forEach(function(el, i, arr){
@@ -233,8 +268,7 @@ var views = {
     },
     
     fileView: function(file){
-        var div = document.createElement('div');
-        div.className = 'file';
+        var div = views.elem('div', { className: 'file' });
         div.setAttribute('data-path', file.path);
         div.title = file.name;
         div.setAttribute('data-title', this.clean(file.name));
