@@ -8,7 +8,7 @@ var send = require('send');
 var ip = require('./ip.js');
 var ffmpeg = require('./ffmpeg.js');
 
-var config = require('./config.json');
+var config = require('./config.js');
 var globalRoot = config.root;
 
 var urlRoot = '';

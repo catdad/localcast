@@ -1,7 +1,7 @@
 /* jshint node: true, -W083 */
 
 var os = require('os');
-var config = require('./config.json');
+var config = require('./config.js');
 
 var ip;
 
