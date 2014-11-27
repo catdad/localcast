@@ -74,31 +74,107 @@ var views = {
     },
     
     //constructors
-    Modal: function(thumb, resource, name, domTrigger) {
+    Modal: function(contentDom, onOpen, origin) {
         var wrapper = views.elem('div', { className: 'modal_wrapper' }),
-            modal = views.elem('div', { className: 'modal' }),
+            onClose;
+            
+        contentDom.classList.add('modal');
+        
+        
+        if (origin && origin.x !== undefined && origin.y !== undefined) {
+            wrapper.style.transformOrigin = origin.x + 'px ' + origin.y + 'px';
+        } else {
+            wrapper.style.transformOrigin = '50% 50%';
+        }
+        
+        // wrapper transition callback
+        var wrapperTransitionEnded = function() {
+            onOpen && onOpen(wrapper);
+        };
+        
+        document.body.appendChild(wrapper);
+        
+        // execute the transition on the next animation frame
+        raf(function() {
+            // add callback for when the animation ends
+            once(wrapper, eventName.transitionEnd, wrapperTransitionEnded);
+            
+            // Chrome on Android won't trigger a transition if this is executed without a timeout,
+            // don't know why...
+            defer(function() {
+                wrapper.classList.add('open');
+            });
+        });
+        
+        function removeModalContent(done) {
+            // when the modal is done closing, hide it
+            once(contentDom, eventName.transitionEnd, function(ev){
+                // stop this event from triggering the wrapper transition end as well
+                ev.preventDefault();
+                ev.stopPropagation();
+                
+                // hide the content for now -- it can be removed later
+                contentDom.style.visibility = 'hidden';
+                
+                // trigger the done callback
+                done && done();
+            });
+        }
+        
+        function closeModal(done) {
+            // when the wrapper is done animating, remove it
+            once(wrapper, eventName.transitionEnd, function(){
+                document.body.removeChild(wrapper);
+                
+                // trigger done callback if it exists
+                done && done();
+                
+                // trigger onClose, if one was provided
+                onClose && onClose();
+            });
+            
+            // remove the open class to animate
+            wrapper.classList.remove('open');
+        }
+        
+        // close Modal if clicking on the black space
+        wrapper.onclick = function(ev) {
+            if (ev.target === wrapper) closeModal();
+        };
+        
+        return {
+            close: closeModal,
+            replace: function(){},
+            onClose: function(cb){
+                onClose = typeof cb === 'function' ? cb : undefined;
+            }
+        };
+    },
+    videoModal: function(ev, thumb, resource, name, domTrigger){
+        var modal = views.elem('div'),
             container = views.elem('div'),
             image = views.elem('img', { className: 'thumb' }),
             title = views.elem('div', { className: 'title', text: name });
         
         container.appendChild(title);
         
-        // attempt to animate opening
+        // get the origin to use for animation
         var triggerBB = domTrigger.getBoundingClientRect(),
-            xOrg = (triggerBB.left + triggerBB.right) / 2,
-            yOrg = (triggerBB.top + triggerBB.bottom) / 2;
-        
-        wrapper.style.transformOrigin = xOrg + 'px ' + yOrg + 'px';
+            origin = {
+                x: (triggerBB.left + triggerBB.right) / 2,
+                y: (triggerBB.top + triggerBB.bottom) / 2
+            };
         
         var playLocalButton = document.createElement('button');
         var playCastButton = document.createElement('button');
-        
-        // keep track of both events
-        var imageLoaded = false,
-            transitionEnded = false;
+      
+        // first, queue the image to load, and keep track here
+        var modalIsOpen = false,
+            imageIsLoaded = false;
         
         // this function should be executed after image has loaded and tranition has ended
-        var imageOnLoad = function() {
+        var imageOnLoad = function(wrapper) {
+            // make sure the modal is empty
             while(wrapper.firstChild) { 
                 wrapper.removeChild(wrapper.firstChild);
             }
@@ -127,65 +203,14 @@ var views = {
             });
         };
         
-        // wrapper transition callback
-        var wrapperTransitionEnded = function() {
-            if (imageLoaded) imageOnLoad();
-            else {
-                transitionEnded = true;
-                // add spinner while the image loads
-                wrapper.appendChild(views.elem('div', { className: 'loading' }));
-            }
-        };
-        
-        document.body.appendChild(wrapper);
-        
-        // execute the transition on the next animation frame
-        raf(function() {
-            // add callback for when the animation ends
-            once(wrapper, eventName.transitionEnd, wrapperTransitionEnded);
-            
-            // Chrome on Android won't trigger a transition if this is executed without a timeout,
-            // don't know why...
-            defer(function() {
-                wrapper.classList.add('open');
-            });
-        });
-        
         // add an onload callback and a source to the image
         image.onload = function() {
-            if (transitionEnded) imageOnLoad();
-            else imageLoaded = true;
+            if (modalIsOpen) imageOnLoad();
+            else imageIsLoaded = true;
         };
         image.src = thumb;
         
-        // function to initiate the modal closing process
-        function close() {
-            // when the modal is done closing, hide it
-            once(modal, eventName.transitionEnd, function(ev){
-                // stop this event from triggering the wrapper transition end as well
-                ev.preventDefault();
-                ev.stopPropagation();
-                
-                modal.style.visibility = 'hidden';
-                // remove the open class to animate
-                wrapper.classList.remove('open');
-            });
-            
-            // when the wrapper is done animating, remove it
-            once(wrapper, eventName.transitionEnd, function(){
-                document.body.removeChild(wrapper);  
-            });
-            
-            // start the remove animation
-            modal.classList.add('remove'); 
-        }
-        
-        // close Modal if clicking on the black space
-        wrapper.onclick = function(ev) {
-            if (ev.target === wrapper) close();
-        };
-        
-        // build the play and cast buttons
+        // Build the play and cast buttons while we wait for the image
         playLocalButton.className = 'play';
         playCastButton.className = 'cast';
         
@@ -217,6 +242,17 @@ var views = {
             
             (chromecast.isAvailable() && false) ? browserCast() : serverCast();
         };
+        
+        var thisModal = views.Modal(modal, function onOpen(wrapper){
+            
+            if (imageIsLoaded) imageOnLoad(wrapper);
+            else {
+                modalIsOpen = true;
+                // add spinner while the image loads
+                wrapper.appendChild(views.elem('div', { className: 'loading' }));
+            }
+            
+        }, origin);
     },
     
     nav: function(path, sep){
@@ -274,7 +310,7 @@ var views = {
         div.setAttribute('data-title', this.clean(file.name));
         
         //build click handler
-        div.onclick = function(){
+        div.onclick = function(ev){
             var stateObj = {
                 resource: file.path,
                 title: file.name,
@@ -289,7 +325,7 @@ var views = {
                 stateObj.resource = stateObj.resource;
 //                hash.push(stateObj, true);
                 
-                views.Modal(file.thumb, file.resource, file.name, div);
+                views.videoModal(ev, file.thumb, file.resource, file.name, div);
             }
             else if (file.isVirtual){
                 stateObj.resource = file.path;
