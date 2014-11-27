@@ -128,19 +128,24 @@
             .modal_wrapper {
                 position: fixed;
                 background: rgba(0,0,0,.6);
-                -webkit-transform: translateZ(0);
+                
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
                 
                 opacity: 0;
-                transition: all 80ms ease-out;
-                will-change: top, left, right, bottom, opacity;
+                transform: scale(0,0);
+                transform: scale3d(0,0,0);
+                
+                transition: all 200ms ease-out;
+                will-change: transform, opacity;
             }
             .modal_wrapper.open {
-                top: 0 !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
+                transform: scale(1,1);
+                transform: scale3d(1,1,1);
                 opacity: 1;
-                transition: all 180ms ease-in;
+                transition: all 300ms ease-in;
             }
             .modal_wrapper .loading {
                 height: 32px;
@@ -183,7 +188,7 @@
                 overflow: hidden;
                 -webkit-transform: translateZ(0);
                 
-                transition: height 220ms, transform 220ms ease-out;
+                transition: height 250ms ease-out, transform 250ms ease-out;
                 will-change: transform, height;
             }
             .modal.remove {

@@ -84,11 +84,11 @@ var views = {
         container.appendChild(title);
         
         // attempt to animate opening
-        var triggerBB = domTrigger.getBoundingClientRect();
-        wrapper.style.top = triggerBB.top + 'px';
-        wrapper.style.left = triggerBB.left + 'px';
-        wrapper.style.bottom = window.innerHeight - triggerBB.top - triggerBB.height + 'px';
-        wrapper.style.right = window.innerWidth - triggerBB.left - triggerBB.width + 'px';
+        var triggerBB = domTrigger.getBoundingClientRect(),
+            xOrg = (triggerBB.left + triggerBB.right) / 2,
+            yOrg = (triggerBB.top + triggerBB.bottom) / 2;
+        
+        wrapper.style.transformOrigin = xOrg + 'px ' + yOrg + 'px';
         
         var playLocalButton = document.createElement('button');
         var playCastButton = document.createElement('button');
