@@ -14,7 +14,8 @@
     });
     
     var Hash = function(){
-        var that = this;
+        var that = this,
+            nextPop = [];
         
         this.validateState = function(state){
             //make sure the object exists
@@ -41,6 +42,7 @@
         
         this.push = function(state, navigate){
             state = this.validateState(state);
+            console.log('pushing', state);
             window.history.pushState(state.resource, state.title, state.url);
             navigate && this.navigate(state.resource);
             return this;
@@ -72,8 +74,37 @@
             });
         };
         
+        this.state = function(){
+            return history.state;
+        };
+        
+        this.onNextPop = function(fn){
+            if (fn && typeof fn === 'function') {
+                nextPop.push(fn);
+            }
+        };
+        
         window.onpopstate = function(ev){
-            that.navigate(ev.state);
+            var defaultPrevented = false,
+                prevent = function(){
+                    defaultPrevented = true;
+                };
+            
+            while(nextPop.length) {
+                var fn = nextPop.shift();
+                if (fn && typeof fn === 'function') {
+                    fn({ preventDefault: prevent });
+                }
+            }
+            
+            if (!defaultPrevented) {
+                that.navigate(ev.state);
+            } else {
+                ev.preventDefault();
+
+                // got forward, so that the page is actually maintained
+                history.forward();
+            }
         };
     };
     

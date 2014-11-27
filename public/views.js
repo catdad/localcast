@@ -76,7 +76,7 @@ var views = {
     //constructors
     Modal: function(contentDom, onOpen, origin) {
         var wrapper = views.elem('div', { className: 'modal_wrapper' }),
-            onClose, onBeforeClose;
+            onClose, onBeforeClose, isClosed = false;
             
         contentDom.classList.add('modal');
         
@@ -125,6 +125,9 @@ var views = {
         }
         
         function closeModal(done) {
+            if (isClosed) return;
+            else isClosed = true;
+            
             var defaultPrevented = false;
             
             // trigger the beforeClose even before anything else happens
@@ -153,6 +156,13 @@ var views = {
         wrapper.onclick = function(ev) {
             if (ev.target === wrapper) closeModal();
         };
+        
+        hash.onNextPop(function(ev){
+            if (!isClosed) {
+                ev.preventDefault();
+                closeModal();
+            }
+        });
         
         return {
             close: closeModal,
@@ -328,7 +338,7 @@ var views = {
             }
             
             function serverCast() {
-                close();
+                thisModal.close();
                 server.playNew(resource, name);
             }
             
