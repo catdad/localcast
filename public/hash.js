@@ -42,7 +42,6 @@
         
         this.push = function(state, navigate){
             state = this.validateState(state);
-            console.log('pushing', state);
             window.history.pushState(state.resource, state.title, state.url);
             navigate && this.navigate(state.resource);
             return this;
