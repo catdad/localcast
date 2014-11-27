@@ -147,6 +147,10 @@
                 opacity: 1;
                 transition: all 300ms ease-in;
             }
+            .modal_wrapper.dim {
+                background: rgba(0,0,0,.95);
+                transition: background 1s ease;
+            }
             .modal_wrapper .loading {
                 height: 32px;
                 width: 32px;
@@ -190,6 +194,10 @@
                 
                 transition: height 250ms ease-out, transform 250ms ease-out;
                 will-change: transform, height;
+            }
+            .modal.video {
+                max-width: 94%;
+                height: auto;
             }
             .modal.remove {
                 transform: scale(0,0);

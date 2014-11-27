@@ -76,10 +76,9 @@ var views = {
     //constructors
     Modal: function(contentDom, onOpen, origin) {
         var wrapper = views.elem('div', { className: 'modal_wrapper' }),
-            onClose;
+            onClose, onBeforeClose;
             
         contentDom.classList.add('modal');
-        
         
         if (origin && origin.x !== undefined && origin.y !== undefined) {
             wrapper.style.transformOrigin = origin.x + 'px ' + origin.y + 'px';
@@ -117,11 +116,24 @@ var views = {
                 contentDom.style.visibility = 'hidden';
                 
                 // trigger the done callback
-                done && done();
+                raf(function(){
+                    done && done();
+                });
             });
+            
+            contentDom.classList.add('remove');
         }
         
         function closeModal(done) {
+            var defaultPrevented = false;
+            
+            // trigger the beforeClose even before anything else happens
+            onBeforeClose && onBeforeClose({
+                preventDefault: function(){ defaultPrevented = true; }
+            });
+            
+            if (defaultPrevented) return;
+            
             // when the wrapper is done animating, remove it
             once(wrapper, eventName.transitionEnd, function(){
                 document.body.removeChild(wrapper);
@@ -144,11 +156,90 @@ var views = {
         
         return {
             close: closeModal,
-            replace: function(){},
+            replace: function(newContent, cb){
+                removeModalContent(function(){
+                    cb && cb(wrapper);
+                });
+            },
             onClose: function(cb){
                 onClose = typeof cb === 'function' ? cb : undefined;
+            },
+            onBeforeClose: function(cb) {
+                onBeforeClose = typeof cb === 'function' ? cb : undefined;
             }
         };
+    },
+    playModal: function(resource, existingModal){
+        var vid = views.elem('video', { className: 'modal video' });
+        vid.src = resource;
+        vid.controls = 'controls';
+        
+        var duration;
+        
+        function togglePlaying(ev) {
+            ev.preventDefault();
+            
+            if (vid.ended) return;
+            
+            if (vid.paused) {
+                vid.play();
+            } else {
+                vid.pause();
+            }
+        }
+        
+        function keyPress(ev) {
+            if (ev.which === 32 || ev.keyCode === 32) {
+                togglePlaying(ev);
+            }
+        }
+        
+        vid.addEventListener('click', togglePlaying);
+        window.addEventListener('keypress', keyPress);
+        
+        vid.addEventListener('durationchange', function(ev){
+            duration = vid.duration;
+        });
+        
+        function setupVideoControls(wrapper) {
+            window.vid = vid;
+            
+            vid.addEventListener('playing', function(){
+                if (!wrapper.classList.contains('dim')) {
+                    wrapper.classList.add('dim');
+                }
+            });
+            
+            vid.addEventListener('ended', function(){
+                window.removeEventListener('keypress', keyPress);
+                
+                raf(function(){
+                    existingModal.close();
+                });
+            });
+        }
+        
+        function onWrapperReceived(wrapper) {
+            existingModal.onBeforeClose(function(ev){
+                //ev.preventDefault();
+                //return;
+                wrapper.classList.remove('dim');
+            });
+            
+            while(wrapper.firstChild) {
+                wrapper.removeChild(wrapper.firstChild);
+            }
+            
+            wrapper.appendChild(vid);
+            setupVideoControls(wrapper);
+            vid.play();
+        }
+        
+        if (existingModal) {
+            existingModal.replace(undefined, onWrapperReceived);
+        } else {
+            existingModal = views.Modal(vid, onWrapperReceived);
+        }
     },
     videoModal: function(ev, thumb, resource, name, domTrigger){
         var modal = views.elem('div'),
@@ -225,7 +316,8 @@ var views = {
         playCastButton.appendChild(castText);
         
         playLocalButton.onclick = function(){
-            playVideo(resource);    
+            views.playModal(resource, thisModal);
+//            playVideo(resource);    
         };
         playCastButton.onclick = function(){
             function browserCast() {
