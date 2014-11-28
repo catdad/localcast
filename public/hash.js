@@ -18,6 +18,8 @@
             nextPop = [];
         
         this.validateState = function(state){
+            console.log(state);
+            
             //make sure the object exists
             state = state || {};
             state.resource = state.resource || window.location.hash.replace('#', '');
@@ -100,9 +102,6 @@
                 that.navigate(ev.state);
             } else {
                 ev.preventDefault();
-
-                // got forward, so that the page is actually maintained
-                history.forward();
             }
         };
     };
