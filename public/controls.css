@@ -25,9 +25,9 @@
 }
 
 #controls.disabled {
-    -webkit-filter: blur(1.5px) grayscale(60%);
-       -moz-filter: blur(1.5px) grayscale(60%);
-            filter: blur(1.5px) grayscale(60%);
+    -webkit-filter: blur(1px) grayscale(60%);
+       -moz-filter: blur(1px) grayscale(60%);
+            filter: blur(1px) grayscale(60%);
 }
 #controls.disabled:after {
     content: '';
@@ -38,6 +38,9 @@
     width: 100%;
     background: #eee;
     opacity: .4;
+}
+#controls.disabled .slider {
+    opacity: 0;
 }
 
 #controls .buttons { 
@@ -84,6 +87,7 @@
     width: 14px;
     height: 14px;
     border-radius: 50%;
+    opacity: 1;
 
     /* reposition the center of the thumb */
     position: relative;
