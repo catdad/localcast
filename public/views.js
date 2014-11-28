@@ -135,7 +135,10 @@ var views = {
                 preventDefault: function(){ defaultPrevented = true; }
             });
             
-            if (defaultPrevented) return;
+            if (defaultPrevented) { 
+                isClosed = false;
+                return;
+            }
             
             // when the wrapper is done animating, remove it
             once(wrapper, eventName.transitionEnd, function(){
@@ -157,12 +160,16 @@ var views = {
             if (ev.target === wrapper) closeModal();
         };
         
+        // close the modal on the next pop state
         hash.onNextPop(function(ev){
             if (!isClosed) {
                 ev.preventDefault();
                 closeModal();
             }
         });
+        
+        // push the current state onto the stack
+        hash.push({ resource: hash.state() });
         
         return {
             close: closeModal,
