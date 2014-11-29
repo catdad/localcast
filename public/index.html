@@ -31,7 +31,7 @@
                 width: 100%;
                 font-family: Roboto, sans-serif;
                 font-size: 1rem;
-                background: #eee;
+                background: #eef1f1;
                 color: #263238;
             }
             
@@ -45,10 +45,8 @@
                 padding: 15px 0;
                 text-align: center;
                 background: white;
-                box-shadow: 0 5px 25px -12px black;
+                box-shadow: 0 5px 15px -10px black;
                 
-                border-radius: 15px/2px;
-                overflow: hidden;
             }
             
             .file {
@@ -116,22 +114,22 @@
             }
             ::-webkit-input-placeholder {
                 color: #eee;
-                opacity: 0.5;
+                opacity: 0.7;
                 text-align: center;
             }
             :-moz-placeholder {
                 color: #eee;
-                opacity: 0.5;
+                opacity: 0.7;
                 text-align: center;
             }
             ::-moz-placeholder {
                 color: #eee;
-                opacity: 0.5;
+                opacity: 0.7;
                 text-align: center;
             }
             :-ms-input-placeholder {
                 color: #eee;
-                opacity: 0.5;
+                opacity: 0.7;
                 text-align: center;
             }
             
@@ -141,14 +139,21 @@
             .icon {
                 /*background-image: url(img/icons.png);*/
                 background-image: url(img/icons.dark.png);
-                background-size: 64px;
+                background-position: top left, 0px 0px;
+                background-origin: content-box;
+                background-clip: content-box;
+                background-size: 128px; /* n/3 */
                 width: 32px;
                 height: 32px;
                 line-height: 1rem;
                 display: inline-block;
             }
-            .icon.icon-play{ background-position: 32px 0px; }
-            .icon.icon-cast{ background-position: 0px 0px; }
+            .icon.icon-stop  { background-position: 32px  0px; }
+            .icon.icon-pause { background-position: 64px  0px; }
+            .icon.icon-play  { background-position: 96px  0px; }
+            .icon.icon-cast  { background-position:  0px  0px; }
+            .icon.icon-mute { background-position: 96px 32px; }
+            .icon.icon-unmute { background-position: 0px 32px; }
             
             .modal_wrapper {
                 position: fixed;
@@ -225,6 +230,9 @@
                 height: auto;
                 background: transparent;
             }
+            .modal.list {
+                height: auto;
+            }
             .modal.remove {
                 transform: scale(0,0);
                 transform: scale3d(0,0,0);
@@ -240,6 +248,10 @@
             }
             .modal .thumb {
                 width: 100%;   
+            }
+            .modal .heading {
+                text-align: center;
+                padding: 10px 0;
             }
             .modal button {
                 display: block;
@@ -326,11 +338,12 @@
             </div>
             <div class="buttons">
                 <span id="prev" class="button mega-octicon octicon-playback-rewind hide"></span>
-                <span id="play" class="button mega-octicon octicon-playback-play"></span>
-                <span id="pause" class="button mega-octicon octicon-playback-pause hide"></span>
+                <span id="play" class="button icon icon-play"></span>
+                <span id="pause" class="button icon icon-pause hide"></span>
                 <span id="next" class="button mega-octicon octicon-playback-fast-forward hide"></span>
-                <span id="stop" class="button mega-octicon octicon-primitive-square"></span>
-                <span id="volume" class="button mega-octicon octicon-unmute"></span>
+                <span id="stop" class="button icon icon-stop"></span>
+                <span id="volume" class="button icon icon-unmute"></span>
+                <span id="cast" class="button icon icon-cast"></span>
             </div>
         </div>
         

@@ -16,6 +16,7 @@ var config = require('./config.js');
 var port = config.port;
 
 var servercast = require('./servercast.js');
+var servercast2 = require('./servercast2.js');
 var ip = require('./ip.js');
 
 // root is one up from the running dir
@@ -51,7 +52,7 @@ app.get('/', function(req, res){
 });
 
 function send(res, err, data){
-    var nowPlaying = servercast.nowPlaying();
+    var nowPlaying = servercast2.session();
     data = data || {};
     data.nowPlaying = nowPlaying;
     
@@ -104,6 +105,11 @@ app.get('/virtualthumb/:dir/*', function(req, res){
     var relativePath = decodeURIComponent(req.url).replace('/virtualthumb/' + req.params.dir + '/', '').split('/');
     
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
+});
+
+// router the servercast module
+app.get('/session2/:action', function(req, res){
+    servercast2.router(req.params.action, req.query, res);
 });
 
 //manage servercast sessions

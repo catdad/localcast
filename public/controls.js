@@ -76,6 +76,7 @@ var player = (function(window){
         play: document.querySelector('#play'),
         pause: document.querySelector('#pause'),
         stop: document.querySelector('#stop'),
+        cast: document.querySelector('#cast'),
         volume: document.querySelector('#volume'),
         show: function() {
             dom.controls.classList.remove('disabled');
@@ -97,12 +98,12 @@ var player = (function(window){
             dom.pause.classList.add('hide');
         },
         mute: function(){
-            dom.volume.classList.remove('octicon-unmute');
-            dom.volume.classList.add('octicon-mute');
+            dom.volume.classList.remove('icon-unmute');
+            dom.volume.classList.add('icon-mute');
         },
         unmute: function(){
-            dom.volume.classList.add('octicon-unmute');
-            dom.volume.classList.remove('octicon-mute');
+            dom.volume.classList.add('icon-unmute');
+            dom.volume.classList.remove('icon-mute');
         }
     };
     
@@ -236,8 +237,10 @@ var player = (function(window){
             events.asyncTrigger('pause');
         }, false);
         dom.stop.addEventListener('click', function(){
-            
             events.asyncTrigger('stop');
+        }, false);
+        dom.cast.addEventListener('click', function(){
+            events.asyncTrigger('castSelect');
         }, false);
 
         var mute = function() {
@@ -250,7 +253,7 @@ var player = (function(window){
         };
 
         dom.volume.addEventListener('click', function(){
-            if (dom.volume.classList.contains('octicon-mute')) {
+            if (dom.volume.classList.contains('icon-mute')) {
                 unmute();
             } else {
                 mute();
@@ -348,30 +351,30 @@ var player = (function(window){
 
 
 // sample events
-    player.on('seeking', function(ev){
-        console.log('player event', 'seek', ev);
-    });
-
-    player.on('seeked', function(ev){
-        console.log('player event', 'seekEnd', ev);
-    });
-
-    player.on('play', function(ev){
-        console.log('player event', 'play', ev);
-    });
-
-    player.on('pause', function(ev){
-        console.log('player event', 'pause', ev);
-    });
-
-    player.on('mute', function(ev){
-        console.log('player event', 'mute', ev);
-    });
-
-    player.on('unmute', function(ev){
-        console.log('player event', 'unmute', ev);
-    });
-
-    player.on('ended', function(ev){
-        console.log('player event', 'ended', ev);
-    });
+//    player.on('seeking', function(ev){
+//        console.log('player event', 'seek', ev);
+//    });
+//
+//    player.on('seeked', function(ev){
+//        console.log('player event', 'seekEnd', ev);
+//    });
+//
+//    player.on('play', function(ev){
+//        console.log('player event', 'play', ev);
+//    });
+//
+//    player.on('pause', function(ev){
+//        console.log('player event', 'pause', ev);
+//    });
+//
+//    player.on('mute', function(ev){
+//        console.log('player event', 'mute', ev);
+//    });
+//
+//    player.on('unmute', function(ev){
+//        console.log('player event', 'unmute', ev);
+//    });
+//
+//    player.on('ended', function(ev){
+//        console.log('player event', 'ended', ev);
+//    });

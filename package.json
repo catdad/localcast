@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server/app.js"
+    "start": "node server/app.js",
+    "debug": "node-theseus server/app.js"
   },
   "author": "Kiril Vatev",
   "license": "MIT",
@@ -15,6 +16,7 @@
     "fluent-ffmpeg": "~1.7.1",
     "http-proxy": "~1.2.0",
     "chromecast-player": "~0.1.6",
-    "qr-image": "~2.0.0"
+    "qr-image": "~2.0.0",
+    "chromecast-js": "~0.1.4"
   }
 }
