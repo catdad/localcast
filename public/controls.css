@@ -65,18 +65,15 @@
     border-radius: 50%;
     margin: 8px;
     
-/*    box-shadow: 0 0 0 8px transparent;*/
-/*
+    /* effects on background icons are a pain */
+    box-shadow: 0 0 0 6px transparent;
     background-color: transparent;
-    transition: background-color 400ms ease-in-out, border-radius 400ms ease-in-out;
-*/
+    transition: background-color 400ms ease-in-out, box-shadow 400ms ease-in-out;
 }
-/*
 #controls .button:hover {
-    box-shadow: 0 0 0 8px #eee;
+    box-shadow: 0 0 0 6px #eee;
     background-color: #eee;
 }
-*/
 
 #controls .track {
     width: 100%;

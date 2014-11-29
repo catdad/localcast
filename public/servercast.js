@@ -36,13 +36,29 @@ var server = function(){
         player.off('unmute', unmute);
     }
     
-    function handleNowPlaying(data) {
+    function handleNowPlaying(data, justFetched) {
         // disconnect events if connected
         disconnectEvents();
         
         console.log(data);
         
-        //duration && player.setDuration(duration);
+        var state = !!data.state && data.state.toLowerCase(),
+            duration = (data.duration === +data.duration) ? +data.duration : 0;
+        
+        duration && player.setDuration(duration);
+        
+        if (state === 'playing' || state === 'buffering') {
+            player.command.play();
+        } else if (state === 'paused') { 
+            player.command.pause();
+        } else if (state === 'idle') {
+        
+        }
+        
+        if (!justFetched && data.device) {
+            player.command.castOn(data.device);
+            toast.log('Connected to ' + data.device);
+        }
         
         player.enable();
         player.command.play();
@@ -71,12 +87,13 @@ var server = function(){
             connectedDevice = deviceName;
             
             toast.success('Connected to ' + deviceName);
+            player.command.castOn(deviceName);
         });
     }
     
     function nowPlaying(data){
         if (data) {
-            handleNowPlaying(data);
+            handleNowPlaying(data, false);
         } else {
             request.json(endpoint + 'nowPlaying', function(err, data){
                 if (serverError(err, data)) { return; }
@@ -84,7 +101,7 @@ var server = function(){
                 // check to make sure nowPlaying is not `false`
                 if (data.nowPlaying) {
                     try {
-                        handleNowPlaying(data.nowPlaying); 
+                        handleNowPlaying(data.nowPlaying, true); 
                     } catch (e) {
                         console.log(e);
                     }    

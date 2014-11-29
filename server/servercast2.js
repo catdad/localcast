@@ -152,7 +152,7 @@ var api = {
         var mediaData;
             
         if (connectedDevice && connectedDevice.player && connectedDevice.player.media) {
-            var sessionData = connectedDevice.player.media.currentSession;
+            var sessionData = connectedDevice.player.media.currentSession || false;
             var metadata = sessionData.media || {};
 
             console.log(connectedDevice.player.media.currentSession);
@@ -160,14 +160,20 @@ var api = {
             console.log(connectedDevice.player.media);
             console.log('--------------------------');
             
-            
-            if (!sessionData) return { error: 'why?' };
+            // I think this is what it means
+            // TODO make sure the device is still connected
+            if (!sessionData) return { 
+                state: 'IDLE',
+                playing: false,
+                device: connectedDevice.config.name
+            };
             
             mediaData = {
                 duration: metadata.duration,
                 id: metadata.contentId,
                 state: sessionData.playerState || 'UNKNOWN',
-                playing: !!connectedDevice.playing
+                playing: !!connectedDevice.playing,
+                device: connectedDevice.config.name
             };
 
             if (metadata && metadata.metadata && metadata.metadata.title) {

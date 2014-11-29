@@ -104,6 +104,16 @@ var player = (function(window){
         unmute: function(){
             dom.volume.classList.add('icon-unmute');
             dom.volume.classList.remove('icon-mute');
+        },
+        castOn: function(name){
+            dom.cast.classList.remove('icon-cast');
+            dom.cast.classList.add('icon-cast-on');
+            dom.cast.setAttribute('data-device', name);
+        },
+        castOff: function(){
+            dom.cast.classList.add('icon-cast');
+            dom.cast.classList.remove('icon-cast-on');
+            dom.cast.removeAttribute('data-device');
         }
     };
     
