@@ -346,7 +346,7 @@ var views = {
             
             function serverCast() {
                 thisModal.close();
-                server.playNew(resource, name);
+                server.playNew(resource, name, thumb);
             }
             
             (chromecast.isAvailable() && false) ? browserCast() : serverCast();
@@ -362,6 +362,40 @@ var views = {
             }
             
         }, origin);
+    },
+    deviceSelectModal: function(list, onSelect, onCancel){
+        var div = views.elem('div', { className: 'list'}),
+            heading = views.elem('div', { className: 'heading', text: 'Select a device:' }),
+            selected = false,
+            height = 0;
+        
+        div.appendChild(heading);
+        
+        var thisModal = views.Modal(div, function(wrapper){
+            wrapper.appendChild(div);
+            
+            [].forEach.call(div.childNodes, function(node){
+                height += node.offsetHeight;
+            });
+            
+            div.style.height = height + 'px';
+        });
+        
+        thisModal.onClose(function(){
+            if (!selected) onCancel();
+        });
+        
+        list.forEach(function(item){
+            var b = views.elem('button', { text: item });
+            
+            b.onclick = function(){
+                selected = true;
+                onSelect(item);
+                thisModal.close();
+            };
+            
+            div.appendChild(b);
+        });
     },
     
     nav: function(path, sep){

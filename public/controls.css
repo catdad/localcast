@@ -24,11 +24,14 @@
     will-change: opacity;
 }
 
+/*
 #controls.disabled {
     -webkit-filter: blur(1px) grayscale(60%);
        -moz-filter: blur(1px) grayscale(60%);
             filter: blur(1px) grayscale(60%);
 }
+*/
+/*
 #controls.disabled:after {
     content: '';
     position: absolute;
@@ -39,6 +42,15 @@
     background: #eee;
     opacity: .4;
 }
+*/
+
+#controls.disabled .button {
+    display: none;
+}
+#controls.disabled #cast.button {
+    display: inline-block;
+}
+
 #controls.disabled .slider {
     opacity: 0;
 }
@@ -49,29 +61,22 @@
 }
 
 #controls .button {
-    padding: 10px;
-    min-width: 32px;
-    text-align: center;
     cursor: pointer;
     border-radius: 50%;
-
+    margin: 8px;
+    
+/*    box-shadow: 0 0 0 8px transparent;*/
+/*
     background-color: transparent;
-    transition: background-color 400ms ease-in-out;
-
-    /* change the color of font icons, hell yeah */
-    color: #333;
+    transition: background-color 400ms ease-in-out, border-radius 400ms ease-in-out;
+*/
 }
+/*
 #controls .button:hover {
+    box-shadow: 0 0 0 8px #eee;
     background-color: #eee;
 }
-
-/* adjust kerning --- why, github? */
-#play.button { letter-spacing: -3px; }
-#pause.button { letter-spacing: 0px; }
-#prev.button { letter-spacing: 3px; }
-#next.button { letter-spacing: -3px; }
-#stop.button { letter-spacing: 0px; }
-#volume.button { letter-spacing: 0px; }
+*/
 
 #controls .track {
     width: 100%;

@@ -68,6 +68,7 @@
                 navDOM.appendChild( views.nav(data.path) );
                 
                 if (data.nowPlaying) {
+                    console.log('now playing data', data.nowPlaying);
                     server.nowPlaying(data.nowPlaying);
                 }
                 
