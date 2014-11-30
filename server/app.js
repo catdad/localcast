@@ -17,6 +17,7 @@ var port = config.port;
 
 var servercast = require('./servercast.js');
 var servercast2 = require('./servercast2.js');
+var servercast3 = require('./servercast3.js');
 var ip = require('./ip.js');
 
 // root is one up from the running dir
@@ -52,7 +53,7 @@ app.get('/', function(req, res){
 });
 
 function send(res, err, data){
-    var nowPlaying = servercast2.session();
+    var nowPlaying = servercast3.session();
     data = data || {};
     data.nowPlaying = nowPlaying;
     
@@ -109,7 +110,7 @@ app.get('/virtualthumb/:dir/*', function(req, res){
 
 // router the servercast module
 app.get('/session2/:action', function(req, res){
-    servercast2.router(req.params.action, req.query, res);
+    servercast3.router(req.params.action, req.query, res);
 });
 
 //manage servercast sessions
