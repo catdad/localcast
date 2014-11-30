@@ -93,7 +93,30 @@ var api = {
                 cb(noDeviceError);
             }
         } else {
-            playMedia();
+            // we have a connected device, but it is possible that it timed out already
+            var currentSession = api.session();
+            
+            // IDLE is not a good indicator of a timed-out device, but it is the state of one that is, it 
+            // definitely means that nothing is playing (in this session, anyway), so we should just 
+            // reconnect and skip any ugliness.
+            if (currentSession && currentSession.state === 'IDLE' && !connectedDevice.player) {
+                // Apparently, we cannot connect to a device that is already connected... go figure. It throws a heartbeat error.
+                // Use the API connect instead... which currently does nothing, but I will update it at some point.
+                
+//                api.connect( currentSession.device, function(err){
+//                    if (err) { 
+//                        cb(err);
+//                        return;
+//                    }
+//                    
+//                    playMedia();
+//                } );
+                
+                connectedDevice.connect();
+                playMedia();
+            } else {
+                playMedia();    
+            }
         }
     },
     
@@ -143,8 +166,14 @@ var api = {
     time: function time(){},
     
     /** Disconnects the current session */
-    disconnect: function disconnect(){
+    disconnect: function disconnect(cb){
+        // how the heck do you disconnect?
+        if (connectedDevice) {
+            console.log(connectedDevice);
+            for (var i in connectedDevice) console.log(i, '-', typeof connectedDevice[i]);
+        }
         connectedDevice = undefined;
+        cb();
     },
     
     /** Gets the current media session */
@@ -155,11 +184,6 @@ var api = {
             var sessionData = connectedDevice.player.media.currentSession || false;
             var metadata = sessionData.media || {};
 
-            console.log(connectedDevice.player.media.currentSession);
-            console.log('--------------------------');
-            console.log(connectedDevice.player.media);
-            console.log('--------------------------');
-            
             // I think this is what it means
             // TODO make sure the device is still connected
             if (!sessionData) return { 
@@ -233,6 +257,11 @@ module.exports.router = function router(action, query, res){
             return;
         case 'connect':
             api.connect(query.device, function(err){
+                routerOnResponse(action, err, res);
+            });
+            return;
+        case 'disconnect':
+            api.disconnect(function(err){
                 routerOnResponse(action, err, res);
             });
             return;
