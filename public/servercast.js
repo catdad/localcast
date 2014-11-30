@@ -3,7 +3,8 @@
 
 var server = function(){
     var endpoint = '/session2/',
-        connectedDevice;
+        connectedDevice,
+        sessionAnnounced = false;
     
     function serverError(err, data) {
         if (err) {
@@ -17,8 +18,13 @@ var server = function(){
         }
     }
     
-    player.on('castSelect', function(){
-        deviceList();
+    player.on('castSelect', function(ev){
+        console.log(ev);
+        if (ev.connected === false) {
+            deviceList();
+        } else {
+            handleDeviceDeselect(ev.connectedTo);
+        }
     });
     
     function connectEvents(){
@@ -57,13 +63,26 @@ var server = function(){
         
         if (!justFetched && data.device) {
             player.command.castOn(data.device);
-            toast.log('Connected to ' + data.device);
+            
+            if (!sessionAnnounced || connectedDevice !== data.device){
+                toast.log('Connected to ' + data.device);
+                connectedDevice = data.device;
+                sessionAnnounced = true;
+            }
         }
         
         player.enable();
         player.command.play();
         
         connectEvents();
+    }
+    
+    function handleDeviceDeselect(device) {
+        views.deviceDeselectModal(device, function onDismiss(userSelectDisconnect){
+            if (userSelectDisconnect) {
+                disconnect();
+            }
+        });
     }
     
     function handleDeviceSelect(data) {
@@ -73,7 +92,7 @@ var server = function(){
             console.log('selected', selected);
             connect(selected);
         }, function onCancel(){
-        
+            
         });
     }
     
@@ -81,10 +100,12 @@ var server = function(){
         request.json(endpoint + 'connect?device=' + deviceName, function(err, data){
             if (serverError(err, data)) {
                 connectedDevice = undefined;
+                sessionAnnounced = false;
                 return;
             }
             
             connectedDevice = deviceName;
+            sessionAnnounced = true;
             
             toast.success('Connected to ' + deviceName);
             player.command.castOn(deviceName);
@@ -94,6 +115,10 @@ var server = function(){
     function nowPlaying(data){
         if (data) {
             handleNowPlaying(data, false);
+        } else if (data === false) {
+            player.command.castOff();
+            connectedDevice = undefined;
+            sessionAnnounced = false;
         } else {
             request.json(endpoint + 'nowPlaying', function(err, data){
                 if (serverError(err, data)) { return; }
@@ -168,6 +193,17 @@ var server = function(){
         });
     }
     
+    function disconnect(){
+        request.json(endpoint + 'disconnect', function(err, data){
+            if (serverError(err, data)) { return; }
+            
+            connectedDevice = undefined;
+            sessionAnnounced = false;
+            
+            player.command.castOff();
+        });
+    }
+    
     function deviceList(){
         request.json(endpoint + 'devices', function(err, data){
             if (serverError(err, data)) { 
@@ -188,6 +224,7 @@ var server = function(){
         stop: stop,
         mute: mute,
         unmute: unmute,
-        nowPlaying: nowPlaying
+        nowPlaying: nowPlaying,
+        currentDevice: function(){ return connectedDevice || undefined; }
     };
 }();

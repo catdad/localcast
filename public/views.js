@@ -397,6 +397,25 @@ var views = {
             div.appendChild(b);
         });
     },
+    deviceDeselectModal: function(device, onDismiss){
+        var dismiss = toast.warning({
+            message: 'Disconnect from ' + device + '?',
+            dismissible: false,
+            action: [{
+                name: 'yes',
+                onclick: function(){
+                    dismiss();
+                    onDismiss(true);
+                }
+            },{
+                name: 'no',
+                onclick: function(){
+                    dismiss();
+                    onDismiss(false);
+                }
+            }]
+        });
+    },
     
     nav: function(path, sep){
         sep = '/';

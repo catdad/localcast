@@ -250,7 +250,10 @@ var player = (function(window){
             events.asyncTrigger('stop');
         }, false);
         dom.cast.addEventListener('click', function(){
-            events.asyncTrigger('castSelect');
+            events.asyncTrigger('castSelect', { 
+                connected: dom.cast.classList.contains('icon-cast-on'), 
+                connectedTo: dom.cast.getAttribute('data-device') || undefined
+            });
         }, false);
 
         var mute = function() {

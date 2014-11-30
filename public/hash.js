@@ -67,8 +67,7 @@
                 //populate nav
                 navDOM.appendChild( views.nav(data.path) );
                 
-                if (data.nowPlaying) {
-                    console.log('now playing data', data.nowPlaying);
+                if (data.nowPlaying !== undefined) {
                     server.nowPlaying(data.nowPlaying);
                 }
                 
