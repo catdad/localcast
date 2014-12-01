@@ -53,9 +53,8 @@ app.get('/', function(req, res){
 });
 
 function send(res, err, data){
-    var nowPlaying = servercast3.session();
     data = data || {};
-    data.nowPlaying = nowPlaying;
+    data.nowPlaying = servercast3.session();
     
     res.send(err || data);
 }

@@ -1,10 +1,12 @@
 /* jshint node: true, -W030 */
 
-var cast = require('chromecast-js');
+var cast = require('./castBrowser.js');
 var player = require('chromecast-player')();
 
+var noop = function(){};
+
 var opts = {
-    device: "Chromecast TV",
+    device: undefined,
     ttl: 500
 };
 
@@ -14,17 +16,19 @@ var error = {
     };
 
 function getDevices(cb) {
-    var list = [],
-        browser = new cast.Browser();
     
-    browser.on('deviceOn', function(device){
-        list.push(device);
+    cast.all({
+        ttl: opts.ttl
+    }, function(err, list){
+        if (err) {
+            cb(error.noDeviceFound);
+            return;
+        }
+        
+        console.log(list);
+        
+        cb(undefined, list);
     });
-    
-    setTimeout(function(){
-        if (list.length) cb(undefined, list);
-        else cb(error.noDeviceFound);
-    }, opts.ttl);
 }
 
 var MediaOpts = function(url, title, imageUrl) {
@@ -66,7 +70,7 @@ var api = {
     connect: function connect(name, cb){
         // find the matching device
         var device = api.lastDeviceList.filter(function(dev){
-            return dev.config.name === name;
+            return dev.name === name;
         })[0];
         
         if (device) {
@@ -120,6 +124,9 @@ var api = {
     stop: function stop(cb){
         if (api.lastPlayer) {
             api.lastPlayer.stop();
+            
+            api.lastMedia = undefined;
+            
             cb();
         }
         else cb(error.noDeviceConnected);
@@ -153,9 +160,9 @@ var api = {
     
     /** Disconnects the current session */
     disconnect: function disconnect(cb){
-        if (api.lastPlayer) {
-            api.lastPlayer.stop();
-        }
+        // this one is not actually asynchronous, so it doesn't matter right now
+        api.stop(noop);
+        api.lastPlayer = undefined;
         
         opts.device = undefined;
         cb();
@@ -163,35 +170,42 @@ var api = {
     
     /** Gets the current media session */
     session: function session(){
-        var mediaData;
-            
+        var mediaData = {
+            device: opts.device,
+            playing: false
+        };
+        
         if (api.lastPlayer) {
             var sessionData = api.lastPlayer.currentSession || {};
-            var metadata = sessionData.media || {};
+            var media = sessionData.media || api.lastMedia;
             
+            // save it, in case we gained some useful tidbits
+            // we will have more data if the playerState is PLAYING
+            api.lastMedia = media;
             
             if (sessionData.playerState === 'IDLE') {
                 var reason = sessionData.idleReason.toLowerCase();
             
                 if (reason === 'cancelled' || reason === 'finished') {
-                    return false;    
+                    return mediaData;    
                 }
             }
             
             mediaData = {
-                duration: metadata.duration,
-                id: metadata.contentId,
+                duration: media.duration,
+                id: media.contentId,
                 state: sessionData.playerState || 'UNKNOWN',
-                playing: sessionData.playing,
+                playing: true,
+                volume: sessionData.volume,
                 device: opts.device
             };
 
-            if (metadata && metadata.metadata && metadata.metadata.title) {
-                mediaData.name = metadata.metadata.title;
+            if (media && media.metadata && media.metadata.title) {
+                mediaData.name = media.metadata.title;
             }
         }
         
-        return mediaData || false;
+        return mediaData;
     },
     
     /** Gets the name of the currently used device */
@@ -237,7 +251,7 @@ module.exports.router = function router(action, query, res){
                     success: true,
                     action: action,
                     list: list.map(function(dev){
-                        return dev.config.name;
+                        return dev.name;
                     })
                 });
             });
