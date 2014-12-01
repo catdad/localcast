@@ -46,35 +46,49 @@ var server = function(){
         // disconnect events if connected
         disconnectEvents();
         
-        console.log(data);
-        
-        var state = !!data.state && data.state.toLowerCase(),
-            duration = (data.duration === +data.duration) ? +data.duration : 0;
-        
-        duration && player.setDuration(duration);
-        
-        if (state === 'playing' || state === 'buffering') {
-            player.command.play();
-        } else if (state === 'paused') { 
-            player.command.pause();
-        } else if (state === 'idle') {
-        
-        }
-        
-        if (!justFetched && data.device) {
-            player.command.castOn(data.device);
-            
-            if (!sessionAnnounced || connectedDevice !== data.device){
-                toast.log('Connected to ' + data.device);
-                connectedDevice = data.device;
+        function connectedTo(deviceName, mediaTitle){
+            player.command.castOn(deviceName);
+
+            if (!sessionAnnounced || connectedDevice !== deviceName){
+                toast.log('Connected to ' + deviceName);
+                connectedDevice = deviceName;
                 sessionAnnounced = true;
+                
+                if (mediaTitle) {
+                    toast.log('Playing ' + mediaTitle);
+                }
             }
         }
         
-        player.enable();
-        player.command.play();
-        
-        connectEvents();
+        if (data.playing) {
+            var state = !!data.state && data.state.toLowerCase(),
+                duration = (data.duration === +data.duration) ? +data.duration : 0;
+
+            duration && player.setDuration(duration);
+
+            if (state === 'playing' || state === 'buffering') {
+                player.command.play();
+            } else if (state === 'paused') { 
+                player.command.pause();
+            } else if (state === 'idle') {
+
+            }
+
+            if (!justFetched && data.device) {
+                connectedTo(data.device, data.name);
+            }
+
+            player.enable();
+            player.command.play();
+            
+            if (data.volume && data.volume.muted) {
+                player.command.mute();
+            }
+
+            connectEvents();
+        } else if (data.device) {
+            connectedTo(data.device);
+        }
     }
     
     function handleDeviceDeselect(device) {
@@ -206,9 +220,10 @@ var server = function(){
     
     function deviceList(){
         request.json(endpoint + 'devices', function(err, data){
-            if (serverError(err, data)) { 
-                toast.error('Could not get devices');
-                console.log('device list err:', err, data);
+            if (data && data.success === false && data.error) {
+                toast.error(data.error);
+                return;
+            } else if (serverError(err, data)) { 
                 return;
             }
             
