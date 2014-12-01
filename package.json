@@ -17,6 +17,6 @@
     "http-proxy": "~1.2.0",
     "chromecast-player": "~0.1.6",
     "qr-image": "~2.0.0",
-    "chromecast-js": "~0.1.4"
+    "mdns-js2": "0.0.5"
   }
 }
