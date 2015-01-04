@@ -16,7 +16,7 @@ var config = require('./config.js');
 var port = config.port;
 
 var servercast = require('./servercast.js');
-var servercast2 = require('./servercast2.js');
+//var servercast2 = require('./servercast2.js');
 var servercast3 = require('./servercast3.js');
 var ip = require('./ip.js');
 

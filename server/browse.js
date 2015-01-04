@@ -71,7 +71,7 @@ function getDirectoryStats(root, fullPath, prefix, prefixfile, prefixthumb, call
 
 function streamFile(req, res, fullPath){
     function initStream(){
-        //like I was really going to veer do this myself...
+        //like I was really going to ever do this myself...
         send(req, fullPath)
             .on('error', function(ev){
                 console.log('steam file error', ev);
