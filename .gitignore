@@ -8,13 +8,6 @@ play/
 #art folder
 art/
 
-#############
-## Node
-#############
-
-#npm modules
-node_modules/
-
 #temp config
 config.json
 temp/
