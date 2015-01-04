@@ -1,4 +1,4 @@
-/*jslint browser: true, devel: true, expr: true */
+/*jshint browser: true, devel: true, expr: true */
 /*globals request, hash, chromecast, server, toast */
 
 function playVideo(resource) {
@@ -528,4 +528,3 @@ var views = {
         return str.replace(/\.|\s|\/|\-/g, ' ').toLowerCase();   
     }
 };
-
