@@ -15,7 +15,7 @@
     "send": "~0.3.0",
     "fluent-ffmpeg": "~1.7.2",
     "http-proxy": "~1.2.1",
-    "chromecast-player": "~0.1.7",
+    "chromecast-player": "0.1.6",
     "qr-image": "~2.0.0",
     "mdns-js2": "0.0.5"
   }
