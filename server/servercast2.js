@@ -5,7 +5,8 @@ var cast = require('chromecast-js');
 var list = [],
     connectedDevice,
     lastConnectedName,
-    noDeviceError = new Error('There is no connected device');
+    noDeviceError = new Error('There is no connected device'),
+    ttl = 1000;
 
 function init(){
     list = [];
@@ -37,7 +38,7 @@ var api = {
         setTimeout(function(){
             console.log(list);
             cb(undefined, list);
-        }, 500);
+        }, ttl);
     },
     
     /** Connects to a device */

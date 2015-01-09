@@ -7,7 +7,7 @@ var noop = function(){};
 
 var opts = {
     device: undefined,
-    ttl: 500
+    ttl: 1000
 };
 
 var error = {
