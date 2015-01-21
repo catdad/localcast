@@ -38,7 +38,6 @@ var views = {
         
         switch (type){
             case "folder":
-//                return "/img/folder.png";
                 temp.innerHTML = '<svg class="folder" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" id="Your_Icon" x="0px" y="0px" width="100px" height="100px" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"><path d="M88.307,24.589H52.947c-2.713,0-6.66-1.789-8.445-3.825l-2.551-2.928c-2.475-2.822-7.352-5.032-11.104-5.032  H11.695c-4.225,0-7.66,3.435-7.66,7.657v58.931c0,3.346,2.158,6.189,5.152,7.23c0.764,0.363,1.609,0.572,2.508,0.572h76.611  c0.896,0,1.744-0.209,2.506-0.572c2.994-1.041,5.152-3.885,5.152-7.23V32.25C95.965,28.025,92.527,24.589,88.307,24.589z   M11.693,16.335h19.152c2.713,0,6.66,1.79,8.445,3.826l2.549,2.927c2.477,2.822,7.354,5.032,11.105,5.032h35.359  c2.275,0,4.127,1.853,4.127,4.129v28.424L7.564,60.625V20.46C7.566,18.186,9.418,16.335,11.693,16.335z"/></svg>';
                 break;
             
@@ -262,7 +261,8 @@ var views = {
         var modal = views.elem('div'),
             container = views.elem('div'),
             image = views.elem('img', { className: 'thumb' }),
-            title = views.elem('div', { className: 'title', text: name });
+            title = views.elem('div', { className: 'title', text: name }),
+            modalWrapper;
         
         container.appendChild(title);
         
@@ -283,7 +283,7 @@ var views = {
         // this function should be executed after image has loaded and tranition has ended
         var imageOnLoad = function(wrapper) {
             // make sure the modal is empty
-            while(wrapper.firstChild) { 
+            while(wrapper && wrapper.firstChild) { 
                 wrapper.removeChild(wrapper.firstChild);
             }
             
@@ -313,8 +313,11 @@ var views = {
         
         // add an onload callback and a source to the image
         image.onload = function() {
-            if (modalIsOpen) imageOnLoad();
-            else imageIsLoaded = true;
+            if (modalIsOpen) {
+                imageOnLoad(modalWrapper);
+            } else {
+                imageIsLoaded = true;
+            }
         };
         image.src = thumb;
         
@@ -334,7 +337,6 @@ var views = {
         
         playLocalButton.onclick = function(){
             views.playModal(resource, thisModal);
-//            playVideo(resource);    
         };
         playCastButton.onclick = function(){
             function browserCast() {
@@ -353,9 +355,11 @@ var views = {
         };
         
         var thisModal = views.Modal(modal, function onOpen(wrapper){
+            modalWrapper = wrapper;
             
-            if (imageIsLoaded) imageOnLoad(wrapper);
-            else {
+            if (imageIsLoaded) {
+                imageOnLoad(wrapper);
+            } else {
                 modalIsOpen = true;
                 // add spinner while the image loads
                 wrapper.appendChild(views.elem('div', { className: 'loading' }));
