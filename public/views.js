@@ -185,7 +185,7 @@ var views = {
             }
         };
     },
-    playModal: function(resource, existingModal){
+    videoModal: function(resource, existingModal){
         var vid = views.elem('video', { className: 'modal video' });
         vid.src = resource;
         vid.controls = 'controls';
@@ -257,7 +257,7 @@ var views = {
             existingModal = views.Modal(vid, onWrapperReceived);
         }
     },
-    videoModal: function(ev, thumb, resource, name, domTrigger){
+    controlsModal: function(ev, thumb, resource, name, domTrigger){
         var modal = views.elem('div'),
             container = views.elem('div'),
             image = views.elem('img', { className: 'thumb' }),
@@ -336,7 +336,7 @@ var views = {
         playCastButton.appendChild(castText);
         
         playLocalButton.onclick = function(){
-            views.playModal(resource, thisModal);
+            views.videoModal(resource, thisModal);
         };
         playCastButton.onclick = function(){
             function browserCast() {
@@ -491,7 +491,7 @@ var views = {
                 stateObj.resource = stateObj.resource;
 //                hash.push(stateObj, true);
                 
-                views.videoModal(ev, file.thumb, file.resource, file.name, div);
+                views.controlsModal(ev, file.thumb, file.resource, file.name, div);
             }
             else if (file.isVirtual){
                 stateObj.resource = file.path;
