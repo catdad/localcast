@@ -85,6 +85,10 @@
             }
         };
         
+        this.back = function(){
+            history.back();
+        };
+        
         window.onpopstate = function(ev){
             var defaultPrevented = false,
                 prevent = function(){

@@ -156,13 +156,15 @@ var views = {
         
         // close Modal if clicking on the black space
         wrapper.onclick = function(ev) {
-            if (ev.target === wrapper) closeModal();
+            // trigger a close using the "back" button
+            if (ev.target === wrapper) triggerCloseModal();
         };
         
         // close the modal on the next pop state
         hash.onNextPop(function(ev){
             if (!isClosed) {
                 ev.preventDefault();
+                // perform an actual close on the modal
                 closeModal();
             }
         });
@@ -170,8 +172,13 @@ var views = {
         // push the current state onto the stack
         hash.push({ resource: hash.state() });
         
+        function triggerCloseModal(){
+            // trigger a pop state in order to close the modal
+            hash.back();
+        }
+        
         return {
-            close: closeModal,
+            close: triggerCloseModal,
             replace: function(newContent, cb){
                 removeModalContent(function(){
                     cb && cb(wrapper);
