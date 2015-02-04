@@ -192,12 +192,16 @@ var views = {
             }
         };
     },
-    videoModal: function(resource, existingModal){
+    videoModal: function(resource, name, existingModal){
         var vid = views.elem('video', { className: 'modal video' });
         vid.src = resource;
         vid.controls = 'controls';
         
         var duration;
+        
+        // set the page title to the video name
+        var documentTitle = document.title;
+        document.title = name + ' - ' + documentTitle;
         
         function togglePlaying(ev) {
             ev.preventDefault();
@@ -246,6 +250,10 @@ var views = {
             existingModal.onBeforeClose(function(ev){
                 //ev.preventDefault();
                 //return;
+                
+                // return the title back to the original
+                document.title = documentTitle;
+                
                 wrapper.classList.remove('dim');
             });
             
@@ -343,7 +351,7 @@ var views = {
         playCastButton.appendChild(castText);
         
         playLocalButton.onclick = function(){
-            views.videoModal(resource, thisModal);
+            views.videoModal(resource, name, thisModal);
         };
         playCastButton.onclick = function(){
             function browserCast() {
