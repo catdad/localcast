@@ -1,0 +1,55 @@
+.animation(@val) {
+    -webkit-animation: @val;
+       -moz-animation: @val;
+         -o-animation: @val;
+            animation: @val;
+}
+
+@defaultWidth: 32px;
+@defaultHeight: @defaultWidth;
+@defaultThickness: 6px;
+@defaultSpeed: 800ms;
+
+.loading (@width: @defaultWidth, 
+          @height: @defaultHeight, 
+          @thickness: @defaultThickness, 
+          @speed: @defaultSpeed)
+{
+    height: @height;
+    width: @width;
+    margin: auto;
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    border-left:   @thickness solid rgba(38,50,56,.25);
+    border-right:  @thickness solid rgba(38,50,56,.25);
+    border-bottom: @thickness solid rgba(38,50,56,.25);
+    border-top:    @thickness solid rgba(38,50,56,1);
+    border-radius: 100%;
+    
+    .animation(spin @speed infinite linear);
+}
+
+@-webkit-keyframes spin {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(359deg);}
+}
+
+@-moz-keyframes spin {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(359deg);}
+}
+
+@-o-keyframes spin {
+    from {-o-transform: rotate(0deg);}
+    to {-o-transform: rotate(359deg);}
+}
+
+@keyframes spin {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(359deg);}
+}

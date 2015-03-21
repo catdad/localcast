@@ -1,0 +1,26 @@
+
+.icon(@name, @pos) {
+    .icon.icon-@{name} {
+        background-position: @pos;
+    }
+}
+
+.icon {
+    background-image: url(img/icons.dark.png);
+    background-position: top left, 0px 0px;
+    background-origin: content-box;
+    background-clip: content-box;
+    background-size: 128px; /* n/3 */
+    width: 32px;
+    height: 32px;
+    line-height: 1rem;
+    display: inline-block;
+}
+
+.icon(stop,    32px  0px);
+.icon(pause,   64px  0px);
+.icon(play,    96px  0px);
+.icon(cast,     0px  0px);
+.icon(mute,    96px 32px);
+.icon(unmute,   0px 32px);
+.icon(cast-on, 64px 32px);
