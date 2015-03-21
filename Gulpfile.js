@@ -2,16 +2,14 @@
 
 var gulp = require('gulp'),
     less = require('gulp-less'),
-    sourcemaps = require('gulp-sourcemaps'),
-    gutil = require('gulp-util');
+    sourcemaps = require('gulp-sourcemaps');
 
 gulp.task('less', function() {
     return gulp.src('./less/style.less')
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./public'))
-        .on('error', gutil.log);
+        .pipe(gulp.dest('./public'));
 });
 
 gulp.task('watch', ['less'], function() {
