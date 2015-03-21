@@ -18,5 +18,8 @@
     "chromecast-player": "0.1.6",
     "qr-image": "~2.0.0",
     "mdns-js2": "0.0.5"
+  },
+  "devDependencies": {
+    "gulp": "^3.8.11"
   }
 }
