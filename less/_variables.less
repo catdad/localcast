@@ -1,0 +1,13 @@
+
+// mixins
+.box-sizing(@val: content-box) {
+    -moz-box-sizing: @val;
+         box-sizing: @val;
+}
+
+.input-placeholder(@rules) {
+    &::-webkit-input-placeholder { @rules(); }
+    &:-moz-placeholder { @rules(); }
+    &::-moz-placeholder { @rules(); }
+    &:-ms-input-placeholder { @rules(); }
+}
