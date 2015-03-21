@@ -1,0 +1,103 @@
+@import (reference) "_variables";
+@import (reference) "_media.less";
+
+.modal_wrapper {
+    position: fixed;
+    background: rgba(0,0,0,.6);
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    opacity: 0;
+    transform: scale(0,0);
+    transform: scale3d(0,0,0);
+
+    transition: all 200ms ease-out;
+    will-change: transform, opacity;
+    
+    &.open {
+        transform: scale(1,1);
+        transform: scale3d(1,1,1);
+        opacity: 1;
+        transition: all 300ms ease-in;
+    }
+    &.dim {
+        background: rgba(0,0,0,.95);
+        transition: background 1s ease;
+    }
+    
+    .loading {
+        .loading();
+    }
+}
+
+
+.modal {
+    position: absolute;
+    width: 94%;
+    max-width: 500px;
+    // height is set by JS
+    height: 0px;
+    max-height: 80%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background: #eee;
+    color: #263238;
+    border-radius: 3px;
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+
+    transition: height 250ms ease-out, transform 250ms ease-out;
+    will-change: transform, height;
+}
+.modal.video {
+    max-width: 94%;
+    height: auto;
+    background: transparent;
+}
+.modal.list {
+    height: auto;
+}
+.modal.remove {
+    transform: scale(0,0);
+    transform: scale3d(0,0,0);
+}
+.modal .title {
+    box-sizing: border-box;
+    font-size: 1.6rem;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding: 10px;
+    word-wrap: break-word;
+}
+.modal .thumb {
+    width: 100%;   
+}
+.modal .heading {
+    text-align: center;
+    padding: 10px 0;
+}
+.modal button {
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    outline: none;
+    border: none;
+    background: #dddddd;
+    color: inherit;
+    font-size: 1.8rem;
+    width: 100%;
+    padding: 15px 10px;;
+    vertical-align: baseline;
+    cursor: pointer;
+}
+.modal button .icon {
+    margin-right: 7px;
+    vertical-align: bottom;
+}
