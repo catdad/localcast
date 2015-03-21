@@ -1,0 +1,298 @@
+@import (reference) "_variables.less";
+@import "_page.less";
+@import "_modal.less";
+@import "_file.less";
+
+// temp include all CSS here
+
+html, body {
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+    font-family: Roboto, sans-serif;
+    font-size: 12pt;
+    background: #eef1f1;
+    color: #263238;
+}
+
+.card {
+    -moz-box-sizing: border-box;
+         box-sizing: border-box;
+
+    width: 90%;
+    max-width: 860px;
+    margin: 15px auto;
+    padding: 15px 0;
+    text-align: center;
+    background: white;
+    box-shadow: 0 5px 15px -10px black;
+}
+
+.file {
+    display: inline-block;
+    position: relative;
+    width: 6rem;
+    height: 6rem;
+    text-align: center;
+    margin: 6px 12px 2.2rem;
+    cursor: pointer;
+}
+.file:before {
+    content: attr(data-title);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    position: absolute;
+    top: 6rem;
+    left: 0;
+    width: 100%;
+    font-size: .8rem;
+}
+.file:after {
+    content: attr(data-episode);
+    position: absolute;
+    top: 7rem;
+    width: 100%;
+    left: 0;
+    font-size: .8rem;
+    font-style: italic;
+    line-height: 1.5rem;
+}
+.file svg {
+    top: 0;
+    left: 0;
+    margin: 0 auto;
+    width: 100%;
+    height: 100%;
+}
+
+.navPart {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 4px;
+    margin: 4px;
+}
+
+#contentSearch { 
+    position: relative; 
+    padding: 0;
+}
+#contentSearch input {
+    padding: 15px;
+    width: 100%;
+    height: 2rem;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+
+    -moz-box-sizing: border-box;
+         box-sizing: border-box;
+
+    background: #f26f83;
+    color: white;
+}
+::-webkit-input-placeholder {
+    color: #eee;
+    opacity: 0.7;
+    text-align: center;
+}
+:-moz-placeholder {
+    color: #eee;
+    opacity: 0.7;
+    text-align: center;
+}
+::-moz-placeholder {
+    color: #eee;
+    opacity: 0.7;
+    text-align: center;
+}
+:-ms-input-placeholder {
+    color: #eee;
+    opacity: 0.7;
+    text-align: center;
+}
+
+svg.video path { fill: #263238; /* #B0CE03; */ }
+svg.folder path { fill: #263238; /* #CE5803; */ }
+
+.icon {
+    background-image: url(img/icons.dark.png);
+    background-position: top left, 0px 0px;
+    background-origin: content-box;
+    background-clip: content-box;
+    background-size: 128px; /* n/3 */
+    width: 32px;
+    height: 32px;
+    line-height: 1rem;
+    display: inline-block;
+}
+.icon.icon-stop  { background-position: 32px  0px; }
+.icon.icon-pause { background-position: 64px  0px; }
+.icon.icon-play  { background-position: 96px  0px; }
+.icon.icon-cast  { background-position:  0px  0px; }
+.icon.icon-mute { background-position: 96px 32px; }
+.icon.icon-unmute { background-position: 0px 32px; }
+.icon.icon-cast-on { background-position: 64px 32px; }
+
+.modal_wrapper {
+    position: fixed;
+    background: rgba(0,0,0,.6);
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    opacity: 0;
+    transform: scale(0,0);
+    transform: scale3d(0,0,0);
+
+    transition: all 200ms ease-out;
+    will-change: transform, opacity;
+}
+.modal_wrapper.open {
+    transform: scale(1,1);
+    transform: scale3d(1,1,1);
+    opacity: 1;
+    transition: all 300ms ease-in;
+}
+.modal_wrapper.dim {
+    background: rgba(0,0,0,.95);
+    transition: background 1s ease;
+}
+.modal_wrapper .loading {
+    height: 32px;
+    width: 32px;
+    margin: auto;
+    position: absolute;
+
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    border-left:   6px solid rgba(38,50,56,.25);
+    border-right:  6px solid rgba(38,50,56,.25);
+    border-bottom: 6px solid rgba(38,50,56,.25);
+    border-top:    6px solid rgba(38,50,56,1);
+    border-radius:100%;
+
+    -webkit-animation: spin 800ms infinite linear;
+       -moz-animation: spin 800ms infinite linear;
+         -o-animation: spin 800ms infinite linear;
+            animation: spin 800ms infinite linear;
+}
+
+.modal {
+    position: absolute;
+    width: 94%;
+    max-width: 500px;
+    /* height set in JS */
+    height: 0px;
+    max-height: 80%;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    background: #eee;
+    color: #263238;
+    border-radius: 3px;
+    overflow: hidden;
+    -webkit-transform: translateZ(0);
+
+    transition: height 250ms ease-out, transform 250ms ease-out;
+    will-change: transform, height;
+}
+.modal.video {
+    max-width: 94%;
+    height: auto;
+    background: transparent;
+}
+.modal.list {
+    height: auto;
+}
+.modal.remove {
+    transform: scale(0,0);
+    transform: scale3d(0,0,0);
+}
+.modal .title {
+    box-sizing: border-box;
+    font-size: 1.6rem;
+    text-align: center;
+    width: 100%;
+    display: block;
+    padding: 10px;
+    word-wrap: break-word;
+}
+.modal .thumb {
+    width: 100%;   
+}
+.modal .heading {
+    text-align: center;
+    padding: 10px 0;
+}
+.modal button {
+    display: block;
+    box-sizing: border-box;
+    margin: 0;
+    outline: none;
+    border: none;
+    background: #dddddd;
+    color: inherit;
+    font-size: 1.8rem;
+    width: 100%;
+    padding: 15px 10px;;
+    vertical-align: baseline;
+    cursor: pointer;
+}
+.modal button .icon {
+    margin-right: 7px;
+    vertical-align: bottom;
+}
+
+@media screen and (max-width: 480px){
+    body { font-size: .84rem; }
+    .navPart {
+        font-size: 1.2rem;
+        line-height: 1rem;
+    }
+
+    .modal .title { font-size: 1rem; }
+
+    .file {
+        width: 5rem;
+        height: 5rem;
+    }
+    .file:before { top: 5em; }
+    .file:after { top: 6em; }
+}
+
+.t-wrap.t-wrap {
+    bottom: 4.2rem;
+}
+
+.hide {
+    display: none;
+}
+
+@-webkit-keyframes spin {
+    from {-webkit-transform: rotate(0deg);}
+    to {-webkit-transform: rotate(359deg);}
+}
+
+@-moz-keyframes spin {
+    from {-moz-transform: rotate(0deg);}
+    to {-moz-transform: rotate(359deg);}
+}
+
+@-o-keyframes spin {
+    from {-o-transform: rotate(0deg);}
+    to {-o-transform: rotate(359deg);}
+}
+
+@keyframes spin {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(359deg);}
+}
+
