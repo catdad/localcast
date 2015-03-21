@@ -1,80 +1,25 @@
 @import (reference) "_variables.less";
 
 @import "_overrides.less";
-@import "_icons.less";
 @import "_page.less";
+@import "_icons.less";
+@import "_card.less";
 @import "_modal.less";
 @import "_file.less";
 @import "_loading.less";
 
 // temp include all CSS here
 
-html, body {
-    padding: 0px;
-    margin: 0px;
-    width: 100%;
-    font-family: Roboto, sans-serif;
-    font-size: 12pt;
-    background: #eef1f1;
-    color: #263238;
-}
-
-.card {
-    -moz-box-sizing: border-box;
-         box-sizing: border-box;
-
-    width: 90%;
-    max-width: 860px;
-    margin: 15px auto;
-    padding: 15px 0;
-    text-align: center;
-    background: white;
-    box-shadow: 0 5px 15px -10px black;
-}
-
-.file {
-    display: inline-block;
-    position: relative;
-    width: 6rem;
-    height: 6rem;
-    text-align: center;
-    margin: 6px 12px 2.2rem;
-    cursor: pointer;
-}
-.file:before {
-    content: attr(data-title);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
-    position: absolute;
-    top: 6rem;
-    left: 0;
-    width: 100%;
-    font-size: .8rem;
-}
-.file:after {
-    content: attr(data-episode);
-    position: absolute;
-    top: 7rem;
-    width: 100%;
-    left: 0;
-    font-size: .8rem;
-    font-style: italic;
-    line-height: 1.5rem;
-}
-.file svg {
-    top: 0;
-    left: 0;
-    margin: 0 auto;
-    width: 100%;
-    height: 100%;
-}
-
 .navPart {
     font-weight: bold;
     cursor: pointer;
     padding: 4px;
     margin: 4px;
+    
+    .smallView({
+        font-size: 1.2rem;
+        line-height: 1rem;
+    });
 }
 
 #contentSearch { 
@@ -88,53 +33,20 @@ html, body {
     border: none;
     outline: none;
     font-size: 1.2rem;
-
-    -moz-box-sizing: border-box;
-         box-sizing: border-box;
-
     background: #f26f83;
     color: white;
-}
-::-webkit-input-placeholder {
-    color: #eee;
-    opacity: 0.7;
-    text-align: center;
-}
-:-moz-placeholder {
-    color: #eee;
-    opacity: 0.7;
-    text-align: center;
-}
-::-moz-placeholder {
-    color: #eee;
-    opacity: 0.7;
-    text-align: center;
-}
-:-ms-input-placeholder {
-    color: #eee;
-    opacity: 0.7;
-    text-align: center;
+
+    .box-sizing(border-box);
+
+    .input-placeholder({
+        color: #eee;
+        opacity: 0.7;
+        text-align: center;
+    });
 }
 
 svg.video path { fill: #263238; /* #B0CE03; */ }
 svg.folder path { fill: #263238; /* #CE5803; */ }
-
-@media screen and (max-width: 480px){
-    body { font-size: .84rem; }
-    .navPart {
-        font-size: 1.2rem;
-        line-height: 1rem;
-    }
-
-    .modal .title { font-size: 1rem; }
-
-    .file {
-        width: 5rem;
-        height: 5rem;
-    }
-    .file:before { top: 5em; }
-    .file:after { top: 6em; }
-}
 
 .hide {
     display: none;
