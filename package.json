@@ -20,6 +20,7 @@
     "mdns-js2": "0.0.5"
   },
   "devDependencies": {
-    "gulp": "^3.8.11"
+    "gulp": "^3.8.11",
+    "gulp-less": "^3.0.2"
   }
 }
