@@ -8,13 +8,13 @@
 }
 
 .icon {
-    background-image: url(img/icons.dark.png);
+    background-image: @iconResource;
     background-position: top left, 0px 0px;
     background-origin: content-box;
     background-clip: content-box;
-    background-size: 128px; /* n/3 */
-    width: 32px;
-    height: 32px;
+    background-size: @iconSpriteSize;
+    width: @iconSize;
+    height: @iconSize;
     line-height: 1rem;
     display: inline-block;
 }
