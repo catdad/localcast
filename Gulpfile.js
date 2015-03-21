@@ -7,11 +7,11 @@ var gulp = require('gulp'),
 
 gulp.task('less', function() {
     return gulp.src('./less/style.less')
+        .on('error', gutil.log)
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./public'))
-        .on('error', gutil.log);
+        .pipe(gulp.dest('./public'));
 });
 
 gulp.task('watch', ['less'], function() {
