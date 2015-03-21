@@ -12,9 +12,6 @@ if (!fs.existsSync(vidPath)){
     process.exit();
 }
 
-console.log(vidPath);
-
-
 var filename = path.basename(vidPath).split('.').slice(0,-1).join(' ') + '12345.mp4';
 
 var outputPath = path.resolve(path.dirname(vidPath), filename);
