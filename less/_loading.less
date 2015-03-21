@@ -28,10 +28,10 @@
     left: 0;
     right: 0;
 
-    border-left:   @thickness solid rgba(38,50,56,.25);
-    border-right:  @thickness solid rgba(38,50,56,.25);
-    border-bottom: @thickness solid rgba(38,50,56,.25);
-    border-top:    @thickness solid rgba(38,50,56,1);
+    border-left:   @thickness solid fade(@color-darkest, 25%);
+    border-right:  @thickness solid fade(@color-darkest, 25%);
+    border-bottom: @thickness solid fade(@color-darkest, 25%);
+    border-top:    @thickness solid @color-darkest;
     border-radius: 100%;
     
     .animation(spin @speed infinite linear);

@@ -1,7 +1,10 @@
+@import (reference) "_variables.less";
+@import (reference) "_media.less";
+
 #page {
     position: relative;
     min-height: 100%;
-    box-sizing: border-box;
+    .box-sizing(border-box);
     padding-bottom: 4.2rem;
 }
 
@@ -15,34 +18,11 @@
     border-top: 1px solid lightgray;
     background-color: #fdfdfd;
 
-    -webkit-user-select: none;
-       -moz-user-select: none;
-        -ms-user-select: none;
-            user-select: none;
+    .user-select(none);
     
     box-shadow: 0 15px 22px 10px black;
     will-change: opacity;
 }
-
-/*
-#controls.disabled {
-    -webkit-filter: blur(1px) grayscale(60%);
-       -moz-filter: blur(1px) grayscale(60%);
-            filter: blur(1px) grayscale(60%);
-}
-*/
-/*
-#controls.disabled:after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background: #eee;
-    opacity: .4;
-}
-*/
 
 #controls.disabled .button {
     display: none;
@@ -65,7 +45,7 @@
     border-radius: 50%;
     margin: 8px;
     
-    /* effects on background icons are a pain */
+    // effects on background icons are a pain
     box-shadow: 0 0 0 6px transparent;
     background-color: transparent;
     transition: background-color 400ms ease-in-out, box-shadow 400ms ease-in-out;
@@ -81,7 +61,7 @@
     padding: 2px 0;
     overflow: visible;
 
-    /* fix for small gap visible on IPS screens -- super annoying */
+    // fix for small gap visible on IPS screens -- super annoying
     transform: translateY(-1px);
 }
 #controls .track .thumb {
@@ -91,7 +71,7 @@
     border-radius: 50%;
     opacity: 1;
 
-    /* reposition the center of the thumb */
+    // reposition the center of the thumb
     position: relative;
     top: -7px;
     left: -7px;
@@ -128,7 +108,7 @@
     color: #fee;
     text-align: center;
 
-    /* hidden state params */
+    // hidden state params
     height: 0;
     padding: 0;
     overflow: hidden;
@@ -141,15 +121,16 @@
     padding: 5px;
     overflow: visible;
     opacity: 1;
-}
-#controls .track .tooltip.show:after {
-    content: '';
-    position: absolute;
-    left: .9rem;
-    bottom: -10px;
-    width: 0;
-    height: 0;
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-top: 10px solid rgba(0,0,0,.5);
+    
+    &:after {
+        content: '';
+        position: absolute;
+        left: .9rem;
+        bottom: -10px;
+        width: 0;
+        height: 0;
+        border-left: 10px solid transparent;
+        border-right: 10px solid transparent;
+        border-top: 10px solid rgba(0,0,0,.5);
+    }
 }
