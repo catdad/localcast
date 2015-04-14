@@ -1,0 +1,12 @@
+{
+    "preset": "google",
+    "disallowSpacesInAnonymousFunctionExpression": null,
+    "excludeFiles": ["node_modules/**"],
+
+    "maximumLineLength": 100,
+    "validateLineBreaks": "LF",
+    "validateIndentation": 4,
+
+    "disallowAnonymousFunctions": true,
+    "disallowTrailingWhitespace": "ignoreEmptyLines"
+}

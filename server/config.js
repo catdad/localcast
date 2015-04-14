@@ -6,7 +6,7 @@ var configFile,
     configFilePath = './config.json';
 
 // just because I feel better about it
-var forEach = function(obj, cb, context){
+var forEach = function forEach(obj, cb, context) {
     // check for a native forEach function
     var native = [].forEach,
         hasProp = Object.prototype.hasOwnProperty;
@@ -27,7 +27,7 @@ var forEach = function(obj, cb, context){
     // it's an object, use the keys
     else {
         // loop through all keys
-        for (var name in obj){
+        for (var name in obj) {
             // call the function with context and native-like arguments
             if (hasProp.call(obj, name)) {
                 cb && cb.call(context, obj[name], name, obj);
@@ -39,24 +39,24 @@ var forEach = function(obj, cb, context){
 try {
     // get the config file synchronously this first time, so that we can require the config.js module
     configFile = require(configFilePath);
-} catch(e) {
+} catch (e) {
     // create a config object using default values
     configFile = {
         port: 8999,
-        root : __dirname,
+        root : '.', //__dirname,
         virtuals : [ ]
     };
 }
 
 var config = {};
 
-function reload(done){
+function reload(done) {
     if (typeof done !== 'function') {
-        done = function(){};
+        done = function() {};
     }
     
     // Read the config file again. This time, we can do async.
-    var newFile = fs.readFile(configFilePath, function(err, content){
+    var newFile = fs.readFile(configFilePath, function(err, content) {
         if (err) {
             // return an error if we got one
             // the config options have not changed
@@ -68,7 +68,7 @@ function reload(done){
         try {
             // attempt to read the data as JSON
             data = JSON.parse(content);
-        } catch(e) {
+        } catch (e) {
             // data is not JSON
             // the config options have not changed
             done(e);
@@ -76,7 +76,7 @@ function reload(done){
         }
         
         // extend the original config file with the options in the new one
-        forEach(data, function(value, key){
+        forEach(data, function(value, key) {
             configFile[key] = value;
         });
         
@@ -89,13 +89,13 @@ function reload(done){
 }
 
 function buildConfigObject() {
-    forEach(configFile, function(value, key){
+    forEach(configFile, function(value, key) {
         // only add a property if one does not exist
         if (!config[key]) {
             // make all the properties read-only
             Object.defineProperty(config, key, {
                 enumerable: true,
-                get: function(){
+                get: function() {
                     return configFile[key];
                 }
             });

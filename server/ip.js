@@ -5,7 +5,7 @@ var config = require('./config.js');
 
 var ip;
 
-module.exports = function(){
+module.exports = function() {
     //check if one was already found
     if (ip) return ip;
     
@@ -19,8 +19,8 @@ module.exports = function(){
     var ifaces = os.networkInterfaces();
     
     //preference Ethernet
-    if (ifaces.Ethernet){
-        var options = ifaces.Ethernet.filter(function(el){
+    if (ifaces.Ethernet) {
+        var options = ifaces.Ethernet.filter(function(el) {
             return (el.family === 'IPv4');
         });
         
@@ -32,7 +32,7 @@ module.exports = function(){
     
     //loop through everything
     for (var dev in ifaces) {
-        ifaces[dev].forEach(function(details){
+        ifaces[dev].forEach(function(details) {
             if (!details.internal && details.family === 'IPv4' && details.address !== '127.0.0.1') {
                 ip = details.address;
             }
