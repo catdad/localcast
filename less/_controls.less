@@ -14,7 +14,7 @@
     bottom: 0;
     left: 0;
     height: 4rem;
-    transform: translateZ(0);
+    .transform( translateZ(0) );
     border-top: 1px solid lightgray;
     background-color: #fdfdfd;
 
@@ -48,7 +48,9 @@
     // effects on background icons are a pain
     box-shadow: 0 0 0 6px transparent;
     background-color: transparent;
-    transition: background-color 400ms ease-in-out, box-shadow 400ms ease-in-out;
+    
+    @transition: background-color 400ms ease-in-out, box-shadow 400ms ease-in-out;
+    .transition(@transition);
 }
 #controls .button:hover {
     box-shadow: 0 0 0 6px #eee;
@@ -62,7 +64,7 @@
     overflow: visible;
 
     // fix for small gap visible on IPS screens -- super annoying
-    transform: translateY(-1px);
+    .transform( translateY(-1px) );
 }
 #controls .track .thumb {
     background: #f26f83;
@@ -114,7 +116,7 @@
     overflow: hidden;
     opacity: 0;
 
-    transition: opacity 800ms ease;
+    .transition( opacity 800ms ease );
 }
 #controls .track .tooltip.show {
     height: auto;
