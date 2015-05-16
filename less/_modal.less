@@ -11,21 +11,20 @@
     right: 0;
 
     opacity: 0;
-    transform: scale(0,0);
-    transform: scale3d(0,0,0);
-
-    transition: all 200ms ease-out;
+    .transform( scale(0,0) );
+    .transform( scale3d(0,0,0) );
+    .transition( all 200ms ease-out );
     will-change: transform, opacity;
     
     &.open {
-        transform: scale(1,1);
-        transform: scale3d(1,1,1);
+        .transform( scale(1,1) );
+        .transform( scale3d(1,1,1) );
         opacity: 1;
-        transition: all 300ms ease-in;
+        .transition( all 300ms ease-in );
     }
     &.dim {
         background: rgba(0,0,0,.95);
-        transition: background 1s ease;
+        .transition( background 1s ease );
     }
     
     .loading {
@@ -52,7 +51,8 @@
     overflow: hidden;
     -webkit-transform: translateZ(0);
 
-    transition: height 250ms ease-out, transform 250ms ease-out;
+    @transition: height 250ms ease-out, transform 250ms ease-out;
+    .transition(@transition);
     will-change: transform, height;
 }
 .modal.video {
@@ -64,8 +64,8 @@
     height: auto;
 }
 .modal.remove {
-    transform: scale(0,0);
-    transform: scale3d(0,0,0);
+    .transform( scale(0,0) );
+    .transform( scale3d(0,0,0) );
 }
 .modal .title {
     box-sizing: border-box;

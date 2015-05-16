@@ -1,17 +1,20 @@
 @import (reference) "_variables.less";
 @import (reference) "_media.less";
 
-@fileWidth: 6rem;
-@fileHeight: 6rem;
+@fileWidth: 6.6rem;
+@fileHeight: 6.6rem;
+@fileBeforeTop: 6rem;
+@fileAfterTop: 7rem;
 
 .file {
     display: inline-block;
     position: relative;
+    text-align: center;
+    cursor: pointer;
+
     width: @fileWidth;
     height: @fileHeight;
-    text-align: center;
-    margin: 6px 12px 2.2rem;
-    cursor: pointer;
+    margin: 6px 6px 2rem;
     
     @fontSize: .8rem;
     
@@ -21,7 +24,7 @@
         white-space: nowrap;
         overflow: hidden;
         position: absolute;
-        top: 6rem;
+        top: @fileBeforeTop;
         left: 0;
         width: 100%;
         font-size: @fontSize;
@@ -29,7 +32,7 @@
     &:after {
         content: attr(data-episode);
         position: absolute;
-        top: 7rem;
+        top: @fileAfterTop;
         width: 100%;
         left: 0;
         font-size: @fontSize;
@@ -38,18 +41,26 @@
     }
     
     .smallView({
-        width: @fileWidth - 1rem;
-        height: @fileHeight - 1rem;
+        @adjustBy: 1rem;
+        
+        margin: 6px 6px 1.5rem;
+        
+        width: @fileWidth - @adjustBy;
+        height: @fileHeight - @adjustBy;
 
-        &:before { top: 5rem; }
-        &:after { top: 6rem; }
+        &:before { top: @fileBeforeTop - @adjustBy; }
+        &:after { top: @fileAfterTop - @adjustBy; }
     });
 }
+
+@svgSize: 80%;
 
 .file svg {
     top: 0;
     left: 0;
     margin: 0 auto;
-    width: 100%;
-    height: 100%;
+    width: @svgSize;
+    height: @svgSize;
+    
+    opacity: 0.9;
 }
