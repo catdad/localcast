@@ -20,6 +20,10 @@ var servercast = require('./servercast.js');
 var servercast3 = require('./servercast3.js');
 var ip = require('./ip.js');
 
+// set the process title to the package name
+var package = require('./../package.json');
+process.title = package.name;
+
 // root is one up from the running dir
 var rootDir = path.resolve(__dirname, '..');
 
