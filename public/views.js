@@ -524,13 +524,25 @@ var views = {
         div.innerHTML = "";
         div.appendChild(icon);
         
-        //build episode field
-        if (file.isFile){
+        //build episode/year field
+        if (file.isFile) {
+            var text;
+            
+            // look for a year first
+            var year = file.name.match(/(?!\()[0-9]{4}(?=\))/);
+            if (year) { text = year[0]; }
+            
+            // look for an s00e00 episode
             var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
             if (!episode) {
+                // look for a 3-digit episode
                 episode = file.name.match(/[0-9]{3}/);
             }
-            div.setAttribute('data-episode', (episode) ? episode[0] : ' ');
+            if (episode && !text) {
+                text = episode[0];
+            }
+            
+            div.setAttribute('data-episode', (text) ? text : ' ');
         }
         
         div.setAttribute('data-filter', this.splitString(file.name));
