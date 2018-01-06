@@ -20,9 +20,10 @@
     "mdns-js2": "0.0.5"
   },
   "devDependencies": {
-    "gulp": "^3.8.11",
+    "gulp": "^3.9.1",
     "gulp-less": "^3.0.2",
     "gulp-plumber": "^1.0.0",
-    "gulp-sourcemaps": "^1.5.1"
+    "gulp-sourcemaps": "^1.5.1",
+    "run-sequence": "^2.2.1"
   }
 }
