@@ -5,31 +5,6 @@ function playVideo(resource) {
     window.location.href = resource;
 }
 
-// event name enum (includes browser-specific events)
-var fake = document.createElement('div'),
-    getName = function(prop){
-        return fake.style[prop.toLowerCase()] !== undefined ? prop.toLowerCase() + 'end' :
-               fake.style['Webkit' + prop] !== undefined ? 'webkit' + prop + 'End' :
-               fake.style['O' + prop] !== undefined ? 'o' + prop + 'End' :
-               fake.style['Moz' + prop] !== undefined ? 'moz' + prop + 'End' : prop.toLowerCase() + 'end';
-    };
-var eventName = {
-    animationEnd: getName('Animation'),
-    transitionEnd: getName('Transition')
-};
-
-var raf = window.requestAnimationFrame || function(cb){ setTimeout(cb, 16); };
-var defer = function(cb){ setTimeout(cb, 0); };
-
-function once(dom, event, cb) {
-    var listener = function(){
-        dom.removeEventListener(event, listener);
-        cb.apply(undefined, arguments);
-    };
-    
-    dom.addEventListener(event, listener);
-}
-
 //file views
 var views = {
     //icon router
@@ -65,214 +40,19 @@ var views = {
         return sub.replace(/\./g, ' ').trim();
     },
     elem: function(type, opts) {
-        opts = opts || {};
-        var el = document.createElement(type);
-        opts.className && (el.className = opts.className);
-        opts.text && (el.appendChild( document.createTextNode(opts.text) ));
-        return el;
+        return window.UTIL.elem(type, opts);
     },
     
     //constructors
     Modal: function(contentDom, onOpen, origin) {
-        var wrapper = views.elem('div', { className: 'modal_wrapper' }),
-            onClose, onBeforeClose, isClosed = false;
-            
-        contentDom.classList.add('modal');
-        
-        if (origin && origin.x !== undefined && origin.y !== undefined) {
-            wrapper.style.transformOrigin = origin.x + 'px ' + origin.y + 'px';
-        } else {
-            wrapper.style.transformOrigin = '50% 50%';
-        }
-        
-        // wrapper transition callback
-        var wrapperTransitionEnded = function() {
-            onOpen && onOpen(wrapper);
-        };
-        
-        document.body.appendChild(wrapper);
-        
-        // execute the transition on the next animation frame
-        raf(function() {
-            // add callback for when the animation ends
-            once(wrapper, eventName.transitionEnd, wrapperTransitionEnded);
-            
-            // Chrome on Android won't trigger a transition if this is executed without a timeout,
-            // don't know why...
-            defer(function() {
-                wrapper.classList.add('open');
-            });
-        });
-        
-        function removeModalContent(done) {
-            // when the modal is done closing, hide it
-            once(contentDom, eventName.transitionEnd, function(ev){
-                // stop this event from triggering the wrapper transition end as well
-                ev.preventDefault();
-                ev.stopPropagation();
-                
-                // hide the content for now -- it can be removed later
-                contentDom.style.visibility = 'hidden';
-                
-                // trigger the done callback
-                raf(function(){
-                    done && done();
-                });
-            });
-            
-            contentDom.classList.add('remove');
-        }
-        
-        function closeModal(done) {
-            if (isClosed) return;
-            else isClosed = true;
-            
-            var defaultPrevented = false;
-            
-            // trigger the beforeClose even before anything else happens
-            onBeforeClose && onBeforeClose({
-                preventDefault: function(){ defaultPrevented = true; }
-            });
-            
-            if (defaultPrevented) { 
-                isClosed = false;
-                return;
-            }
-            
-            // when the wrapper is done animating, remove it
-            once(wrapper, eventName.transitionEnd, function(){
-                document.body.removeChild(wrapper);
-                
-                // trigger done callback if it exists
-                done && done();
-                
-                // trigger onClose, if one was provided
-                onClose && onClose();
-            });
-            
-            // remove the open class to animate
-            wrapper.classList.remove('open');
-        }
-        
-        // close Modal if clicking on the black space
-        wrapper.onclick = function(ev) {
-            // trigger a close using the "back" button
-            if (ev.target === wrapper) triggerCloseModal();
-        };
-        
-        // close the modal on the next pop state
-        hash.onNextPop(function(ev){
-            if (!isClosed) {
-                ev.preventDefault();
-                // perform an actual close on the modal
-                closeModal();
-            }
-        });
-        
-        // push the current state onto the stack
-        hash.push({ resource: hash.state() });
-        
-        function triggerCloseModal(){
-            // trigger a pop state in order to close the modal
-            hash.back();
-        }
-        
-        return {
-            close: triggerCloseModal,
-            replace: function(newContent, cb){
-                removeModalContent(function(){
-                    cb && cb(wrapper);
-                });
-            },
-            onClose: function(cb){
-                onClose = typeof cb === 'function' ? cb : undefined;
-            },
-            onBeforeClose: function(cb) {
-                onBeforeClose = typeof cb === 'function' ? cb : undefined;
-            }
-        };
+        window.STATE.emit('modal:open', contentDom, onOpen, origin);
     },
-    videoModal: function(resource, name, existingModal){
-        var vid = views.elem('video', { className: 'modal video' });
-        vid.src = resource;
-        vid.controls = 'controls';
-        
-        var duration;
-        
-        // set the page title to the video name
-        var documentTitle = document.title;
-        document.title = name + ' - ' + documentTitle;
-        
-        function togglePlaying(ev) {
-            ev.preventDefault();
-            
-            if (vid.ended) return;
-            
-            if (vid.paused) {
-                vid.play();
-            } else {
-                vid.pause();
-            }
-        }
-        
-        function keyPress(ev) {
-            if (ev.which === 32 || ev.keyCode === 32) {
-                togglePlaying(ev);
-            }
-        }
-        
-        vid.addEventListener('click', togglePlaying);
-        window.addEventListener('keypress', keyPress);
-        
-        vid.addEventListener('durationchange', function(ev){
-            duration = vid.duration;
-        });
-        
-        function setupVideoControls(wrapper) {
-            window.vid = vid;
-            
-            vid.addEventListener('playing', function(){
-                if (!wrapper.classList.contains('dim')) {
-                    wrapper.classList.add('dim');
-                }
-            });
-            
-            vid.addEventListener('ended', function(){
-                window.removeEventListener('keypress', keyPress);
-                
-                raf(function(){
-                    existingModal.close();
-                });
-            });
-        }
-        
-        function onWrapperReceived(wrapper) {
-            existingModal.onBeforeClose(function(ev){
-                //ev.preventDefault();
-                //return;
-                
-                // return the title back to the original
-                document.title = documentTitle;
-                
-                wrapper.classList.remove('dim');
-            });
-            
-            while(wrapper.firstChild) {
-                wrapper.removeChild(wrapper.firstChild);
-            }
-            
-            wrapper.appendChild(vid);
-            setupVideoControls(wrapper);
-            vid.play();
-        }
-        
-        if (existingModal) {
-            existingModal.replace(undefined, onWrapperReceived);
-        } else {
-            existingModal = views.Modal(vid, onWrapperReceived);
-        }
+    videoModal: function(resource, name){
+        window.STATE.emit('video:play', resource, name);
     },
     controlsModal: function(ev, thumb, resource, name, domTrigger){
+        console.log('clicked', name);
+        
         var modal = views.elem('div'),
             container = views.elem('div'),
             image = views.elem('img', { className: 'thumb' }),
@@ -321,7 +101,7 @@ var views = {
             var containerHeight = container.offsetHeight;
             
             // let's animate the height transition as well
-            raf(function() {
+            window.UTIL.raf(function() {
                 modal.style.height = ( cWidth * height / width ) + containerHeight + 'px';
             });
         };
@@ -351,7 +131,7 @@ var views = {
         playCastButton.appendChild(castText);
         
         playLocalButton.onclick = function(){
-            views.videoModal(resource, name, thisModal);
+            views.videoModal(resource, name);
         };
         playCastButton.onclick = function(){
             function browserCast() {
@@ -362,14 +142,14 @@ var views = {
             }
             
             function serverCast() {
-                thisModal.close();
+                window.STATE.emit('modal:close');
                 server.playNew(resource, name, thumb);
             }
             
             (chromecast.isAvailable() && false) ? browserCast() : serverCast();
         };
         
-        var thisModal = views.Modal(modal, function onOpen(wrapper){
+        views.Modal(modal, function onOpen(wrapper){
             modalWrapper = wrapper;
             
             if (imageIsLoaded) {
@@ -390,7 +170,7 @@ var views = {
         
         div.appendChild(heading);
         
-        var thisModal = views.Modal(div, function(wrapper){
+        views.Modal(div, function(wrapper){
             wrapper.appendChild(div);
             
             [].forEach.call(div.childNodes, function(node){
@@ -400,17 +180,17 @@ var views = {
             div.style.height = height + 'px';
         });
         
-        thisModal.onClose(function(){
+        window.STATE.once('modal:closed', function () {
             if (!selected) onCancel();
         });
-        
+                
         list.forEach(function(item){
             var b = views.elem('button', { text: item });
             
             b.onclick = function(){
                 selected = true;
                 onSelect(item);
-                thisModal.close();
+                window.STATE.emit('modal:close');
             };
             
             div.appendChild(b);
