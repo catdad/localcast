@@ -139,9 +139,11 @@ var Browser = function(root, prefix) {
         //get file format
         var format = fullPath.split('.').pop();
         
-        if (format === 'mp4' || format === 'webm')
-            streamFile(req, res, fullPath);
-        else ffmpegStream(req, res, fullPath);
+        if (format === 'mp4' || format === 'webm') {
+            return streamFile(req, res, fullPath);
+        }
+        
+        return ffmpegStream(req, res, fullPath);
     };
     
     this.thumb = function(req, res, relativePath) {
