@@ -19,17 +19,26 @@ gulp.task('server:kill', function () {
         return;
     }
 
-    return new Promise(function (resolve, reject) {
-        server.on('close', function (code) {
-            console.log('closed with code', code);
-
+    var temp = server;
+    server = null;
+    
+    return Promise.all([
+        new Promise(function (resolve, reject) {
+            temp.on('exit', function (code) {
+                console.log('exited with code', code);
+                resolve();
+            });
+        }),
+        new Promise(function (resolve, reject) {
+            temp.on('close', function () {
+                resolve();
+            });
+        }),
+        new Promise(function (resolve, reject) {
+            temp.kill();
             resolve();
-        });
-
-        server.kill();
-
-        server = null;
-    });
+        })
+    ]);
 });
 
 gulp.task('server:start', function () {
