@@ -8,17 +8,19 @@
     var currentModal;
     
     // event name enum (includes browser-specific events)
-    var fake = document.createElement('div'),
-        getName = function(prop){
+    var eventName = function (fake) {
+        var getName = function(prop){
             return fake.style[prop.toLowerCase()] !== undefined ? prop.toLowerCase() + 'end' :
                    fake.style['Webkit' + prop] !== undefined ? 'webkit' + prop + 'End' :
                    fake.style['O' + prop] !== undefined ? 'o' + prop + 'End' :
                    fake.style['Moz' + prop] !== undefined ? 'moz' + prop + 'End' : prop.toLowerCase() + 'end';
         };
-    var eventName = {
-        animationEnd: getName('Animation'),
-        transitionEnd: getName('Transition')
-    };
+
+        return {
+            animationEnd: getName('Animation'),
+            transitionEnd: getName('Transition')
+        };
+    }(document.createElement('div'));
     
     function Modal(contentDom, onOpen, origin) {
         var wrapper = UTIL.elem('div', { className: 'modal_wrapper' }),
