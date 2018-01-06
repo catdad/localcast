@@ -69,3 +69,7 @@ gulp.task('watch', ['less', 'server'], function() {
     gulp.watch('./less/**/*.less', ['less']);
     gulp.watch('./server/**/*', ['server']);
 });
+
+gulp.task('build', ['less']);
+gulp.task('dev', ['watch']);
+gulp.task('default', ['dev']);
