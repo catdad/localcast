@@ -62,7 +62,7 @@ gulp.task('less', function() {
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(sourcemaps.write())
-        .pipe(gulp.dest('./public'));
+        .pipe(gulp.dest('./build'));
 });
 
 gulp.task('watch', ['less', 'server'], function() {
