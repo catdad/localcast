@@ -178,6 +178,7 @@ app.get('/gui*', function(req, res) {
 app.use(express.static(path.resolve(rootDir, 'public')));
 app.use('/friendlyCast', express.static(path.resolve('.', 'friendlyCast')));
 app.use('/lib/octicons', express.static(path.resolve('.', 'lib/octicons')));
+app.use('/build', express.static(path.resolve('.', 'build')));
 
 // generate links to the home page inside the local network
 app.get('/link', function(req, res) {
