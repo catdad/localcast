@@ -23,8 +23,8 @@
     }(document.createElement('div'));
     
     function Modal(contentDom, onOpen, origin) {
-        var wrapper = UTIL.elem('div', { className: 'modal_wrapper' }),
-            onClose, onBeforeClose, isClosed = false;
+        var wrapper = UTIL.elem('div', { className: 'modal_wrapper' });
+        var isClosed = false;
             
         contentDom.classList.add('modal');
         
@@ -83,12 +83,9 @@
             var defaultPrevented = false;
             
             // trigger the beforeClose even before anything else happens
-            STATE.emit('modal:closing');
-            if (onBeforeClose) {
-                onBeforeClose({
-                    preventDefault: function(){ defaultPrevented = true; }
-                });
-            }
+            STATE.emit('modal:closing', {
+                preventDefault: function(){ defaultPrevented = true; }
+            });
             
             if (defaultPrevented) { 
                 isClosed = false;
@@ -104,11 +101,7 @@
                     done();
                 }
                 
-                // trigger onClose, if one was provided
                 STATE.emit('modal:closed');
-                if (onClose) {
-                    onClose();
-                }
             });
             
             // remove the open class to animate
@@ -146,12 +139,6 @@
                         cb(wrapper);
                     }
                 });
-            },
-            onClose: function(cb){
-                onClose = typeof cb === 'function' ? cb : undefined;
-            },
-            onBeforeClose: function(cb) {
-                onBeforeClose = typeof cb === 'function' ? cb : undefined;
             }
         };
     }
