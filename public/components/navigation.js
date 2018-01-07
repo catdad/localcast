@@ -7,8 +7,8 @@
     
     var navDOM = document.getElementById('contentNav');
     
-    STATE.on('navigate', function (path, sep) {
-        sep = '/';
+    STATE.on('navigate', function (path) {
+        var sep = '/';
         path = (!path || path === '.') ? '' : path;
         
         var that = this;
