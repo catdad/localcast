@@ -5,6 +5,56 @@
     var UTIL = window.UTIL;
     var STATE = window.STATE;
     
+    function createPlayButton(resource, name, thumb) {
+        var playLocalButton = document.createElement('button');
+        playLocalButton.className = 'play';
+
+        var playIcon = UTIL.elem('span', { className: 'icon icon-play' }),
+            playText = document.createTextNode('Play');
+        playLocalButton.appendChild(playIcon);
+        playLocalButton.appendChild(playText);
+        
+        playLocalButton.onclick = function() {
+            STATE.emit('video:play', resource, name);
+        };
+        
+        return playLocalButton;
+    }
+    
+    function createCastButton(resource, name, thumb) {
+        var playCastButton = document.createElement('button');
+
+        playCastButton.className = 'cast';
+        
+        var castIcon = UTIL.elem('span', { className: 'icon icon-cast' }),
+            castText = document.createTextNode('Cast');
+        
+        playCastButton.appendChild(castIcon);
+        playCastButton.appendChild(castText);
+        
+        playCastButton.onclick = function(){
+            function browserCast() {
+                chromecast.startCast(resource, {
+                    title: name,
+                    images: [{ url: thumb }]
+                });
+            }
+            
+            function serverCast() {
+                STATE.emit('modal:close');
+                server.playNew(resource, name, thumb);
+            }
+            
+            if (chromecast.isAvailable() && false) {
+                browserCast();
+            } else {
+                serverCast();
+            }
+        };
+        
+        return playCastButton;
+    }
+    
     STATE.on('splash', function (ev, thumb, resource, name, domTrigger) {
         var modal = UTIL.elem('div'),
             container = UTIL.elem('div'),
@@ -15,18 +65,18 @@
         container.appendChild(title);
         
         // get the origin to use for animation
-        var triggerBB = domTrigger.getBoundingClientRect(),
-            origin = {
-                x: (triggerBB.left + triggerBB.right) / 2,
-                y: (triggerBB.top + triggerBB.bottom) / 2
-            };
+        var triggerBB = domTrigger.getBoundingClientRect();
+        var origin = {
+            x: (triggerBB.left + triggerBB.right) / 2,
+            y: (triggerBB.top + triggerBB.bottom) / 2
+        };
         
-        var playLocalButton = document.createElement('button');
-        var playCastButton = document.createElement('button');
-      
         // first, queue the image to load, and keep track here
         var modalIsOpen = false,
             imageIsLoaded = false;
+        
+        var playButton = createPlayButton(resource, name, thumb);
+        var castButton = createCastButton(resource, name, thumb);
         
         // this function should be executed after image has loaded and tranition has ended
         var imageOnLoad = function(wrapper) {
@@ -46,8 +96,8 @@
             modal.appendChild(image);
             
             // insert the two buttons created earlier
-            container.appendChild(playLocalButton);
-            container.appendChild(playCastButton);
+            container.appendChild(playButton);
+            container.appendChild(castButton);
             
             modal.appendChild(container);
             
@@ -69,44 +119,6 @@
         };
         image.src = thumb;
         
-        // Build the play and cast buttons while we wait for the image
-        playLocalButton.className = 'play';
-        playCastButton.className = 'cast';
-        
-        var playIcon = UTIL.elem('span', { className: 'icon icon-play' }),
-            playText = document.createTextNode('Play');
-        var castIcon = UTIL.elem('span', { className: 'icon icon-cast' }),
-            castText = document.createTextNode('Cast');
-        
-        playLocalButton.appendChild(playIcon);
-        playLocalButton.appendChild(playText);
-        playCastButton.appendChild(castIcon);
-        playCastButton.appendChild(castText);
-        
-        playLocalButton.onclick = function() {
-            STATE.emit('video:play', resource, name);
-        };
-
-        playCastButton.onclick = function(){
-            function browserCast() {
-                chromecast.startCast(resource, {
-                    title: name,
-                    images: [{ url: thumb }]
-                });
-            }
-            
-            function serverCast() {
-                STATE.emit('modal:close');
-                server.playNew(resource, name, thumb);
-            }
-            
-            if (chromecast.isAvailable() && false) {
-                browserCast();
-            } else {
-                serverCast();
-            }
-        };
-        
         window.STATE.emit('modal:open', modal, function onOpen(wrapper) {
             modalWrapper = wrapper;
             
@@ -117,7 +129,6 @@
                 // add spinner while the image loads
                 wrapper.appendChild(UTIL.elem('div', { className: 'loading' }));
             }
-            
         }, origin);
     });
 }(window));
