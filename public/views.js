@@ -108,51 +108,7 @@ var views = {
     },
     
     nav: function(path, sep){
-        sep = '/';
-        path = (!path || path === '.') ? '' : path;
-        
-        var that = this;
-        //generate links for nav
-        var linker = function(href, display){
-            var span = views.elem("span", { className: 'navPart' });
-            
-            span.onclick = function(){ 
-                hash.push({
-                    resource: href,
-                    title: 'root',
-                    url: href || '/'
-                }, true);
-            };
-            span.innerHTML = display;
-            return span;
-        };
-        
-        //generate nav separators
-        var separator = function(){
-            var s = views.elem("span");
-            s.innerHTML = "  &raquo;  ";
-            return s;
-        };
-
-        var dom = views.elem('div');
-        
-        if (path) {
-            path.split(sep).forEach(function(el, i, arr){
-                //ugh, special case
-                if (i === 0){
-                    //create root
-                    dom.appendChild(linker('dir', "root"));
-                }
-                else{
-                    //add separator
-                    dom.appendChild(separator());
-                    //add link
-                    dom.appendChild(linker(arr.slice(0,i+1).join(sep),el));
-                }
-            });
-        }
-        
-        return dom;
+        window.STATE.emit('navigate', path, sep);
     },
     
     fileView: function(file){

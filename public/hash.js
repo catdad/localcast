@@ -5,7 +5,6 @@
     //these don't belong here
     var fileDOM = document.getElementById('contentFiles');
     var dirDOM = document.getElementById('contentDirs');
-    var navDOM = document.getElementById('contentNav');
     
     var searchDOM = document.querySelector('#contentSearch input');
     searchDOM && (searchDOM.oninput = function(ev){
@@ -56,7 +55,7 @@
                 if (err) return;
             
                 //reset DOM elements
-                fileDOM.innerHTML = dirDOM.innerHTML = navDOM.innerHTML = '';
+                fileDOM.innerHTML = dirDOM.innerHTML = '';
             
                 //populate files
                 data.files.forEach(function(el){
@@ -64,8 +63,8 @@
                     else fileDOM.appendChild( views.fileView(el) );
                 });
             
-                //populate nav
-                navDOM.appendChild( views.nav(data.path) );
+                //navigate
+                views.nav(data.path)
                 
                 if (data.nowPlaying !== undefined) {
                     server.nowPlaying(data.nowPlaying);
