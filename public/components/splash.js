@@ -5,14 +5,21 @@
     var UTIL = window.UTIL;
     var STATE = window.STATE;
     
+    function createButton(text) {
+        var type = text.toLowerCase();
+        
+        var buttonElem = UTIL.elem('button', { className: type });
+        var iconElem = UTIL.elem('span', { className: 'icon icon-' + type });
+        var textElem = document.createTextNode(text);
+        
+        buttonElem.appendChild(iconElem);
+        buttonElem.appendChild(textElem);
+        
+        return buttonElem;
+    }
+    
     function createPlayButton(resource, name, thumb) {
-        var playLocalButton = document.createElement('button');
-        playLocalButton.className = 'play';
-
-        var playIcon = UTIL.elem('span', { className: 'icon icon-play' }),
-            playText = document.createTextNode('Play');
-        playLocalButton.appendChild(playIcon);
-        playLocalButton.appendChild(playText);
+        var playLocalButton = createButton('Play');
         
         playLocalButton.onclick = function() {
             STATE.emit('video:play', resource, name);
@@ -22,15 +29,7 @@
     }
     
     function createCastButton(resource, name, thumb) {
-        var playCastButton = document.createElement('button');
-
-        playCastButton.className = 'cast';
-        
-        var castIcon = UTIL.elem('span', { className: 'icon icon-cast' }),
-            castText = document.createTextNode('Cast');
-        
-        playCastButton.appendChild(castIcon);
-        playCastButton.appendChild(castText);
+        var playCastButton = createButton('Cast');
         
         playCastButton.onclick = function(){
             function browserCast() {
