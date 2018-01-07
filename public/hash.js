@@ -2,17 +2,6 @@
 /*globals views, request, server */
 
 !function(){
-    //these don't belong here
-    var fileDOM = document.getElementById('contentFiles');
-    var dirDOM = document.getElementById('contentDirs');
-    var navDOM = document.getElementById('contentNav');
-    
-    var searchDOM = document.querySelector('#contentSearch input');
-    searchDOM && (searchDOM.oninput = function(ev){
-        views.filter(fileDOM.children, this.value);
-        //views.filter(dirDOM.children, this.value);
-    });
-    
     var Hash = function(){
         var that = this,
             nextPop = [];
@@ -54,18 +43,12 @@
                 url: url.replace(/\\/g,'/')
             }, function(err, data){
                 if (err) return;
-            
-                //reset DOM elements
-                fileDOM.innerHTML = dirDOM.innerHTML = navDOM.innerHTML = '';
-            
+                            
                 //populate files
-                data.files.forEach(function(el){
-                    if (el.isDirectory || el.isVirtual) dirDOM.appendChild( views.fileView(el) );
-                    else fileDOM.appendChild( views.fileView(el) );
-                });
-            
-                //populate nav
-                navDOM.appendChild( views.nav(data.path) );
+                window.STATE.emit('list', data);
+                
+                //navigate
+                window.STATE.emit('navigate', data.path);
                 
                 if (data.nowPlaying !== undefined) {
                     server.nowPlaying(data.nowPlaying);
