@@ -64,7 +64,7 @@
                 });
             
                 //navigate
-                views.nav(data.path)
+                window.STATE.emit('navigate', data.path);
                 
                 if (data.nowPlaying !== undefined) {
                     server.nowPlaying(data.nowPlaying);

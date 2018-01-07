@@ -107,10 +107,6 @@ var views = {
         });
     },
     
-    nav: function(path, sep){
-        window.STATE.emit('navigate', path, sep);
-    },
-    
     fileView: function(file){
         var div = views.elem('div', { className: 'file' });
         div.setAttribute('data-path', file.path);
