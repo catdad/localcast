@@ -30,10 +30,22 @@
         }
     };
 
+    function clean(str) {
+        var idx = str.search(/s[0-9]{2}e[0-9]{2}/i);
+        var sub = (idx > 0) ? str.substr(0, idx) : str;
+        return sub.replace(/\./g, ' ').trim();
+    }
+    
+    function splitString(str) {
+        return str.replace(/\.|\s|\/|\-/g, ' ').toLowerCase();
+    }
+    
     window.UTIL = {
         raf: raf,
         defer: defer,
         once: once,
-        elem: views.elem
+        elem: views.elem,
+        clean: clean,
+        splitString: splitString
     };
 }(window));

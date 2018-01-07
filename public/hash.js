@@ -2,10 +2,6 @@
 /*globals views, request, server */
 
 !function(){
-    //these don't belong here
-    var fileDOM = document.getElementById('contentFiles');
-    var dirDOM = document.getElementById('contentDirs');
-    
     var searchDOM = document.querySelector('#contentSearch input');
     searchDOM && (searchDOM.oninput = function(ev){
         views.filter(fileDOM.children, this.value);
@@ -53,16 +49,10 @@
                 url: url.replace(/\\/g,'/')
             }, function(err, data){
                 if (err) return;
-            
-                //reset DOM elements
-                fileDOM.innerHTML = dirDOM.innerHTML = '';
-            
+                            
                 //populate files
-                data.files.forEach(function(el){
-                    if (el.isDirectory || el.isVirtual) dirDOM.appendChild( views.fileView(el) );
-                    else fileDOM.appendChild( views.fileView(el) );
-                });
-            
+                window.STATE.emit('list', data);
+                
                 //navigate
                 window.STATE.emit('navigate', data.path);
                 
