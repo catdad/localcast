@@ -19,7 +19,7 @@
         });
     }
     
-    STATE.on('video:play', function (resource, name, existingModal) {
+    STATE.on('video:play', function (resource, name) {
         var vid = UTIL.elem('video', { className: 'modal video' });
         vid.src = resource;
         vid.controls = 'controls';
@@ -68,8 +68,8 @@
                 window.removeEventListener('keypress', keyPress);
                 exitFullScreen();
                 
-                UTIL.raf(function(){
-                    existingModal.close();
+                UTIL.raf(function() {
+                    STATE.emit('modal:close');
                 });
             });
         }
