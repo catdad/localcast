@@ -19,12 +19,6 @@ var views = {
     Modal: function(contentDom, onOpen, origin) {
         window.STATE.emit('modal:open', contentDom, onOpen, origin);
     },
-    videoModal: function(resource, name) {
-        window.STATE.emit('video:play', resource, name);
-    },
-    controlsModal: function(ev, thumb, resource, name, domTrigger) {
-        window.STATE.emit('splash', ev, thumb, resource, name, domTrigger);
-    },
     deviceSelectModal: function(list, onSelect, onCancel) {
         var div = views.elem('div', { className: 'list'}),
             heading = views.elem('div', { className: 'heading', text: 'Select a device:' }),
@@ -77,9 +71,5 @@ var views = {
                 }
             }]
         });
-    },
-    
-    splitString: function(str) {
-        return window.UTIL.splitString(str);   
     }
 };
