@@ -30,7 +30,7 @@
         div.setAttribute('data-title', UTIL.clean(file.name));
         
         //build click handler
-        div.onclick = function(ev){
+        div.onclick = function(ev) {
             var stateObj = {
                 resource: file.path,
                 title: file.name,
@@ -40,14 +40,12 @@
             if (file.isDirectory){
                 stateObj.resource = stateObj.resource;
                 hash.push(stateObj, true);
-            }
-            else if (file.isFile){
+            } else if (file.isFile){
                 stateObj.resource = stateObj.resource;
 //                hash.push(stateObj, true);
                 
                 window.STATE.emit('splash', ev, file.thumb, file.resource, file.name, div);
-            }
-            else if (file.isVirtual){
+            } else if (file.isVirtual){
                 stateObj.resource = file.path;
                 hash.push(stateObj, true);
             }
