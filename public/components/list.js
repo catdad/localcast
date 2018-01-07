@@ -101,4 +101,14 @@
             }
         });
     });
+    
+    STATE.on('list:filter', function (term) {
+        var nodes = fileDOM.children;
+        
+        term = term.toLowerCase() || /./;
+        
+        [].forEach.call(nodes, function(el) {
+            el.style.display = (el.getAttribute('data-filter').match(term)) ? '' : 'none';
+        });
+    });
 }(window));

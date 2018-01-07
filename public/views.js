@@ -79,12 +79,6 @@ var views = {
         });
     },
     
-    filter: function(nodes, term){
-        term = term.toLowerCase() || /./;
-        [].forEach.call(nodes, function(el){
-            el.style.display = (el.getAttribute('data-filter').match(term)) ? '' : 'none';
-        });
-    },
     splitString: function(str) {
         return window.UTIL.splitString(str);   
     }
