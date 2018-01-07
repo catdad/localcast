@@ -2,12 +2,6 @@
 /*globals views, request, server */
 
 !function(){
-    var searchDOM = document.querySelector('#contentSearch input');
-    searchDOM && (searchDOM.oninput = function(ev){
-        views.filter(fileDOM.children, this.value);
-        //views.filter(dirDOM.children, this.value);
-    });
-    
     var Hash = function(){
         var that = this,
             nextPop = [];
