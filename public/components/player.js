@@ -50,8 +50,8 @@
         }
         
         function tearDown() {
-            window.removeEventListener('keypress', onKeyPress);
             vid.removeEventListener('click', onVideoClick);
+            window.removeEventListener('keypress', onKeyPress);
             
             vid.src = null;
         }
@@ -61,6 +61,7 @@
             var documentTitle = document.title;
             document.title = name + ' - ' + documentTitle;
 
+            // add convenient play/pause controls
             vid.addEventListener('click', onVideoClick);
             window.addEventListener('keypress', onKeyPress);
 
@@ -75,7 +76,7 @@
                 wrapper.classList.add('dim');
             });
             
-            vid.addEventListener('ended', function(){
+            vid.addEventListener('ended', function() {
                 tearDown();
                 exitFullScreen();
                 
