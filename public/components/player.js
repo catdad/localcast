@@ -24,10 +24,6 @@
         vid.src = resource;
         vid.controls = 'controls';
         
-        // set the page title to the video name
-        var documentTitle = document.title;
-        document.title = name + ' - ' + documentTitle;
-        
         function togglePlaying() {
             if (vid.ended) return;
             
@@ -58,6 +54,10 @@
         }
         
         function onModalOpen(wrapper) {
+            // set the page title to the video name
+            var documentTitle = document.title;
+            document.title = name + ' - ' + documentTitle;
+
             vid.addEventListener('click', onVideoClick);
             window.addEventListener('keypress', onKeyPress);
 
