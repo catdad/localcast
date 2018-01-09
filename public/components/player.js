@@ -87,11 +87,6 @@
                 wrapper.classList.remove('dim');
             });
             
-            while (wrapper.firstChild) {
-                wrapper.removeChild(wrapper.firstChild);
-            }
-            
-            wrapper.appendChild(vid);
             setupVideoControls(wrapper);
             vid.play();
         }

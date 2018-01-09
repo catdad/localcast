@@ -134,7 +134,9 @@
         return {
             close: triggerCloseModal,
             replace: function(newContent, cb){
-                removeModalContent(function(){
+                removeModalContent(function() {
+                    wrapper.appendChild(newContent);
+                    
                     if (cb) {
                         cb(wrapper);
                     }
