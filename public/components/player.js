@@ -71,7 +71,7 @@
                 wrapper.classList.remove('dim');
             });
             
-            vid.addEventListener('playing', function(){
+            UTIL.once(vid, 'playing', function () {
                 wrapper.classList.add('dim');
             });
             
