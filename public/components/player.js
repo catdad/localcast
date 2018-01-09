@@ -43,6 +43,7 @@
         }
         
         function onKeyPress(ev) {
+            // space bar pauses and plays the video
             if (ev.which === 32 || ev.keyCode === 32) {
                 onVideoClick(ev);
             }
