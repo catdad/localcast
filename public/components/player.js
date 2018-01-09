@@ -96,10 +96,7 @@
             vid.play();
         }
         
-        STATE.once('modal:closed', function () {
-            tearDown();
-        });
-        
+        STATE.once('modal:closed', tearDown);
         STATE.emit('modal:open', vid, onWrapperReceived);        
     });
 }(window));
