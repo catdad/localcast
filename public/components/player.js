@@ -69,9 +69,7 @@
             });
             
             vid.addEventListener('playing', function(){
-                if (!wrapper.classList.contains('dim')) {
-                    wrapper.classList.add('dim');
-                }
+                wrapper.classList.add('dim');
             });
             
             vid.addEventListener('ended', function(){
