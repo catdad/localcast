@@ -25,13 +25,15 @@
         vid.controls = 'controls';
         
         function togglePlaying() {
-            if (vid.ended) return;
+            if (vid.ended) {
+                return;
+            }
             
             if (vid.paused) {
-                vid.play();
-            } else {
-                vid.pause();
+                return vid.play();
             }
+            
+            return vid.pause();
         }
         
         function onVideoClick(ev) {
