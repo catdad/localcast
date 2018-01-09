@@ -50,9 +50,6 @@
             }
         }
         
-        vid.addEventListener('click', onVideoClick);
-        window.addEventListener('keypress', onKeyPress);
-        
         function tearDown() {
             window.removeEventListener('keypress', onKeyPress);
             vid.removeEventListener('click', onVideoClick);
@@ -60,8 +57,16 @@
             vid.src = null;
         }
         
-        function setupVideoControls(wrapper) {
-            window.vid = vid;
+        function onModalOpen(wrapper) {
+            vid.addEventListener('click', onVideoClick);
+            window.addEventListener('keypress', onKeyPress);
+
+            STATE.once('modal:closing', function () {
+                // return the title back to the original
+                document.title = documentTitle;
+                
+                wrapper.classList.remove('dim');
+            });
             
             vid.addEventListener('playing', function(){
                 if (!wrapper.classList.contains('dim')) {
@@ -77,21 +82,11 @@
                     STATE.emit('modal:close');
                 });
             });
-        }
-        
-        function onWrapperReceived(wrapper) {
-            STATE.once('modal:closing', function () {
-                // return the title back to the original
-                document.title = documentTitle;
-                
-                wrapper.classList.remove('dim');
-            });
             
-            setupVideoControls(wrapper);
             vid.play();
         }
         
         STATE.once('modal:closed', tearDown);
-        STATE.emit('modal:open', vid, onWrapperReceived);        
+        STATE.emit('modal:open', vid, onModalOpen);        
     });
 }(window));
