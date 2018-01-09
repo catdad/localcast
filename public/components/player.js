@@ -24,15 +24,11 @@
         vid.src = resource;
         vid.controls = 'controls';
         
-        var duration;
-        
         // set the page title to the video name
         var documentTitle = document.title;
         document.title = name + ' - ' + documentTitle;
         
-        function togglePlaying(ev) {
-            ev.preventDefault();
-            
+        function togglePlaying() {
             if (vid.ended) return;
             
             if (vid.paused) {
@@ -42,18 +38,27 @@
             }
         }
         
-        function keyPress(ev) {
+        function onVideoClick(ev) {
+            ev.preventDefault();
+            
+            togglePlaying();
+        }
+        
+        function onKeyPress(ev) {
             if (ev.which === 32 || ev.keyCode === 32) {
-                togglePlaying(ev);
+                onVideoClick(ev);
             }
         }
         
-        vid.addEventListener('click', togglePlaying);
-        window.addEventListener('keypress', keyPress);
+        vid.addEventListener('click', onVideoClick);
+        window.addEventListener('keypress', onKeyPress);
         
-        vid.addEventListener('durationchange', function(ev){
-            duration = vid.duration;
-        });
+        function tearDown() {
+            window.removeEventListener('keypress', onKeyPress);
+            vid.removeEventListener('click', onVideoClick);
+            
+            vid.src = null;
+        }
         
         function setupVideoControls(wrapper) {
             window.vid = vid;
@@ -65,7 +70,7 @@
             });
             
             vid.addEventListener('ended', function(){
-                window.removeEventListener('keypress', keyPress);
+                tearDown();
                 exitFullScreen();
                 
                 UTIL.raf(function() {
@@ -91,6 +96,10 @@
             vid.play();
         }
         
-        STATE.emit('modal:open', vid, onWrapperReceived);
+        STATE.once('modal:closed', function () {
+            tearDown();
+        });
+        
+        STATE.emit('modal:open', vid, onWrapperReceived);        
     });
 }(window));
