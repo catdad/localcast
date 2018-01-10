@@ -23,6 +23,16 @@
         return temp.firstChild;
     }
     
+    function navigateTo(dir) {
+        var stateObj = {
+            resource: dir.path,
+            title: dir.name,
+            url: dir.path.replace(/\\/g, '/')
+        };
+
+        hash.push(stateObj, true);
+    }
+    
     function fileView(file) {
         var div = UTIL.elem('div', { className: 'file' });
         div.setAttribute('data-path', file.path);
@@ -31,34 +41,27 @@
         
         //build click handler
         div.onclick = function(ev) {
-            var stateObj = {
-                resource: file.path,
-                title: file.name,
-                url: file.path.replace(/\\/g, '/')
-            };
+            if (file.isDirectory || file.isVirtual) {
+                return navigateTo(file);
+            }
             
-            if (file.isDirectory){
-                stateObj.resource = stateObj.resource;
-                hash.push(stateObj, true);
-            } else if (file.isFile){
-                stateObj.resource = stateObj.resource;
-//                hash.push(stateObj, true);
-                
+            if (file.isFile){
                 window.STATE.emit('splash', ev, file.thumb, file.resource, file.name, div);
-            } else if (file.isVirtual){
-                stateObj.resource = file.path;
-                hash.push(stateObj, true);
             }
         };
         
         //build icon
         var icon = (file.isFile) ? img('video') : img('folder');
         
-        if (file.isVirtual) icon.style.opacity = '.4';
-        if (file.isFile && file.format !== 'mp4') icon.style.opacity = '.2';
+        if (file.isVirtual) {
+            icon.style.opacity = '.4';
+        }
+        
+        if (file.isFile && file.format !== 'mp4') {
+            icon.style.opacity = '.2';
+        }
         
         //add elements to the DOM
-        div.innerHTML = "";
         div.appendChild(icon);
         
         //build episode/year field
