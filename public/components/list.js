@@ -33,6 +33,27 @@
         hash.push(stateObj, true);
     }
     
+    function getFileSubtitle(file) {
+        //build episode/year field
+        var text;
+
+        // look for a year first
+        var year = file.name.match(/(?!\()[0-9]{4}(?=\))/);
+        if (year) { text = year[0]; }
+
+        // look for an s00e00 episode
+        var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
+        if (!episode) {
+            // look for a 3-digit episode
+            episode = file.name.match(/[0-9]{3}/);
+        }
+        if (episode && !text) {
+            text = episode[0];
+        }
+        
+        return text || ' ';
+    }
+    
     function view(file) {
         var div = UTIL.elem('div', { className: 'file' });
         div.setAttribute('data-path', file.path);
@@ -75,28 +96,11 @@
         if (file.format !== 'mp4') {
             icon.style.opacity = '.2';
         }
-        
+
+        div.setAttribute('data-episode', getFileSubtitle(file));
+
         //add elements to the DOM
         div.appendChild(icon);
-        
-        //build episode/year field
-        var text;
-
-        // look for a year first
-        var year = file.name.match(/(?!\()[0-9]{4}(?=\))/);
-        if (year) { text = year[0]; }
-
-        // look for an s00e00 episode
-        var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
-        if (!episode) {
-            // look for a 3-digit episode
-            episode = file.name.match(/[0-9]{3}/);
-        }
-        if (episode && !text) {
-            text = episode[0];
-        }
-
-        div.setAttribute('data-episode', (text) ? text : ' ');
         
         return div;
     }
