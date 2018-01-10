@@ -33,31 +33,46 @@
         hash.push(stateObj, true);
     }
     
-    function fileView(file) {
+    function view(file) {
         var div = UTIL.elem('div', { className: 'file' });
         div.setAttribute('data-path', file.path);
         div.title = file.name;
         div.setAttribute('data-title', UTIL.clean(file.name));
         
-        //build click handler
-        div.onclick = function(ev) {
-            if (file.isDirectory || file.isVirtual) {
-                return navigateTo(file);
-            }
-            
-            if (file.isFile){
-                window.STATE.emit('splash', ev, file.thumb, file.resource, file.name, div);
-            }
-        };
+        div.setAttribute('data-filter', UTIL.splitString(file.name));
         
-        //build icon
-        var icon = (file.isFile) ? img('video') : img('folder');
+        return div;
+    }
+    
+    function dirView(file) {
+        var div = view(file);
+        
+        var icon = img('folder');
         
         if (file.isVirtual) {
             icon.style.opacity = '.4';
         }
         
-        if (file.isFile && file.format !== 'mp4') {
+        div.appendChild(icon);
+        
+        div.onclick = function () {
+            navigateTo(file);
+        };
+        
+        return div;
+    }
+    
+    function fileView(file) {
+        var div = view(file);
+        
+        div.onclick = function(ev) {
+            window.STATE.emit('splash', ev, file.thumb, file.resource, file.name, div);
+        };
+        
+        //build icon
+        var icon = img('video');
+        
+        if (file.format !== 'mp4') {
             icon.style.opacity = '.2';
         }
         
@@ -65,27 +80,23 @@
         div.appendChild(icon);
         
         //build episode/year field
-        if (file.isFile) {
-            var text;
-            
-            // look for a year first
-            var year = file.name.match(/(?!\()[0-9]{4}(?=\))/);
-            if (year) { text = year[0]; }
-            
-            // look for an s00e00 episode
-            var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
-            if (!episode) {
-                // look for a 3-digit episode
-                episode = file.name.match(/[0-9]{3}/);
-            }
-            if (episode && !text) {
-                text = episode[0];
-            }
-            
-            div.setAttribute('data-episode', (text) ? text : ' ');
+        var text;
+
+        // look for a year first
+        var year = file.name.match(/(?!\()[0-9]{4}(?=\))/);
+        if (year) { text = year[0]; }
+
+        // look for an s00e00 episode
+        var episode = file.name.match(/s[0-9]{2}e[0-9]{2}/i);
+        if (!episode) {
+            // look for a 3-digit episode
+            episode = file.name.match(/[0-9]{3}/);
         }
-        
-        div.setAttribute('data-filter', UTIL.splitString(file.name));
+        if (episode && !text) {
+            text = episode[0];
+        }
+
+        div.setAttribute('data-episode', (text) ? text : ' ');
         
         return div;
     }
@@ -96,7 +107,7 @@
 
         data.files.forEach(function(el){
             if (el.isDirectory || el.isVirtual) {
-                dirDOM.appendChild( fileView(el) );
+                dirDOM.appendChild( dirView(el) );
             } else {
                 fileDOM.appendChild( fileView(el) );
             }
