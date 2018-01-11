@@ -60,7 +60,7 @@
         
         container.appendChild(bar);
         
-        var duration = 1000 * 6;
+        var duration = 1000 * 5;
         var start = Date.now();
         var stopped = false;
         
