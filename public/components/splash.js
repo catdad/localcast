@@ -173,7 +173,7 @@
         };
         image.src = thumb;
         
-        window.STATE.emit('modal:open', modal, function onOpen(wrapper) {
+        STATE.emit('modal:open', modal, function onOpen(wrapper) {
             modalWrapper = wrapper;
             
             if (imageIsLoaded) {
