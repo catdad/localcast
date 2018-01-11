@@ -64,6 +64,14 @@
         var start = Date.now();
         var stopped = false;
         
+        function onDone() {
+            bar.style.width = '100%';
+
+            if (api.ondone) {
+                api.ondone();
+            }
+        }
+        
         function onFrame() {
             if (stopped) {
                 return;
@@ -73,14 +81,7 @@
             var elapsed = Date.now() - start;
             
             if (elapsed > duration) {
-                // we are done
-                bar.style.width = '100%';
-                
-                if (api.ondone) {
-                    api.ondone();
-                }
-                
-                return;
+                return onDone();
             }
             
             bar.style.width = (elapsed / duration * 100) + '%';
@@ -97,7 +98,7 @@
             },
             dom: container
         };
-            
+        
         return api;
     }
     
@@ -112,6 +113,15 @@
         var castButton = createCastButton(resource, name, thumb);
         
         var progress = progressBar();
+        
+        // cancel the progress if either of these buttons is clicked by the user    
+        [playButton, castButton].forEach(function (button) {
+            UTIL.once(button, 'click', function () {
+                progress.stop();
+            });
+        });
+        
+        // when progress is done, click the play button automatically
         progress.ondone = function () {
             playButton.click();
         };
