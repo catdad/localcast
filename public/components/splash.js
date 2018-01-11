@@ -54,6 +54,53 @@
         return playCastButton;
     }
     
+    function progressBar() {
+        var container = UTIL.elem('div', { className: 'progress-container' });
+        var bar = UTIL.elem('div', { className: 'progress-bar' });
+        
+        container.appendChild(bar);
+        
+        var duration = 1000 * 6;
+        var start = Date.now();
+        var stopped = false;
+        
+        function onFrame() {
+            if (stopped) {
+                return;
+            }
+            
+            var time = Date.now();
+            var elapsed = Date.now() - start;
+            
+            if (elapsed > duration) {
+                // we are done
+                bar.style.width = '100%';
+                
+                if (api.ondone) {
+                    api.ondone();
+                }
+                
+                return;
+            }
+            
+            bar.style.width = (elapsed / duration * 100) + '%';
+            
+            return UTIL.raf(onFrame);
+        }
+        
+        var api = {
+            start: function () {
+                UTIL.raf(onFrame);
+            },
+            stop: function () {
+                stopped = true;
+            },
+            dom: container
+        };
+            
+        return api;
+    }
+    
     STATE.on('splash', function (ev, thumb, resource, name, domTrigger) {
         var modal = UTIL.elem('div'),
             container = UTIL.elem('div'),
@@ -61,6 +108,15 @@
             title = UTIL.elem('div', { className: 'title', text: name }),
             modalWrapper;
         
+        var playButton = createPlayButton(resource, name, thumb);
+        var castButton = createCastButton(resource, name, thumb);
+        
+        var progress = progressBar();
+        progress.ondone = function () {
+            playButton.click();
+        };
+        
+        container.appendChild(progress.dom);
         container.appendChild(title);
         
         // get the origin to use for animation
@@ -73,9 +129,6 @@
         // first, queue the image to load, and keep track here
         var modalIsOpen = false,
             imageIsLoaded = false;
-        
-        var playButton = createPlayButton(resource, name, thumb);
-        var castButton = createCastButton(resource, name, thumb);
         
         // this function should be executed after image has loaded and tranition has ended
         var imageOnLoad = function(wrapper) {
@@ -103,8 +156,10 @@
             var containerHeight = container.offsetHeight;
             
             // let's animate the height transition as well
-            window.UTIL.raf(function() {
+            UTIL.raf(function() {
                 modal.style.height = ( cWidth * height / width ) + containerHeight + 'px';
+                
+                progress.start();
             });
         };
         
@@ -129,5 +184,10 @@
                 wrapper.appendChild(UTIL.elem('div', { className: 'loading' }));
             }
         }, origin);
+        
+        STATE.once('modal:closing', function () {
+            // stop the progress bar from triggering an event if the modal closes early
+            progress.stop();
+        });
     });
 }(window));
