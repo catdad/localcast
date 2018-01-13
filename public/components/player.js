@@ -40,7 +40,6 @@
         var title = UTIL.elem('div', { className: 'video-title', text: file.name });
         var vid = vidElem || UTIL.elem('video');
 
-        vid.src = file.resource;
         vid.controls = 'controls';
         
         player.appendChild(vid);
@@ -108,7 +107,9 @@
             if (next) {
                 // if a next video exists, play it in
                 // replacement mode
-                return onVideoPlay(next, vid);
+                console.log('playing next', next);
+                file = next;
+                return initVideo(next);
             }
 
             exitFullScreen();
@@ -128,18 +129,33 @@
             vid.src = null;
         }
         
-        function onModalOpen(wrapper) {
+        function initVideo(file) {
+            // reset the title
+            UTIL.empty(title);
+            title.appendChild(UTIL.text(file.name));
+            
+            // add video source
+            vid.src = file.resource;
+
             // set the page title to the video name
             var documentTitle = document.title;
             document.title = file.name + ' - ' + documentTitle;
-
+            
             // add convenient play/pause controls
             vid.addEventListener('click', onVideoClick);
             vid.addEventListener('mousemove', onVideoMove);
             vid.addEventListener('mouseout', onVideoOut);
             vid.addEventListener('ended', onVideoEnded);
             window.addEventListener('keypress', onKeyPress);
-
+            
+            showTitle();
+            
+            vid.play();
+        }
+        
+        function onModalOpen(wrapper) {
+            var documentTitle = document.title;
+            
             STATE.once('modal:closing', function () {
                 // return the title back to the original
                 document.title = documentTitle;
@@ -149,10 +165,9 @@
             
             UTIL.once(vid, 'playing', function () {
                 wrapper.classList.add('dim');
-                showTitle();
             });
             
-            vid.play();
+            initVideo(file);
         }
         
         STATE.once('modal:closed', tearDown);
