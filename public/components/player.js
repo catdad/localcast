@@ -21,17 +21,14 @@
     
     function onVideoPlay(file, vidElem) {
         var player = UTIL.elem('div', { className: 'player' });
-        var container = UTIL.elem('div', { className: 'player-container' });
         var title = UTIL.elem('div', { className: 'video-title', text: file.name });
         var vid = vidElem || UTIL.elem('video');
 
         vid.src = file.resource;
         vid.controls = 'controls';
         
-        container.appendChild(vid);
-        container.appendChild(title);
-        
-        player.appendChild(container);
+        player.appendChild(vid);
+        player.appendChild(title);
         
         var showTitle = (function () {
             var timeout;
