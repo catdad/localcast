@@ -102,15 +102,15 @@
         return api;
     }
     
-    STATE.on('splash', function (ev, thumb, resource, name, domTrigger) {
+    STATE.on('splash', function (file, domTrigger) {
         var modal = UTIL.elem('div'),
             container = UTIL.elem('div'),
             image = UTIL.elem('img', { className: 'thumb' }),
-            title = UTIL.elem('div', { className: 'title', text: name }),
+            title = UTIL.elem('div', { className: 'title', text: file.name }),
             modalWrapper;
         
-        var playButton = createPlayButton(resource, name, thumb);
-        var castButton = createCastButton(resource, name, thumb);
+        var playButton = createPlayButton(file.resource, file.name, file.thumb);
+        var castButton = createCastButton(file.resource, file.name, file.thumb);
         
         var progress = progressBar();
         
@@ -181,7 +181,7 @@
                 imageIsLoaded = true;
             }
         };
-        image.src = thumb;
+        image.src = file.thumb;
         
         STATE.emit('modal:open', modal, function onOpen(wrapper) {
             modalWrapper = wrapper;

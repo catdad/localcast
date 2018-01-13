@@ -86,8 +86,8 @@
     function fileView(file) {
         var div = view(file);
         
-        div.onclick = function(ev) {
-            window.STATE.emit('splash', ev, file.thumb, file.resource, file.name, div);
+        div.onclick = function() {
+            window.STATE.emit('splash', file, div);
         };
         
         //build icon
