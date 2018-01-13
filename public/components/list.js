@@ -109,15 +109,31 @@
         //reset DOM elements
         fileDOM.innerHTML = dirDOM.innerHTML = '';
         
-        data.files.forEach(function(el) {
-            if (el.isDirectory || el.isVirtual) {
-                el.elem = dirView(el);
-                dirDOM.appendChild(el.elem);
+        var lists = data.files.reduce(function (memo, file) {
+            if (file.isDirectory || file.isVirtual) {
+                memo.dirs.push(file);
             } else {
-                el.elem = fileView(el);
-                fileDOM.appendChild(el.elem);
+                memo.files.push(file);
             }
+            
+            return memo;
+        }, {
+            dirs: [],
+            files: []
         });
+        
+        lists.dirs.forEach(function (el) {
+            el.elem = dirView(el);
+            dirDOM.appendChild(el.elem);
+        });
+        
+        lists.files.forEach(function (el) {
+            el.elem = fileView(el);
+            fileDOM.appendChild(el.elem);
+        });
+        
+        STATE.store('dirs', lists.dirs);
+        STATE.store('files', lists.files);
     });
     
     STATE.on('list:filter', function (term) {
