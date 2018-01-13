@@ -40,12 +40,25 @@
         return str.replace(/\.|\s|\/|\-/g, ' ').toLowerCase();
     }
     
+    function empty(elem) {
+        if (!elem) {
+            return;
+        }
+        
+        while (elem.firstChild) {
+            elem.removeChild(elem.firstChild);
+        }
+        
+        return elem;
+    }
+    
     window.UTIL = {
         raf: raf,
         defer: defer,
         once: once,
         elem: views.elem,
         clean: clean,
-        splitString: splitString
+        splitString: splitString,
+        empty: empty
     };
 }(window));

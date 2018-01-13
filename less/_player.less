@@ -1,0 +1,40 @@
+@import (reference) "_variables";
+
+.player {
+    position: absolute;
+    
+    top: 50%;
+    left: 50%;
+    width: 100%;
+
+    transform: translate(-50%, -50%);
+}
+
+.player-container {
+    position: relative;
+    
+    video {
+        width: 100%;
+    }
+    
+    .video-title {
+        position: absolute;
+        width: 100%;
+        top: 0;
+        left: 0;
+        
+        padding: 5px;
+        height: 2.5rem;
+        transform: translate(-2px, -2px);
+        
+        background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+        color: @color-lightest;
+        text-align: center;
+        
+        z-index: 2147483647;
+        
+        &.hidden {
+            display: none;
+        }
+    }
+}
