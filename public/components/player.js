@@ -98,6 +98,10 @@
             }
         }
         
+        function onVideoPlaying() {
+            STATE.emit('modal:dim');
+        }
+        
         function onVideoEnded() {
             // remove existing events
             tearDown();
@@ -119,6 +123,7 @@
         }
         
         function tearDown() {
+            vid.removeEventListener('playing', onVideoPlaying);
             vid.removeEventListener('click', onVideoClick);
             vid.removeEventListener('mousemove', onVideoMove);
             vid.removeEventListener('mouseout', onVideoOut);
@@ -141,6 +146,7 @@
             document.title = file.name + ' - ' + documentTitle;
             
             // add convenient play/pause controls
+            vid.addEventListener('playing', onVideoPlaying);
             vid.addEventListener('click', onVideoClick);
             vid.addEventListener('mousemove', onVideoMove);
             vid.addEventListener('mouseout', onVideoOut);
@@ -158,12 +164,6 @@
             STATE.once('modal:closing', function () {
                 // return the title back to the original
                 document.title = documentTitle;
-                
-                wrapper.classList.remove('dim');
-            });
-            
-            UTIL.once(vid, 'playing', function () {
-                wrapper.classList.add('dim');
             });
             
             initVideo(file);
