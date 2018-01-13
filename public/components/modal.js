@@ -134,13 +134,12 @@
         return {
             close: triggerCloseModal,
             replace: function(newContent, cb){
-                removeModalContent(function() {
-                    wrapper.appendChild(newContent);
-                    
-                    if (cb) {
-                        cb(wrapper);
-                    }
-                });
+                UTIL.empty(wrapper);
+                wrapper.appendChild(newContent);
+                
+                if (cb) {
+                    cb(wrapper);
+                }
             }
         };
     }
