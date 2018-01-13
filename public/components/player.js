@@ -19,12 +19,12 @@
         });
     }
     
-    STATE.on('video:play', function (resource, name) {
+    function onVideoPlay(file, vidElem) {
         var player = UTIL.elem('div', { className: 'player' });
-        var title = UTIL.elem('div', { className: 'video-title', text: name });
-        var vid = UTIL.elem('video');
+        var title = UTIL.elem('div', { className: 'video-title', text: file.name });
+        var vid = vidElem || UTIL.elem('video');
 
-        vid.src = resource;
+        vid.src = file.resource;
         vid.controls = 'controls';
         
         player.appendChild(vid);
@@ -83,10 +83,33 @@
             }
         }
         
+        function onVideoEnded() {
+            var defaultPrevented = false;
+            
+            tearDown();
+            
+            STATE.emit('video:ended', {
+                preventDefault: function () {
+                    defaultPrevented = true;
+                }
+            });
+
+            if (defaultPrevented) {
+                return;
+            }
+
+            exitFullScreen();
+
+            UTIL.raf(function() {
+                STATE.emit('modal:close');
+            });
+        }
+        
         function tearDown() {
             vid.removeEventListener('click', onVideoClick);
             vid.removeEventListener('mousemove', onVideoMove);
             vid.removeEventListener('mouseout', onVideoOut);
+            vid.removeEventListener('ended', onVideoEnded);
             window.removeEventListener('keypress', onKeyPress);
             
             vid.src = null;
@@ -95,12 +118,13 @@
         function onModalOpen(wrapper) {
             // set the page title to the video name
             var documentTitle = document.title;
-            document.title = name + ' - ' + documentTitle;
+            document.title = file.name + ' - ' + documentTitle;
 
             // add convenient play/pause controls
             vid.addEventListener('click', onVideoClick);
             vid.addEventListener('mousemove', onVideoMove);
             vid.addEventListener('mouseout', onVideoOut);
+            vid.addEventListener('ended', onVideoEnded);
             window.addEventListener('keypress', onKeyPress);
 
             STATE.once('modal:closing', function () {
@@ -115,19 +139,14 @@
                 showTitle();
             });
             
-            vid.addEventListener('ended', function() {
-                tearDown();
-                exitFullScreen();
-                
-                UTIL.raf(function() {
-                    STATE.emit('modal:close');
-                });
-            });
-            
             vid.play();
         }
         
         STATE.once('modal:closed', tearDown);
-        STATE.emit('modal:open', player, onModalOpen);        
+        STATE.emit('modal:open', player, onModalOpen);
+    }
+    
+    STATE.on('video:play', function (file) {
+        onVideoPlay(file);
     });
 }(window));

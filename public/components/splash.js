@@ -18,30 +18,30 @@
         return buttonElem;
     }
     
-    function createPlayButton(resource, name, thumb) {
+    function createPlayButton(file, elem) {
         var playLocalButton = createButton('Play');
         
         playLocalButton.onclick = function() {
-            STATE.emit('video:play', resource, name);
+            STATE.emit('video:play', file);
         };
         
         return playLocalButton;
     }
     
-    function createCastButton(resource, name, thumb) {
+    function createCastButton(file) {
         var playCastButton = createButton('Cast');
         
         playCastButton.onclick = function(){
             function browserCast() {
-                chromecast.startCast(resource, {
-                    title: name,
-                    images: [{ url: thumb }]
+                chromecast.startCast(file.resource, {
+                    title: file.name,
+                    images: [{ url: file.thumb }]
                 });
             }
             
             function serverCast() {
                 STATE.emit('modal:close');
-                server.playNew(resource, name, thumb);
+                server.playNew(file.resource, file.name, file.thumb);
             }
             
             if (chromecast.isAvailable() && false) {
@@ -109,8 +109,8 @@
             title = UTIL.elem('div', { className: 'title', text: file.name }),
             modalWrapper;
         
-        var playButton = createPlayButton(file.resource, file.name, file.thumb);
-        var castButton = createCastButton(file.resource, file.name, file.thumb);
+        var playButton = createPlayButton(file, domTrigger);
+        var castButton = createCastButton(file, domTrigger);
         
         var progress = progressBar();
         
