@@ -21,17 +21,14 @@
     
     STATE.on('video:play', function (resource, name) {
         var player = UTIL.elem('div', { className: 'player' });
-        var container = UTIL.elem('div', { className: 'player-container' });
         var title = UTIL.elem('div', { className: 'video-title', text: name });
         var vid = UTIL.elem('video');
 
         vid.src = resource;
         vid.controls = 'controls';
         
-        container.appendChild(vid);
-        container.appendChild(title);
-        
-        player.appendChild(container);
+        player.appendChild(vid);
+        player.appendChild(title);
         
         var showTitle = (function () {
             var timeout;
