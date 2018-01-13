@@ -19,6 +19,22 @@
         });
     }
     
+    function nextFile(file) {
+        var files = STATE.get('files');
+        
+        if (!files) {
+            return null;
+        }
+        
+        var idx = files.indexOf(file);
+        
+        if (idx >= 0 && idx < files.length) {
+            return files[idx + 1];
+        }
+
+        return null;
+    }
+    
     function onVideoPlay(file, vidElem) {
         var player = UTIL.elem('div', { className: 'player' });
         var title = UTIL.elem('div', { className: 'video-title', text: file.name });
@@ -84,18 +100,15 @@
         }
         
         function onVideoEnded() {
-            var defaultPrevented = false;
-            
+            // remove existing events
             tearDown();
-            
-            STATE.emit('video:ended', {
-                preventDefault: function () {
-                    defaultPrevented = true;
-                }
-            });
 
-            if (defaultPrevented) {
-                return;
+            var next = nextFile(file);
+            
+            if (next) {
+                // if a next video exists, play it in
+                // replacement mode
+                return onVideoPlay(next, vid);
             }
 
             exitFullScreen();
