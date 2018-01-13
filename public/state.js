@@ -3,6 +3,7 @@
 (function (window) {
     var events = {};
     var api = {};
+    var STORE = {};
 
     function addEvent(name, func, wrapped) {
         var evName = name.toLowerCase();
@@ -56,6 +57,16 @@
         events[evName].forEach(function (obj) {
             obj.wrapped.apply(null, [].slice.call(args, 1));
         });
+    };
+    
+    api.store = function store(name, value) {
+        STORE[name] = value;
+        
+        return api;
+    };
+    
+    api.get = function get(name) {
+        return STORE[name] || undefined;
     };
 
     window.STATE = api;
