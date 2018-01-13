@@ -107,7 +107,6 @@
             if (next) {
                 // if a next video exists, play it in
                 // replacement mode
-                console.log('playing next', next);
                 file = next;
                 return initVideo(next);
             }
