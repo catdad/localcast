@@ -19,13 +19,13 @@
         });
     }
     
-    STATE.on('video:play', function (resource, name) {
+    function onVideoPlay(file, vidElem) {
         var player = UTIL.elem('div', { className: 'player' });
         var container = UTIL.elem('div', { className: 'player-container' });
-        var title = UTIL.elem('div', { className: 'video-title', text: name });
-        var vid = UTIL.elem('video');
+        var title = UTIL.elem('div', { className: 'video-title', text: file.name });
+        var vid = vidElem || UTIL.elem('video');
 
-        vid.src = resource;
+        vid.src = file.resource;
         vid.controls = 'controls';
         
         container.appendChild(vid);
@@ -88,7 +88,9 @@
         
         function onVideoEnded() {
             var defaultPrevented = false;
-                
+            
+            tearDown();
+            
             STATE.emit('video:ended', {
                 preventDefault: function () {
                     defaultPrevented = true;
@@ -99,7 +101,6 @@
                 return;
             }
 
-            tearDown();
             exitFullScreen();
 
             UTIL.raf(function() {
@@ -120,7 +121,7 @@
         function onModalOpen(wrapper) {
             // set the page title to the video name
             var documentTitle = document.title;
-            document.title = name + ' - ' + documentTitle;
+            document.title = file.name + ' - ' + documentTitle;
 
             // add convenient play/pause controls
             vid.addEventListener('click', onVideoClick);
@@ -145,6 +146,10 @@
         }
         
         STATE.once('modal:closed', tearDown);
-        STATE.emit('modal:open', player, onModalOpen);        
+        STATE.emit('modal:open', player, onModalOpen);
+    }
+    
+    STATE.on('video:play', function (file) {
+        onVideoPlay(file);
     });
 }(window));

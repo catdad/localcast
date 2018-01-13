@@ -108,12 +108,14 @@
     STATE.on('list', function (data) {
         //reset DOM elements
         fileDOM.innerHTML = dirDOM.innerHTML = '';
-
-        data.files.forEach(function(el){
+        
+        data.files.forEach(function(el) {
             if (el.isDirectory || el.isVirtual) {
-                dirDOM.appendChild( dirView(el) );
+                el.elem = dirView(el);
+                dirDOM.appendChild(el.elem);
             } else {
-                fileDOM.appendChild( fileView(el) );
+                el.elem = fileView(el);
+                fileDOM.appendChild(el.elem);
             }
         });
     });
