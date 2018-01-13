@@ -86,10 +86,32 @@
             }
         }
         
+        function onVideoEnded() {
+            var defaultPrevented = false;
+                
+            STATE.emit('video:ended', {
+                preventDefault: function () {
+                    defaultPrevented = true;
+                }
+            });
+
+            if (defaultPrevented) {
+                return;
+            }
+
+            tearDown();
+            exitFullScreen();
+
+            UTIL.raf(function() {
+                STATE.emit('modal:close');
+            });
+        }
+        
         function tearDown() {
             vid.removeEventListener('click', onVideoClick);
             vid.removeEventListener('mousemove', onVideoMove);
             vid.removeEventListener('mouseout', onVideoOut);
+            vid.removeEventListener('ended', onVideoEnded);
             window.removeEventListener('keypress', onKeyPress);
             
             vid.src = null;
@@ -104,6 +126,7 @@
             vid.addEventListener('click', onVideoClick);
             vid.addEventListener('mousemove', onVideoMove);
             vid.addEventListener('mouseout', onVideoOut);
+            vid.addEventListener('ended', onVideoEnded);
             window.addEventListener('keypress', onKeyPress);
 
             STATE.once('modal:closing', function () {
@@ -116,15 +139,6 @@
             UTIL.once(vid, 'playing', function () {
                 wrapper.classList.add('dim');
                 showTitle();
-            });
-            
-            vid.addEventListener('ended', function() {
-                tearDown();
-                exitFullScreen();
-                
-                UTIL.raf(function() {
-                    STATE.emit('modal:close');
-                });
             });
             
             vid.play();
