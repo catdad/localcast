@@ -66,6 +66,11 @@
             };
         }());
         
+        function setTitle(text) {
+            UTIL.empty(title);
+            title.appendChild(UTIL.text(file.name));
+        }
+        
         function togglePlaying() {
             if (vid.ended) {
                 return;
@@ -99,6 +104,19 @@
             }
         }
         
+        function tearDown() {
+            vid.removeEventListener('playing', onVideoPlaying);
+            vid.removeEventListener('click', onVideoClick);
+            vid.removeEventListener('mousemove', onVideoMove);
+            vid.removeEventListener('mouseout', onVideoOut);
+            vid.removeEventListener('ended', onVideoEnded);
+            window.removeEventListener('keypress', onKeyPress);
+            
+            vid.src = null;
+            
+            document.title = originalTitle;
+        }
+        
         function onVideoPlaying() {
             STATE.emit('modal:dim');
         }
@@ -123,24 +141,8 @@
             });
         }
         
-        function tearDown() {
-            vid.removeEventListener('playing', onVideoPlaying);
-            vid.removeEventListener('click', onVideoClick);
-            vid.removeEventListener('mousemove', onVideoMove);
-            vid.removeEventListener('mouseout', onVideoOut);
-            vid.removeEventListener('ended', onVideoEnded);
-            window.removeEventListener('keypress', onKeyPress);
-            
-            vid.src = null;
-            
-            // return the title back to the original
-            document.title = originalTitle;
-        }
-        
         function initVideo(file) {
-            // reset the title
-            UTIL.empty(title);
-            title.appendChild(UTIL.text(file.name));
+            setTitle(file.name);
             
             // add video source
             vid.src = file.resource;
