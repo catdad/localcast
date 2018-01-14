@@ -36,6 +36,7 @@
     }
     
     function onVideoPlay(file, vidElem) {
+        var originalTitle = document.title;
         var player = UTIL.elem('div', { className: 'player' });
         var title = UTIL.elem('div', { className: 'video-title', text: file.name });
         var vid = vidElem || UTIL.elem('video');
@@ -131,6 +132,9 @@
             window.removeEventListener('keypress', onKeyPress);
             
             vid.src = null;
+            
+            // return the title back to the original
+            document.title = originalTitle;
         }
         
         function initVideo(file) {
@@ -142,8 +146,7 @@
             vid.src = file.resource;
 
             // set the page title to the video name
-            var documentTitle = document.title;
-            document.title = file.name + ' - ' + documentTitle;
+            document.title = file.name + ' - ' + originalTitle;
             
             // add convenient play/pause controls
             vid.addEventListener('playing', onVideoPlaying);
@@ -159,13 +162,6 @@
         }
         
         function onModalOpen(wrapper) {
-            var documentTitle = document.title;
-            
-            STATE.once('modal:closing', function () {
-                // return the title back to the original
-                document.title = documentTitle;
-            });
-            
             initVideo(file);
         }
         
