@@ -38,7 +38,7 @@
     function onVideoPlay(file, vidElem) {
         var originalTitle = document.title;
         var player = UTIL.elem('div', { className: 'player' });
-        var title = UTIL.elem('div', { className: 'video-title', text: file.name });
+        var title = UTIL.elem('div', { className: 'video-title' });
         var vid = vidElem || UTIL.elem('video');
 
         vid.controls = 'controls';
