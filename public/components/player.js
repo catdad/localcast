@@ -68,7 +68,10 @@
         
         function setTitle(text) {
             UTIL.empty(title);
-            title.appendChild(UTIL.text(file.name));
+            title.appendChild(UTIL.text(text));
+            
+            // set the page title to the video name
+            document.title = text + ' - ' + originalTitle;
         }
         
         function togglePlaying() {
@@ -128,11 +131,13 @@
             var next = nextFile(file);
             
             if (next) {
-                // if a next video exists, play it in
-                // replacement mode
+                // if a next video exists, reinitialize
+                // the video with the new file
                 file = next;
                 return initVideo(next);
             }
+            
+            // there is no next video to play, exit everything
 
             exitFullScreen();
 
@@ -147,9 +152,6 @@
             // add video source
             vid.src = file.resource;
 
-            // set the page title to the video name
-            document.title = file.name + ' - ' + originalTitle;
-            
             // add convenient play/pause controls
             vid.addEventListener('playing', onVideoPlaying);
             vid.addEventListener('click', onVideoClick);
