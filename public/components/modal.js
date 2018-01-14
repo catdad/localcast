@@ -105,6 +105,7 @@
             });
             
             // remove the open class to animate
+            wrapper.classList.remove('dim');
             wrapper.classList.remove('open');
         }
         
