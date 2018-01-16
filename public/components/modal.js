@@ -105,6 +105,7 @@
             });
             
             // remove the open class to animate
+            wrapper.classList.remove('dim');
             wrapper.classList.remove('open');
         }
         
@@ -133,13 +134,18 @@
         
         return {
             close: triggerCloseModal,
-            replace: function(newContent, cb){
+            replace: function(newContent, cb) {
+                wrapper.classList.remove('dim');
+                
                 UTIL.empty(wrapper);
                 wrapper.appendChild(newContent);
                 
                 if (cb) {
                     cb(wrapper);
                 }
+            },
+            dim: function () {
+                wrapper.classList.add('dim');
             }
         };
     }
@@ -158,7 +164,14 @@
         }
     });
     
+    STATE.on('modal:dim', function () {
+        if (currentModal) {
+            currentModal.dim();
+        }
+    });
+
     STATE.on('modal:closing', function () {
         currentModal = null;
     });
+    
 }(window));

@@ -19,12 +19,28 @@
         });
     }
     
+    function nextFile(file) {
+        var files = STATE.get('files');
+        
+        if (!files) {
+            return null;
+        }
+        
+        var idx = files.indexOf(file);
+        
+        if (idx >= 0 && idx < files.length) {
+            return files[idx + 1];
+        }
+
+        return null;
+    }
+    
     function onVideoPlay(file, vidElem) {
+        var originalTitle = document.title;
         var player = UTIL.elem('div', { className: 'player' });
-        var title = UTIL.elem('div', { className: 'video-title', text: file.name });
+        var title = UTIL.elem('div', { className: 'video-title' });
         var vid = vidElem || UTIL.elem('video');
 
-        vid.src = file.resource;
         vid.controls = 'controls';
         
         player.appendChild(vid);
@@ -49,6 +65,14 @@
                 timeout = setTimeout(hide, timeOverride || time);
             };
         }());
+        
+        function setTitle(text) {
+            UTIL.empty(title);
+            title.appendChild(UTIL.text(text));
+            
+            // set the page title to the video name
+            document.title = text + ' - ' + originalTitle;
+        }
         
         function togglePlaying() {
             if (vid.ended) {
@@ -83,20 +107,37 @@
             }
         }
         
+        function tearDown() {
+            vid.removeEventListener('playing', onVideoPlaying);
+            vid.removeEventListener('click', onVideoClick);
+            vid.removeEventListener('mousemove', onVideoMove);
+            vid.removeEventListener('mouseout', onVideoOut);
+            vid.removeEventListener('ended', onVideoEnded);
+            window.removeEventListener('keypress', onKeyPress);
+            
+            vid.src = null;
+            
+            document.title = originalTitle;
+        }
+        
+        function onVideoPlaying() {
+            STATE.emit('modal:dim');
+        }
+        
         function onVideoEnded() {
-            var defaultPrevented = false;
-            
+            // remove existing events
             tearDown();
-            
-            STATE.emit('video:ended', {
-                preventDefault: function () {
-                    defaultPrevented = true;
-                }
-            });
 
-            if (defaultPrevented) {
-                return;
+            var next = nextFile(file);
+            
+            if (next) {
+                // if a next video exists, reinitialize
+                // the video with the new file
+                file = next;
+                return initVideo(next);
             }
+            
+            // there is no next video to play, exit everything
 
             exitFullScreen();
 
@@ -105,41 +146,27 @@
             });
         }
         
-        function tearDown() {
-            vid.removeEventListener('click', onVideoClick);
-            vid.removeEventListener('mousemove', onVideoMove);
-            vid.removeEventListener('mouseout', onVideoOut);
-            vid.removeEventListener('ended', onVideoEnded);
-            window.removeEventListener('keypress', onKeyPress);
+        function initVideo(file) {
+            setTitle(file.name);
             
-            vid.src = null;
-        }
-        
-        function onModalOpen(wrapper) {
-            // set the page title to the video name
-            var documentTitle = document.title;
-            document.title = file.name + ' - ' + documentTitle;
+            // add video source
+            vid.src = file.resource;
 
             // add convenient play/pause controls
+            vid.addEventListener('playing', onVideoPlaying);
             vid.addEventListener('click', onVideoClick);
             vid.addEventListener('mousemove', onVideoMove);
             vid.addEventListener('mouseout', onVideoOut);
             vid.addEventListener('ended', onVideoEnded);
             window.addEventListener('keypress', onKeyPress);
-
-            STATE.once('modal:closing', function () {
-                // return the title back to the original
-                document.title = documentTitle;
-                
-                wrapper.classList.remove('dim');
-            });
             
-            UTIL.once(vid, 'playing', function () {
-                wrapper.classList.add('dim');
-                showTitle();
-            });
+            showTitle();
             
             vid.play();
+        }
+        
+        function onModalOpen(wrapper) {
+            initVideo(file);
         }
         
         STATE.once('modal:closed', tearDown);

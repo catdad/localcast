@@ -23,10 +23,13 @@
             }
 
             if (opts.text) {
-                el.appendChild( document.createTextNode(opts.text) );
+                el.appendChild( views.text(opts.text) );
             }
 
             return el;
+        },
+        text: function(str) {
+            return document.createTextNode(str || '');
         }
     };
 
@@ -57,6 +60,7 @@
         defer: defer,
         once: once,
         elem: views.elem,
+        text: views.text,
         clean: clean,
         splitString: splitString,
         empty: empty
