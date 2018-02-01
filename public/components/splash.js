@@ -29,7 +29,8 @@
     }
     
     function createCastButton(file) {
-        var button = createButton('Cast');
+        var castName = chromecast.isAvailable() ? 'Browser Cast' : 'Server Cast';
+        var button = createButton(castName);
         
         button.onclick = function(){
             function browserCast() {
@@ -44,7 +45,7 @@
                 server.playNew(file.resource, file.name, file.thumb);
             }
             
-            if (chromecast.isAvailable() && false) {
+            if (chromecast.isAvailable()) {
                 browserCast();
             } else {
                 serverCast();
