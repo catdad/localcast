@@ -11,18 +11,29 @@
         };
         
         return memo;
-    }, {});
+    }, {
+        mute: function () {
+            chromecast.control.volume('mute');
+        },
+        unmute: function () {
+            chromecast.control.volume('unmute');
+        }
+    });
     
     function initControls() {
         STATE.on('controls:play', controls.play);
         STATE.on('controls:pause', controls.pause);
         STATE.on('controls:stop', controls.stop);
+        STATE.on('controls:mute', controls.mute);
+        STATE.on('controls:unmute', controls.unmute);
     }
     
     function destroyControls() {
         STATE.off('controls:stop', controls.stop);
         STATE.off('controls:pause', controls.pause);
         STATE.off('controls:stop', controls.stop);
+        STATE.off('controls:mute', controls.mute);
+        STATE.off('controls:unmute', controls.unmute);
     }
     
     function onMediaDiscovered(ev) {

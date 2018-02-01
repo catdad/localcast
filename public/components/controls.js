@@ -63,10 +63,15 @@
             console.log('stop clicked');
             STATE.emit('controls:stop');
         }, false);
-    }
-    
-    function onSetDuration(opts) {
-        
+        dom.volume.addEventListener('click', function(){
+            if (dom.volume.classList.contains('icon-mute')) {
+                commands.unmute();
+                STATE.emit('controls:unmute');
+            } else {
+                commands.mute();
+                STATE.emit('controls:mute');
+            }
+        }, false);
     }
     
     STATE.on('controls:init', function (metadata) {
@@ -217,22 +222,7 @@ var player = (function(window){
         track.addEventListener('touchstart', seekStart, false);
 
         
-        var mute = function() {
-            commands.mute();
-            events.asyncTrigger('mute');
-        };
-        var unmute = function() {
-            commands.unmute();
-            events.asyncTrigger('unmute');
-        };
-
-        dom.volume.addEventListener('click', function(){
-            if (dom.volume.classList.contains('icon-mute')) {
-                unmute();
-            } else {
-                mute();
-            }
-        }, false);
+        
 
         return {
             setProgress: setBarPercent,
