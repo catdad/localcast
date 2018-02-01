@@ -29,9 +29,9 @@
     }
     
     function createCastButton(file) {
-        var playCastButton = createButton('Cast');
+        var button = createButton('Cast');
         
-        playCastButton.onclick = function(){
+        button.onclick = function(){
             function browserCast() {
                 chromecast.startCast(file.resource, {
                     title: file.name,
@@ -51,7 +51,7 @@
             }
         };
         
-        return playCastButton;
+        return button;
     }
     
     function progressBar() {
