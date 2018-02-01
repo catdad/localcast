@@ -150,6 +150,10 @@ var server = function(){
     }
     
     function playNew(url, name, thumb){
+        // disabling this for now
+        toast.error('Server Cast is not available');
+        return;
+        
         var uri = endpoint + 'play';
 
         if (url) {
