@@ -34,10 +34,7 @@
         
         button.onclick = function(){
             function browserCast() {
-                chromecast.startCast(file.resource, {
-                    title: file.name,
-                    images: [{ url: file.thumb }]
-                });
+                STATE.emit('browsercast:play', file);
             }
             
             function serverCast() {
@@ -45,11 +42,11 @@
                 server.playNew(file.resource, file.name, file.thumb);
             }
             
-            if (chromecast.isAvailable()) {
+//            if (chromecast.isAvailable()) {
                 browserCast();
-            } else {
-                serverCast();
-            }
+//            } else {
+//                serverCast();
+//            }
         };
         
         return button;
