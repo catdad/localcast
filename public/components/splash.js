@@ -35,6 +35,7 @@
         button.onclick = function(){
             function browserCast() {
                 STATE.emit('browsercast:play', file);
+                STATE.emit('modal:close');
             }
             
             function serverCast() {
