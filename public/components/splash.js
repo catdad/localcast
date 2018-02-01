@@ -44,7 +44,7 @@
                 server.playNew(file.resource, file.name, file.thumb);
             }
             
-            if (chromecast.isAvailable() && false) {
+            if (chromecast.isAvailable()) {
                 browserCast();
             } else {
                 serverCast();
