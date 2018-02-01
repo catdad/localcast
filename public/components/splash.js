@@ -29,7 +29,8 @@
     }
     
     function createCastButton(file) {
-        var button = createButton('Cast');
+        var castName = chromecast.isAvailable() ? 'Browser Cast' : 'Server Cast';
+        var button = createButton(castName);
         
         button.onclick = function(){
             function browserCast() {
