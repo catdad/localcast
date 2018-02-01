@@ -50,9 +50,9 @@
                 //navigate
                 window.STATE.emit('navigate', data.path);
                 
-                if (data.nowPlaying !== undefined) {
-                    server.nowPlaying(data.nowPlaying);
-                }
+//                if (data.nowPlaying !== undefined) {
+//                    server.nowPlaying(data.nowPlaying);
+//                }
                 
                 window.scrollTo(0,0);
             });

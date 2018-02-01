@@ -2,6 +2,7 @@
 /* jshint browser: true, expr: true, devel: true */
 
 var server = function(){
+    return;
     var endpoint = '/session2/',
         connectedDevice,
         sessionAnnounced = false;

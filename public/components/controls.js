@@ -1,82 +1,14 @@
-/* jshint browser: true, devel: true, expr: true */        
+/* jshint browser: true, devel: true, expr: true */
 
-var player = (function(window){
-
-    // Event module
-    // https://gist.github.com/catdad/9acd13dd3a8a34a79de6
-    var EventEmitter = function(){
-        var events = {};
-
-        this.on = function(name, callback){
-            name = name.toLowerCase();
-            events[name] = events[name] || [];
-            events[name].push(callback);
-
-            return this;
-        };
-
-        this.off = function(name, callback){
-            name = name.toLowerCase();
-            if (name in events === false) return this;
-            events[name].splice(events[name].indexOf(callback), 1);
-            return this;
-        };
-
-        this.once = function(name, callback){
-            function disposable(){
-                this.off(name, disposable);
-                callback.apply(this, arguments);
-            }
-
-            this.on(name, disposable);
-
-            return this;
-        };
-
-        this.trigger = function(name){
-            var that = this,
-                args = arguments;
-
-            name = name.toLowerCase();
-
-            if (name in events === false) return this;
-            events[name].forEach(function(fn){
-                fn.apply(that, [].slice.call(args, 1));
-            });
-
-            return this;
-        };
-
-        this.asyncTrigger = function(name){
-            var args = arguments,
-                that = this;
-            setTimeout(function(){
-                that.trigger.apply(that, args);
-            }, 0);
-
-            return this;
-        };
-    };
+(function (window) {
+    var STATE = window.STATE;
     
-    // helper -- throttle function
-    function throttle(func) {
-        return setTimeout(func, 64);
-    }
-    
-    // helper -- pad numbers
-    var padNumber = function(n, len){
-        var s = n.toString();
-        while(s.length < (len || 2)) { s = '0' + s; }
-        return s;
-    };
-
     // parse the document for the interesting buttons
     var dom = {
         controls: document.querySelector('#controls'),
         play: document.querySelector('#play'),
         pause: document.querySelector('#pause'),
         stop: document.querySelector('#stop'),
-        cast: document.querySelector('#cast'),
         volume: document.querySelector('#volume'),
         show: function() {
             dom.controls.classList.remove('disabled');
@@ -85,7 +17,7 @@ var player = (function(window){
             dom.controls.classList.add('disabled');
         }
     };
-
+    
     var commands = {
         play: function(){
             // change play/pause buttons
@@ -117,8 +49,57 @@ var player = (function(window){
         }
     };
     
-    // event emitter for the controls module
-    var events = new EventEmitter();
+    function initEvents() {
+        // add button events
+        dom.play.addEventListener('click', function(){
+            commands.play();
+            STATE.emit('controls:play');
+        }, false);
+        dom.pause.addEventListener('click', function(){
+            commands.pause();
+            STATE.emit('controls:pause');
+        }, false);
+        dom.stop.addEventListener('click', function(){
+            console.log('stop clicked');
+            STATE.emit('controls:stop');
+        }, false);
+    }
+    
+    function onSetDuration(opts) {
+        
+    }
+    
+    STATE.on('controls:init', function (metadata) {
+        initEvents();
+        dom.show();
+        
+        console.log('controls medatada', metadata);
+        
+        if (metadata.state === 'paused') {
+            commands.pause();
+        } else {
+            // TODO: we are assuming that if it is not paused,
+            // it is playing... we will handle the 'buffering'
+            // case later... requires update to friendlyCast
+            commands.play();
+        }
+    });
+}(window));
+
+var player = (function(window){
+    return;
+
+    // helper -- throttle function
+    function throttle(func) {
+        return setTimeout(func, 64);
+    }
+    
+    // helper -- pad numbers
+    var padNumber = function(n, len){
+        var s = n.toString();
+        while(s.length < (len || 2)) { s = '0' + s; }
+        return s;
+    };
     
     // monitor the slider
     var slider = (function(){
@@ -235,27 +216,7 @@ var player = (function(window){
         track.addEventListener('mousedown', seekStart, false);
         track.addEventListener('touchstart', seekStart, false);
 
-        // add button events
-        dom.play.addEventListener('click', function(){
-            commands.play();
-            
-            events.asyncTrigger('play');
-        }, false);
-        dom.pause.addEventListener('click', function(){
-            commands.pause();
-            
-            events.asyncTrigger('pause');
-        }, false);
-        dom.stop.addEventListener('click', function(){
-            events.asyncTrigger('stop');
-        }, false);
-        dom.cast.addEventListener('click', function(){
-            events.asyncTrigger('castSelect', { 
-                connected: dom.cast.classList.contains('icon-cast-on'), 
-                connectedTo: dom.cast.getAttribute('data-device') || undefined
-            });
-        }, false);
-
+        
         var mute = function() {
             commands.mute();
             events.asyncTrigger('mute');
