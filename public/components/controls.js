@@ -60,7 +60,6 @@
             STATE.emit('controls:pause');
         }, false);
         dom.stop.addEventListener('click', function(){
-            console.log('stop clicked');
             STATE.emit('controls:stop');
         }, false);
         dom.volume.addEventListener('click', function(){
