@@ -171,10 +171,10 @@
 
         var seekEnd = function(ev){
             // remove events
-            track.removeEventListener('mousemove', handleSeekEvent, false);
-            track.removeEventListener('mouseup', seekEnd, false);
-            track.removeEventListener('touchmove', handleSeekEvent, false);
-            track.removeEventListener('touchend', seekEnd, false);
+            window.removeEventListener('mousemove', handleSeekEvent, false);
+            window.removeEventListener('mouseup', seekEnd, false);
+            window.removeEventListener('touchmove', handleSeekEvent, false);
+            window.removeEventListener('touchend', seekEnd, false);
 
             STATE.emit('controls:seek', {
                 percent: getSeekPercent(ev)
@@ -185,11 +185,10 @@
             handleSeekEvent(ev);
 
             // add additional event listeners
-            // TODO these should be on window
-            track.addEventListener('mousemove', handleSeekEvent, false);
-            track.addEventListener('mouseup', seekEnd, false);
-            track.addEventListener('touchmove', handleSeekEvent, false);
-            track.addEventListener('touchend', seekEnd, false);
+            window.addEventListener('mousemove', handleSeekEvent, false);
+            window.addEventListener('mouseup', seekEnd, false);
+            window.addEventListener('touchmove', handleSeekEvent, false);
+            window.addEventListener('touchend', seekEnd, false);
         };
 
         // listen to mouse and touch start
