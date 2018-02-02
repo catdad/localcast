@@ -240,11 +240,13 @@
                 STATE.off('controls:play', onPlay);
                 STATE.off('controls:pause', onPause);
                 STATE.off('controls:seek-end', onSeedEnd);
+                STATE.off('controls:stop', destroy);
             }
             
             STATE.on('controls:play', onPlay);
             STATE.on('controls:pause', onPause);
             STATE.on('controls:seek-end', onSeedEnd);
+            STATE.on('controls:stop', destroy);
             
             onPlay();
         }
