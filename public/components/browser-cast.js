@@ -17,6 +17,10 @@
         },
         unmute: function () {
             chromecast.control.volume('unmute');
+        },
+        seek: function (ev) {
+            var seekSeconds = chromecast.control.duration() * ev.percent;
+            chromecast.control.seek(seekSeconds);
         }
     });
     
@@ -26,6 +30,7 @@
         STATE.on('controls:stop', controls.stop);
         STATE.on('controls:mute', controls.mute);
         STATE.on('controls:unmute', controls.unmute);
+        STATE.on('controls:seek', controls.seek);
     }
     
     function destroyControls() {
@@ -34,6 +39,7 @@
         STATE.off('controls:stop', controls.stop);
         STATE.off('controls:mute', controls.mute);
         STATE.off('controls:unmute', controls.unmute);
+        STATE.off('controls:seek', controls.seek);
     }
     
     function onMediaDiscovered(ev) {
