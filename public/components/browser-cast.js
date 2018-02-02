@@ -75,6 +75,5 @@
         } catch (e) {
             toast.error('Casting is not supported on this browser.');
         }
-        
     });
 }(window));
