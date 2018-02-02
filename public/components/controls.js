@@ -195,8 +195,6 @@
 
         // track the progress using a timer... ew
         function automaticTracking() {
-            console.log('AUTO TRACKING');
-            
             var isPlaying = false,
                 time = 1000,
                 timer;
@@ -253,7 +251,6 @@
                 return lastPercent;
             },
             setDuration: function(val){
-                console.log('setting duration', val);
                 duration = +val || 0;
             }
         };
@@ -262,8 +259,6 @@
     STATE.on('controls:init', function (metadata) {
         initEvents();
         dom.show();
-        
-        console.log('controls medatada', metadata);
         
         if (metadata.state === 'paused') {
             commands.pause();
