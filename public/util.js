@@ -55,6 +55,24 @@
         return elem;
     }
     
+    // helper -- throttle function
+    function throttle(func, time) {
+        var t = Number(time);
+        
+        if (time < 1) {
+            time = 64;
+        }
+        
+        return setTimeout(func, time);
+    }
+    
+    // helper -- pad numbers
+    var padNumber = function(n, len){
+        var s = n.toString();
+        while(s.length < (len || 2)) { s = '0' + s; }
+        return s;
+    };
+    
     window.UTIL = {
         raf: raf,
         defer: defer,
@@ -63,6 +81,8 @@
         text: views.text,
         clean: clean,
         splitString: splitString,
-        empty: empty
+        empty: empty,
+        throttle: throttle,
+        padNumber: padNumber
     };
 }(window));
