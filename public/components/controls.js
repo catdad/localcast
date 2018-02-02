@@ -233,9 +233,14 @@
             function onSeedEnd() {
                 isPlaying = false;
                 clearTimer();
+                destroy();
             }
             
-            // TODO add destroy/onStop
+            function destroy() {
+                STATE.off('controls:play', onPlay);
+                STATE.off('controls:pause', onPause);
+                STATE.off('controls:seek-end', onSeedEnd);
+            }
             
             STATE.on('controls:play', onPlay);
             STATE.on('controls:pause', onPause);
