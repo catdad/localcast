@@ -2,6 +2,7 @@
 
 (function (window) {
     var STATE = window.STATE;
+    var UTIL = window.UTIL;
     
     // parse the document for the interesting buttons
     var dom = {
@@ -73,38 +74,6 @@
         }, false);
     }
     
-    STATE.on('controls:init', function (metadata) {
-        initEvents();
-        dom.show();
-        
-        console.log('controls medatada', metadata);
-        
-        if (metadata.state === 'paused') {
-            commands.pause();
-        } else {
-            // TODO: we are assuming that if it is not paused,
-            // it is playing... we will handle the 'buffering'
-            // case later... requires update to friendlyCast
-            commands.play();
-        }
-    });
-}(window));
-
-var player = (function(window){
-    return;
-
-    // helper -- throttle function
-    function throttle(func) {
-        return setTimeout(func, 64);
-    }
-    
-    // helper -- pad numbers
-    var padNumber = function(n, len){
-        var s = n.toString();
-        while(s.length < (len || 2)) { s = '0' + s; }
-        return s;
-    };
-    
     // monitor the slider
     var slider = (function(){
         var track = dom.controls.querySelector('.track'),
@@ -123,9 +92,11 @@ var player = (function(window){
             width = slider.offsetWidth;
         }, false);
 
-        var setBarPercent = function(percent){
+        function setBarPercent(percent) {
+            console.log('set percent', percent, duration);
+            
             if (percent >= 1) {
-                events.asyncTrigger('ended');
+                STATE.emit('controls:seek-end');
                 percent = 1;
             }
             
@@ -136,16 +107,17 @@ var player = (function(window){
 
             // update tooltip if still visible
             updateTooltip(percent, showTooltip);
-        };
+        }
 
         var updateTooltip = function(percent, show){
             if (show) {
-                throttle(function(){
+                UTIL.throttle(function () {
                     var text = '';
+                    
                     if (duration) {
                         var totalSeconds = percent * duration,
                             mins = parseInt(totalSeconds / 60),
-                            seconds = padNumber(parseInt(totalSeconds - (mins * 60)));
+                            seconds = UTIL.padNumber(parseInt(totalSeconds - (mins * 60)));
 
                         text = mins + ':' + seconds;
                     } else {
@@ -193,7 +165,8 @@ var player = (function(window){
                 showTooltip = false;
             }, 2500);
 
-            events.asyncTrigger('seeking', { percent: seekPercent });
+            // TODO is this needed
+//            events.asyncTrigger('seeking', { percent: seekPercent });
         };
 
         var seekEnd = function(ev){
@@ -203,13 +176,16 @@ var player = (function(window){
             track.removeEventListener('touchmove', handleSeekEvent, false);
             track.removeEventListener('touchend', seekEnd, false);
 
-            events.asyncTrigger('seeked', { percent: getSeekPercent(ev) });
+            STATE.emit('controls:seek', {
+                percent: getSeekPercent(ev)
+            });
         };
 
         var seekStart = function(ev){
             handleSeekEvent(ev);
 
             // add additional event listeners
+            // TODO these should be on window
             track.addEventListener('mousemove', handleSeekEvent, false);
             track.addEventListener('mouseup', seekEnd, false);
             track.addEventListener('touchmove', handleSeekEvent, false);
@@ -220,22 +196,64 @@ var player = (function(window){
         track.addEventListener('mousedown', seekStart, false);
         track.addEventListener('touchstart', seekStart, false);
 
-        
-        
+        // track the progress using a timer... ew
+        function automaticTracking() {
+            console.log('AUTO TRACKING');
+            
+            var isPlaying = false,
+                time = 1000,
+                timer;
 
+            function tick() {
+                if (!isPlaying) {
+                    return;
+                }
+                
+                var newPercent = ((lastPercent * duration) + 1) / duration;
+
+                setBarPercent(newPercent);
+
+                timer = setTimeout(tick, time);
+            }
+            
+            function clearTimer() {
+                if (timer) {
+                    clearTimeout(timer);
+                    timer = null;
+                }
+            }
+            
+            function onPlay() {
+                isPlaying = true;
+                clearTimer();
+                
+                timer = setTimeout(tick, time);
+            }
+            
+            function onPause() {
+                isPlaying = false;
+                clearTimer();
+            }
+            
+            function onSeedEnd() {
+                isPlaying = false;
+                clearTimer();
+            }
+            
+            // TODO add destroy/onStop
+            
+            STATE.on('controls:play', onPlay);
+            STATE.on('controls:pause', onPause);
+            STATE.on('controls:seek-end', onSeedEnd);
+            
+            onPlay();
+        }
+        
         return {
+            autoTrack: automaticTracking,
             setProgress: setBarPercent,
             getProgress: function() {
                 return lastPercent;
-            },
-            on: function(name, cb){
-                events.on(name, cb);   
-            },
-            once: function(name, cb){
-                events.once(name, cb);   
-            },
-            off: function(name, cb){
-                events.off(name, cb);
             },
             setDuration: function(val){
                 console.log('setting duration', val);
@@ -244,72 +262,57 @@ var player = (function(window){
         };
     })();
     
-    // track the progress using a timer... ew
-    function automaticTracking(){
-        var isPlaying = false,
-            time = 1000,
-            timer;
-        
-        var tick = function(){
-            var newPercent = ((slider.getProgress() * 100) + 1) / 100;
-            
-            slider.setProgress( newPercent );
-            
-            if (isPlaying) {
-                timer = setTimeout(tick, time);
-            }
-        };
-        
-        events.on('play', function(){
-            isPlaying = true;
-            
-            timer = setTimeout(tick, time);
-        });
-        
-        events.on('pause', function(){
-            isPlaying = false;
-            
-            if (timer) {
-                clearTimeout(timer);
-                timer = undefined;
-            }
-        });
-        
-        events.on('ended', function(){
-            isPlaying = false;
-            
-            if (timer) {
-                clearTimeout(timer);
-                timer = undefined;
-            }
-        });
-    }
-    
-    slider.autoTrack = automaticTracking;
-    
-    slider.enable = function(alreadyPlaying){
+    STATE.on('controls:init', function (metadata) {
+        initEvents();
         dom.show();
         
-        if (alreadyPlaying) {
-            slider.play();
+        console.log('controls medatada', metadata);
+        
+        if (metadata.state === 'paused') {
+            commands.pause();
+        } else {
+            // TODO: we are assuming that if it is not paused,
+            // it is playing... we will handle the 'buffering'
+            // case later... requires update to friendlyCast
+            commands.play();
         }
-    };
-    slider.disable = function(){
-        dom.hide();
-    };
-    
-    slider.play = function(){
-        dom.play.click();
-    };
-    
-    slider.command = commands;
-    
-    slider.reset = function(){
-        slider.setProgress(0);
-        dom.hide();
-    };
-    
-    return slider;
+        
+        slider.setDuration(metadata.duration);
+        
+        // TODO start this once the media is done buffering
+        // and is playing
+        slider.autoTrack();
+    });
+}(window));
+
+var player = (function(window){
+    return;
+
+//    slider.autoTrack = automaticTracking;
+//    
+//    slider.enable = function(alreadyPlaying){
+//        dom.show();
+//        
+//        if (alreadyPlaying) {
+//            slider.play();
+//        }
+//    };
+//    slider.disable = function(){
+//        dom.hide();
+//    };
+//    
+//    slider.play = function(){
+//        dom.play.click();
+//    };
+//    
+//    slider.command = commands;
+//    
+//    slider.reset = function(){
+//        slider.setProgress(0);
+//        dom.hide();
+//    };
+//    
+//    return slider;
 })(window);
 
 
