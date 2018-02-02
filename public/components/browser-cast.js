@@ -66,10 +66,15 @@
     chromecast.on(chromecast.Events.mediaEnd, onMediaStopped);
         
     STATE.on('browsercast:play', function (file) {
-        //play the media
-        chromecast.startCast(file.resource, {
-            title: file.name,
-            images: [{ url: file.thumb }]
-        });
+        try {
+            //play the media
+            chromecast.startCast(file.resource, {
+                title: file.name,
+                images: [{ url: file.thumb }]
+            });    
+        } catch (e) {
+            toast.error('Casting is not supported on this browser.');
+        }
+        
     });
 }(window));
