@@ -29,15 +29,12 @@
     }
     
     function createCastButton(file) {
-        var castName = chromecast.isAvailable() ? 'Browser Cast' : 'Server Cast';
-        var button = createButton(castName);
+        var button = createButton('Cast');
         
         button.onclick = function(){
             function browserCast() {
-                chromecast.startCast(file.resource, {
-                    title: file.name,
-                    images: [{ url: file.thumb }]
-                });
+                STATE.emit('browsercast:play', file);
+                STATE.emit('modal:close');
             }
             
             function serverCast() {
@@ -45,11 +42,14 @@
                 server.playNew(file.resource, file.name, file.thumb);
             }
             
-            if (chromecast.isAvailable()) {
-                browserCast();
-            } else {
-                serverCast();
-            }
+            // we will always try to browser-cast
+            browserCast();
+            
+//            if (chromecast.isAvailable()) {
+//                browserCast();
+//            } else {
+//                serverCast();
+//            }
         };
         
         return button;

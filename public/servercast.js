@@ -2,6 +2,7 @@
 /* jshint browser: true, expr: true, devel: true */
 
 var server = function(){
+    return;
     var endpoint = '/session2/',
         connectedDevice,
         sessionAnnounced = false;
@@ -150,6 +151,10 @@ var server = function(){
     }
     
     function playNew(url, name, thumb){
+        // disabling this for now
+        toast.error('Server Cast is not available');
+        return;
+        
         var uri = endpoint + 'play';
 
         if (url) {
