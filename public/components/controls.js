@@ -93,8 +93,6 @@
         }, false);
 
         function setBarPercent(percent) {
-            console.log('set percent', percent, duration);
-            
             if (percent >= 1) {
                 STATE.emit('controls:seek-end');
                 percent = 1;
