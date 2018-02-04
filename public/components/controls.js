@@ -277,6 +277,7 @@
         }
         
         slider.setDuration(metadata.duration);
+        slider.setProgress(0);
         
         // TODO start this once the media is done buffering
         // and is playing
