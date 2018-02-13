@@ -104,8 +104,11 @@ function getThumbnail(req, res, fullPath, callback) {
         fs.readFile(pathToRead, function(err, file) {
             res.writeHead(200, {'Content-Type': 'image/jpeg'});
             res.end(file);
+            
             //delete file if needed
-            name && fs.unlink(name);
+            name && fs.unlink(name, function (err) {
+                err && console.error(err);
+            });
         });
     });
 }
