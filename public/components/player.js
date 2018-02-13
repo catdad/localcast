@@ -115,7 +115,7 @@
             vid.removeEventListener('ended', onVideoEnded);
             window.removeEventListener('keypress', onKeyPress);
             
-            vid.src = null;
+            vid.src = '';
             
             document.title = originalTitle;
         }
