@@ -73,8 +73,8 @@
         };
         
         window.onpopstate = function(ev){
-            var defaultPrevented = false,
-                prevent = function(){
+            var defaultPrevented = false;
+            var prevent = function(){
                     defaultPrevented = true;
                 };
             
