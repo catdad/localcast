@@ -93,8 +93,6 @@ function getThumbnail(req, res, fullPath, callback) {
     ffmpeg.thumb(fullPath, function(err, img) {
         res.writeHead(200, {'Content-Type': 'image/jpeg'});
         
-        console.log('callback', err);
-
         if (err) {
             console.error('error generating thumbnail', err);
             
