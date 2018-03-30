@@ -90,26 +90,21 @@ function streamFile(req, res, fullPath) {
 }
 
 function getThumbnail(req, res, fullPath, callback) {
-    ffmpeg.thumb(fullPath, function(err, name) {
+    ffmpeg.thumb(fullPath, function(err, img) {
+        res.writeHead(200, {'Content-Type': 'image/jpeg'});
+        
+        console.log('callback', err);
+
         if (err) {
-            res.send(err);
+            console.error('error generating thumbnail', err);
+            
+            var pathToRead = path.resolve('.', 'temp', 'error.jpg');
+            fs.createReadStream(pathToRead).pipe(res);
+
             return;
         }
         
-        var pathToRead = path.resolve('.', 'temp', 'error.jpg');
-        if (name) {
-            pathToRead = name;
-        }
-        
-        fs.readFile(pathToRead, function(err, file) {
-            res.writeHead(200, {'Content-Type': 'image/jpeg'});
-            res.end(file);
-            
-            //delete file if needed
-            name && fs.unlink(name, function (err) {
-                err && console.error(err);
-            });
-        });
+        img.pipe(res);
     });
 }
 
