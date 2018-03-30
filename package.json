@@ -18,7 +18,8 @@
     "http-proxy": "~1.2.1",
     "mdns-js2": "0.0.5",
     "qr-image": "~2.0.0",
-    "send": "^0.16.1"
+    "send": "^0.16.1",
+    "through2": "^2.0.3"
   },
   "devDependencies": {
     "gulp": "^3.9.1",

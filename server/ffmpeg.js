@@ -6,6 +6,8 @@ var fs = require('fs');
 var child_process = require('child_process');
 var path = require('path');
 
+var through = require('through2');
+
 // root is one up from the running dir
 var dir = path.resolve(__dirname, '..');
 
@@ -48,23 +50,37 @@ function stream_fluent(res, vid){
 }
 
 function thumbnail(fullPath, callback){
-    var output = path.resolve('.', 'temp', 'shot-' + Date.now() + '.jpg');
-    var command = ffmpegPath + ' -ss 00:01:00 -i \"' + fullPath + '\" -y -f mjpeg -vframes 1 \"' + path.resolve(output) + '\"';
-
-    var thumbCommand = child_process.exec(command, function(error, stdout, stderr) {
-        if (error){
-            console.log('error', error);
-            callback(error);
-            return;
+    var firstRead = true;
+    
+    var task = child_process.spawn(ffmpegPath, [
+        '-ss', '00:01:11', '-i', fullPath,
+        '-y', '-f', 'mjpeg', '-vframes', '1', '-'
+    ], {
+        stdio: ['ignore', 'pipe', 'pipe']
+    });
+    
+    var file = through(function (chunk, enc, cb) {
+        if (firstRead) {
+            firstRead = false;
+            callback(null, file);
         }
-        else if (fs.existsSync(output)){
-            var data = stdout;
-            callback(null, output);   
+        
+        cb(null, chunk);
+    });
+    
+    task.stdout.pipe(file);
+    
+    task.on('exit', function (code) {
+        if (firstRead) {
+            firstRead = false;
+            callback(new Error('exit code ' + code + ' without read'));
         }
-        else if (stderr) {
-            console.log('stderr');
-            callback(stderr);
-            return;
+    });
+    
+    task.on('error', function (err) {
+        if (firstRead) {
+            firstRead = false;
+            callback(err);
         }
     });
 }
