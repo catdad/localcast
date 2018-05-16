@@ -5,6 +5,21 @@
     <title>📺 Local Cast</title>
 </head>
 <body>
-    This is the localcast index page
+    Server root address:
+    <input type="text">
+    <button>load</button>
+    <script>
+        var ipInput = document.querySelector('input');
+        var loadBtn = document.querySelector('button');
+        
+        loadBtn.onclick = function () {
+            var ip = ipInput.value;
+            
+            var script = document.createElement('script');
+            script.src = 'http://' + ip + '/inject.js';
+            
+            document.head.appendChild(script);
+        };
+    </script>
 </body>
 </html>
