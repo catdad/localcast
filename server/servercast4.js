@@ -86,6 +86,8 @@ module.exports = function (req, res) {
         console.log('returning 500 error');
         
         res.writeHead(500);
-        res.end(err.toString());
+        res.end(JSON.stringify({
+            error: err.toString()
+        }));
     });
 };
