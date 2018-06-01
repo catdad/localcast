@@ -40,6 +40,7 @@ function discover() {
         }), 100);
         
         list.on('update', onUpdate);
+        list.update();
     });
 }
 
