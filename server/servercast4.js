@@ -1,4 +1,5 @@
 /* jshint node: true */
+/* global Promise */
 
 var chromecasts = require('chromecasts');
 var ns = require('node-stream');
