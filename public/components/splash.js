@@ -28,31 +28,23 @@
         return playLocalButton;
     }
     
-    function createCastButton(file) {
-        var button = createButton('Cast');
+    function createCastButton(file, text, eventName) {
+        var button = createButton(text);
         
         button.onclick = function(){
-            function browserCast() {
-                STATE.emit('browsercast:play', file);
-                STATE.emit('modal:close');
-            }
-            
-            function serverCast() {
-                STATE.emit('modal:close');
-                server.playNew(file.resource, file.name, file.thumb);
-            }
-            
-            // we will always try to browser-cast
-            browserCast();
-            
-//            if (chromecast.isAvailable()) {
-//                browserCast();
-//            } else {
-//                serverCast();
-//            }
+            STATE.emit(eventName, file);
+            STATE.emit('modal:close');
         };
         
         return button;
+    }
+    
+    function createBrowserCastButton(file) {
+        return createCastButton(file, 'Browser Cast', 'browsercast:play');
+    }
+    
+    function createServerCastButton(file) {
+        return createCastButton(file, 'Server Cast', 'servercast:play');
     }
     
     function progressBar() {
@@ -111,12 +103,13 @@
             modalWrapper;
         
         var playButton = createPlayButton(file, domTrigger);
-        var castButton = createCastButton(file, domTrigger);
+        var browserCastButton = createBrowserCastButton(file, domTrigger);
+        var serverCastButton = createServerCastButton(file, domTrigger);
         
         var progress = progressBar();
         
         // cancel the progress if either of these buttons is clicked by the user    
-        [playButton, castButton].forEach(function (button) {
+        [playButton, browserCastButton, serverCastButton].forEach(function (button) {
             UTIL.once(button, 'click', function () {
                 progress.stop();
             });
@@ -160,7 +153,8 @@
             
             // insert the two buttons created earlier
             container.appendChild(playButton);
-            container.appendChild(castButton);
+            container.appendChild(browserCastButton);
+            container.appendChild(serverCastButton);
             
             modal.appendChild(container);
             
