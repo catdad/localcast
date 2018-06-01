@@ -19,6 +19,7 @@
     "http-proxy": "~1.2.1",
     "lodash": "^4.17.10",
     "mdns-js2": "0.0.5",
+    "node-ssdp": "^3.3.0",
     "node-stream": "^1.7.0",
     "qr-image": "~2.0.0",
     "send": "^0.16.1",
