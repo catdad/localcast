@@ -18,10 +18,13 @@ function parseJson(stream) {
 
 function discover() {
     function players() {
-        return list.players.map(function (player) {
-            return player.name;
-        });
+        return {
+            players: list.players.map(function (player) {
+                return player.name;
+            })
+        };
     }
+    
     return new Promise(function (resolve, reject) {
         if (!list) {
             list = chromecasts();
@@ -77,6 +80,8 @@ module.exports = function (req, res) {
     }).then(function (obj) {
         if (obj) {
             res.write(JSON.stringify(obj));
+        } else {
+            res.write('{}');
         }
         
         res.end();
