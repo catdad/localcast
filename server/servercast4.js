@@ -55,7 +55,6 @@ function play(file, name) {
                 title: file.name
             }, function (err) {
                 if (err) {
-                    console.log('the play errored')
                     return reject(err);
                 }
                 
