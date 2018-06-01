@@ -4,37 +4,46 @@
 (function (window) {
     var STATE = window.STATE;
     
-    function discover(done) {
-        request({
+    function castReq(body, done) {
+        request.json({
             method: 'POST',
             url: '/cast',
-            body: JSON.stringify({
-                command: 'discover'
-            })
-        }, function (err, body, res) {
-            if (typeof body === 'string') {
-                body = JSON.parse(body);
+            body: JSON.stringify(body),
+            headers: {
+                'content-type': 'application/json'
+            }
+        }, function (err, body) {
+            if (err) {
+                return done(err);
             }
             
-            done(err, body);
+            return done(null, body);
+        });
+    }
+    
+    function discover(done) {
+        castReq({
+            command: 'discover'
+        }, function (err, body, res) {
+            if (err) {
+                return done(err);
+            }
+            
+            return done(null, body.players);
         });
     }
     
     function play(file, player, done) {
-        request({
-            method: 'POST',
-            url: '/cast',
-            body: JSON.stringify({
-                command: 'play',
-                file: {
-                    name: file.name,
-                    path: file.path,
-                    resource: file.resource,
-                    thumb: file.thumb
-                },
-                player: player
-            })
-        }, function (err, body, res) {
+        castReq({
+            command: 'play',
+            file: {
+                name: file.name,
+                path: file.path,
+                resource: file.resource,
+                thumb: file.thumb
+            },
+            player: player
+        }, function (err, body) {
             if (done) {
                 return done(err, body);
             }
