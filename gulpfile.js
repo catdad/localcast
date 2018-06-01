@@ -47,6 +47,11 @@ gulp.task('server:start', function () {
             stdio: 'inherit',
             cwd: __dirname
         });
+        
+        server.on('exit', function (code) {
+            server = null;
+            console.log('server exited with code', code);
+        });
 
         return resolve();
     });
