@@ -55,6 +55,8 @@
     }
     
     STATE.on('servercast:play', function (file) {
+        toast.clear();
+        
         discover(function (err, list) {
             if (err) {
                 return toast.error(err.message);
