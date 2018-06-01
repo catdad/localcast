@@ -64,7 +64,11 @@ function play(file, name) {
                 }
                 
                 return resolve();
-            });    
+            });
+            
+            player.on('error', function (err) {
+                return reject(err);
+            });
         });
     });
 }
