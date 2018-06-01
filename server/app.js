@@ -18,6 +18,7 @@ var port = config.port;
 var servercast = require('./servercast.js');
 //var servercast2 = require('./servercast2.js');
 var servercast3 = require('./servercast3.js');
+var servercast4 = require('./servercast4.js');
 var ip = require('./ip.js');
 
 // set the process title to the package name
@@ -115,6 +116,10 @@ app.get('/virtualthumb/:dir/*', function(req, res) {
         .split('/');
     
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
+});
+
+app.post('/cast', function (req, res) {
+    servercast4(req, res);
 });
 
 // router the servercast module
