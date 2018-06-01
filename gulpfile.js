@@ -25,7 +25,6 @@ gulp.task('server:kill', function () {
     return Promise.all([
         new Promise(function (resolve, reject) {
             temp.on('exit', function (code) {
-                console.log('exited with code', code);
                 resolve();
             });
         }),
@@ -49,8 +48,12 @@ gulp.task('server:start', function () {
         });
         
         server.on('exit', function (code) {
+            if (server) {
+                console.log('server exited with code', code);
+                console.log('waiting for a change to restart it');
+            }
+            
             server = null;
-            console.log('server exited with code', code);
         });
 
         return resolve();
