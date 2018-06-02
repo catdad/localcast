@@ -92,7 +92,8 @@ function status(options) {
                     state: status.playerState,
                     resource: status.media ? status.media.contentId : undefined,
                     currentTime: status.currentTime,
-                    duration: status.media ? status.media.duration : 0
+                    duration: status.media ? status.media.duration : 0,
+                    _raw: status
                 };
                 
                 return resolve(response);
