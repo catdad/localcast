@@ -1,9 +1,9 @@
-/* jshint browser: true, devel: true */        
+/* jshint browser: true, devel: true */
 /* globals request, hash, chromecast, server, toast */
 
 (function (window) {
     var STATE = window.STATE;
-    
+
     function castReq(body, done) {
         request.json({
             method: 'POST',
@@ -16,11 +16,11 @@
             if (err) {
                 return done(err);
             }
-            
+
             return done(null, body);
         });
     }
-    
+
     function discover(done) {
         castReq({
             command: 'discover'
@@ -28,11 +28,11 @@
             if (err) {
                 return done(err);
             }
-            
+
             return done(null, body.players);
         });
     }
-    
+
     function play(file, player, done) {
         castReq({
             command: 'play',
@@ -47,13 +47,13 @@
             if (done) {
                 return done(err, body);
             }
-            
+
             if (err) {
                 console.error(err);
             }
         });
     }
-    
+
     function status(player, done) {
         castReq({
             command: 'status',
@@ -62,22 +62,22 @@
             console.log(err, body);
         });
     }
-    
+
     STATE.on('servercast:play', function (file) {
         toast.clear();
-        
+
         discover(function (err, list) {
             if (err) {
                 return toast.error(err.message);
             }
-            
+
             list.forEach(function (name) {
                 toast.log({
                     message: name,
                     timeout: -1,
                     onclick: function () {
                         toast.clear();
-                        
+
                         play(file, name);
                     }
                 });
