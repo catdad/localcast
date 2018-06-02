@@ -14,7 +14,7 @@ var views = {
     elem: function(type, opts) {
         return window.UTIL.elem(type, opts);
     },
-    
+
     //constructors
     Modal: function(contentDom, onOpen, origin) {
         window.STATE.emit('modal:open', contentDom, onOpen, origin);
@@ -24,32 +24,32 @@ var views = {
             heading = views.elem('div', { className: 'heading', text: 'Select a device:' }),
             selected = false,
             height = 0;
-        
+
         div.appendChild(heading);
-        
+
         views.Modal(div, function(wrapper){
             wrapper.appendChild(div);
-            
+
             [].forEach.call(div.childNodes, function(node){
                 height += node.offsetHeight;
             });
-            
+
             div.style.height = height + 'px';
         });
-        
+
         window.STATE.once('modal:closed', function () {
             if (!selected) onCancel();
         });
-                
+
         list.forEach(function(item){
             var b = views.elem('button', { text: item });
-            
+
             b.onclick = function(){
                 selected = true;
                 onSelect(item);
                 window.STATE.emit('modal:close');
             };
-            
+
             div.appendChild(b);
         });
     },

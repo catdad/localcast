@@ -21,7 +21,7 @@ gulp.task('server:kill', function () {
 
     var temp = server;
     server = null;
-    
+
     return Promise.all([
         new Promise(function (resolve, reject) {
             temp.on('exit', function (code) {
@@ -46,13 +46,13 @@ gulp.task('server:start', function () {
             stdio: 'inherit',
             cwd: __dirname
         });
-        
+
         server.on('exit', function (code) {
             if (server) {
                 console.log('server exited with code', code);
                 console.log('waiting for a change to restart it');
             }
-            
+
             server = null;
         });
 

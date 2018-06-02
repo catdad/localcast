@@ -55,7 +55,7 @@ app.get('/', function(req, res) {
 
 function send(res, err, data) {
     data = data || {};
-    
+
     res.send(err || data);
 }
 
@@ -72,7 +72,7 @@ app.get('/virtual/:dir', function(req, res) {
 
 app.get('/dir/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url).replace('/dir/', '').split('/');
-    
+
     browse.getDirStats(path.join.apply(path, relativePath), function(err, data) {
         send(res, err, data);
     });
@@ -81,7 +81,7 @@ app.get('/virtual/:dir/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url)
         .replace('/virtual/' + req.params.dir + '/', '')
         .split('/');
-    
+
     browse.virtual(req.params.dir).getDirStats(path.join.apply(path, relativePath), function(err, data) {
         send(res, err, data);
     });
@@ -89,27 +89,27 @@ app.get('/virtual/:dir/*', function(req, res) {
 
 app.get('/dirfile/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url).replace('/dirfile/', '').split('/');
-    
+
     browse.stream(req, res, path.join.apply(path, relativePath));
 });
 app.get('/virtualfile/:dir/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url)
         .replace('/virtualfile/' + req.params.dir + '/', '')
         .split('/');
-    
+
     browse.virtual(req.params.dir).stream(req, res, path.join.apply(path, relativePath));
 });
 
 app.get('/dirthumb/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url).replace('/dirthumb/', '').split('/');
-    
+
     browse.thumb(req, res, path.join.apply(path, relativePath));
 });
 app.get('/virtualthumb/:dir/*', function(req, res) {
     var relativePath = decodeURIComponent(req.url)
         .replace('/virtualthumb/' + req.params.dir + '/', '')
         .split('/');
-    
+
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
 });
 
@@ -125,16 +125,16 @@ app.use('/lib/octicons', express.static(path.resolve('.', 'lib/octicons')));
 app.get('/link', function(req, res) {
     var format = (req.query.f || 'png').toLowerCase();
     var address = 'http://' + ip() + ':' + port;
-    
+
     if (format === 'json') {
         res.send({url: address});
         return;
     }
-    
+
     if (format !== 'pdf' && format !== 'svg') {
         format = 'png';
     }
-    
+
     var code = qr.image(address, {type: format});
     res.type(format);
     code.pipe(res);

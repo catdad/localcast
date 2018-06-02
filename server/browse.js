@@ -92,16 +92,16 @@ function streamFile(req, res, fullPath) {
 function getThumbnail(req, res, fullPath, callback) {
     ffmpeg.thumb(fullPath, function(err, img) {
         res.writeHead(200, {'Content-Type': 'image/jpeg'});
-        
+
         if (err) {
             console.error('error generating thumbnail', err);
-            
+
             var pathToRead = path.resolve('.', 'temp', 'error.jpg');
             fs.createReadStream(pathToRead).pipe(res);
 
             return;
         }
-        
+
         img.pipe(res);
     });
 }
@@ -118,46 +118,46 @@ var Browser = function(root, prefix) {
     //set the root inside scope
     this.root = root;
     this.prefix = prefix;
-    
+
     this.getPrefix = function(type) {
         return this.prefix.replace('{{file}}', (type || ''));
     };
-    
+
     this.getDirStats = function(dir, callback) {
         var fullPath = path.resolve(this.root, dir);
-        
+
         getDirectoryStats(this.root, fullPath, this.getPrefix(), this.getPrefix('file'), this.getPrefix('thumb'), callback);
     };
-    
+
     this.stream = function(req, res, relativePath) {
         var fullPath = path.resolve(this.root, relativePath);
-        
+
         //get file format
         var format = fullPath.split('.').pop();
-        
+
         if (format === 'mp4' || format === 'webm') {
             return streamFile(req, res, fullPath);
         }
-        
+
         return ffmpegStream(req, res, fullPath);
     };
-    
+
     this.thumb = function(req, res, relativePath) {
         var fullPath = path.resolve(this.root, relativePath);
-        
+
         getThumbnail(req, res, fullPath);
     };
-    
+
     this.virtual = function(name) {
         var virtual = config.virtuals.filter(function(el) {
             return (el.name === name);
         });
-        
+
         var newRoot = '.'; //assume current directory
         if (virtual.length) {
             newRoot = virtual[0].directory;
         }
-        
+
         return new Browser(newRoot, path.join('virtual{{file}}', name));
     };
 };
