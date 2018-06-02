@@ -12,12 +12,12 @@
 
         dom.addEventListener(event, listener);
     }
-    
+
     var views = {
         elem: function(type, opts) {
             opts = opts || {};
             var el = document.createElement(type);
-            
+
             if (opts.className) {
                 el.className = opts.className;
             }
@@ -38,41 +38,41 @@
         var sub = (idx > 0) ? str.substr(0, idx) : str;
         return sub.replace(/\./g, ' ').trim();
     }
-    
+
     function splitString(str) {
         return str.replace(/\.|\s|\/|\-/g, ' ').toLowerCase();
     }
-    
+
     function empty(elem) {
         if (!elem) {
             return;
         }
-        
+
         while (elem.firstChild) {
             elem.removeChild(elem.firstChild);
         }
-        
+
         return elem;
     }
-    
+
     // helper -- throttle function
     function throttle(func, time) {
         var t = Number(time);
-        
+
         if (time < 1) {
             time = 64;
         }
-        
+
         return setTimeout(func, time);
     }
-    
+
     // helper -- pad numbers
     var padNumber = function(n, len){
         var s = n.toString();
         while(s.length < (len || 2)) { s = '0' + s; }
         return s;
     };
-    
+
     window.UTIL = {
         raf: raf,
         defer: defer,
