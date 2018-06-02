@@ -63,16 +63,6 @@
         });
     }
     
-    function showTempControls(opts) {
-        toast.info({
-            message: 'status',
-            timeout: -1,
-            onclick: function () {
-                status(opts.player, function () {});
-            }
-        });
-    }
-    
     STATE.on('servercast:play', function (file) {
         toast.clear();
         
@@ -89,8 +79,6 @@
                         toast.clear();
                         
                         play(file, name);
-                        
-                        showTempControls({ player: name })
                     }
                 });
             });
