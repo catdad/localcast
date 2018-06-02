@@ -8,7 +8,6 @@ var url = require('url');
 var express = require('express');
 var app = express();
 
-var proxy = require('http-proxy').createProxyServer({});
 var qr = require('qr-image');
 
 var browse = require('./browse.js');
@@ -115,12 +114,6 @@ app.get('/virtualthumb/:dir/*', function(req, res) {
 });
 
 app.post('/cast', servercast);
-
-app.get('/gui*', function(req, res) {
-    proxy.web(req, res, {
-        target: 'http://localhost:8050'
-    });
-});
 
 //public static files
 app.use(express.static(path.resolve(rootDir, 'public')));
