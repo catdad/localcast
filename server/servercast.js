@@ -6,6 +6,7 @@ var ns = require('node-stream');
 var _ = require('lodash');
 
 var list;
+var status;
 
 function parseJson(stream) {
     return new Promise(function (resolve, reject) {
@@ -44,7 +45,7 @@ function discover() {
     });
 }
 
-function play(file, name) {
+function findPlayer(name) {
     return discover().then(function (players) {
         var player = _.find(list.players, function (player) {
             return player.name === name;
@@ -54,6 +55,12 @@ function play(file, name) {
             return Promise.reject(name + ' not found');    
         }
         
+        return Promise.resolve(player);
+    });
+}
+
+function play(file, name) {
+    return findPlayer(name).then(function (player) {
         return new Promise(function (resolve, reject) {
             player.play(file.resource, {
                 type: 'video/mp4',
@@ -73,6 +80,27 @@ function play(file, name) {
     });
 }
 
+function status(options) {
+    return findPlayer(options.player).then(function (player) {
+        return new Promise(function (resolve, reject) {
+            player.status(function (err, status) {
+                if (err) {
+                    return reject(err);
+                }
+                
+                var response = {
+                    state: status.playerState,
+                    resource: status.media ? status.media.contentId : undefined,
+                    currentTime: status.currentTime,
+                    duration: status.media ? status.media.duration : 0
+                };
+                
+                return resolve(response);
+            });
+        });
+    });
+}
+
 module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
@@ -80,6 +108,8 @@ module.exports = function (req, res) {
                 return play(body.file, body.player);
             case 'discover':
                 return discover();
+            case 'status':
+                return status(body);
         }
         
         return Promise.reject('invalid command provided');
