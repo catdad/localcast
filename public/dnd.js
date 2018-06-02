@@ -3,7 +3,7 @@
 function handleFiles(files) {
 //    mediaList.push.apply(mediaList, [].slice.call(files));
 //    displayMediaList( mediaList.get() );
-//    
+//
 //    if (mediaList.hasNext()) {
 //        playFileAutoSelect( mediaList.cursor(0) );
 //    }
@@ -37,16 +37,16 @@ function throttle(func) {
 
 function dragover(ev) {
     killEvent(ev);
-    
+
     // clear any pending leave events
     clearTimeout(dragThrottle);
-    
+
     addClass(dropbox, 'show');
 }
 
 function dragleave(ev) {
     killEvent(ev);
-    
+
     // delay execution of this event
     dragThrottle = throttle(function(){
         removeClass(dropbox, 'show');
@@ -56,7 +56,7 @@ function dragleave(ev) {
 function drop(ev) {
     killEvent(ev);
     removeClass(dropbox, 'show');
-    
+
     dropbox.className = document.body.className.replace(/show/g, '');
 
     handleFiles(ev.dataTransfer.files);

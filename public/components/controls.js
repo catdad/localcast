@@ -3,7 +3,7 @@
 (function (window) {
     var STATE = window.STATE;
     var UTIL = window.UTIL;
-    
+
     // parse the document for the interesting buttons
     var dom = {
         controls: document.querySelector('#controls'),
@@ -18,7 +18,7 @@
             dom.controls.classList.add('disabled');
         }
     };
-    
+
     var commands = {
         play: function(){
             // change play/pause buttons
@@ -49,7 +49,7 @@
             dom.cast.removeAttribute('data-device');
         }
     };
-    
+
     function initEvents() {
         // add button events
         dom.play.addEventListener('click', function(){
@@ -73,7 +73,7 @@
             }
         }, false);
     }
-    
+
     // monitor the slider
     var slider = (function(){
         var track = dom.controls.querySelector('.track'),
@@ -97,10 +97,10 @@
                 STATE.emit('controls:seek-end');
                 percent = 1;
             }
-            
+
             transform = width * percent;
             slider.style.transform = 'translateX(' + transform + 'px)';
-            
+
             lastPercent = percent;
 
             // update tooltip if still visible
@@ -111,7 +111,7 @@
             if (show) {
                 UTIL.throttle(function () {
                     var text = '';
-                    
+
                     if (duration) {
                         var totalSeconds = percent * duration,
                             mins = parseInt(totalSeconds / 60),
@@ -158,7 +158,7 @@
 
             // set a timeout to clear the tooltip display
             tooltipTimeout && clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(function(){ 
+            tooltipTimeout = setTimeout(function(){
                 tooltipTimeout = undefined;
                 showTooltip = false;
             }, 2500);
@@ -203,57 +203,57 @@
                 if (!isPlaying) {
                     return;
                 }
-                
+
                 var newPercent = ((lastPercent * duration) + 1) / duration;
 
                 setBarPercent(newPercent);
 
                 timer = setTimeout(tick, time);
             }
-            
+
             function clearTimer() {
                 if (timer) {
                     clearTimeout(timer);
                     timer = null;
                 }
             }
-            
+
             function onPlay() {
                 isPlaying = true;
                 clearTimer();
-                
+
                 timer = setTimeout(tick, time);
             }
-            
+
             function onPause() {
                 isPlaying = false;
                 clearTimer();
             }
-            
+
             function onSeedEnd() {
                 isPlaying = false;
                 clearTimer();
-                
+
                 dom.hide();
-                
+
                 destroy();
             }
-            
+
             function destroy() {
                 STATE.off('controls:play', onPlay);
                 STATE.off('controls:pause', onPause);
                 STATE.off('controls:seek-end', onSeedEnd);
                 STATE.off('controls:stop', destroy);
             }
-            
+
             STATE.on('controls:play', onPlay);
             STATE.on('controls:pause', onPause);
             STATE.on('controls:seek-end', onSeedEnd);
             STATE.on('controls:stop', destroy);
-            
+
             onPlay();
         }
-        
+
         return {
             autoTrack: automaticTracking,
             setProgress: setBarPercent,
@@ -265,11 +265,11 @@
             }
         };
     })();
-    
+
     STATE.on('controls:init', function (metadata) {
         initEvents();
         dom.show();
-        
+
         if (metadata.state === 'paused') {
             commands.pause();
         } else {
@@ -278,10 +278,10 @@
             // case later... requires update to friendlyCast
             commands.play();
         }
-        
+
         slider.setDuration(metadata.duration);
         slider.setProgress(0);
-        
+
         // TODO start this once the media is done buffering
         // and is playing
         slider.autoTrack();

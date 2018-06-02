@@ -25,7 +25,7 @@ function discover() {
             })
         };
     }
-    
+
     return new Promise(function (resolve, reject) {
         if (!list) {
             list = chromecasts();
@@ -34,11 +34,11 @@ function discover() {
         if (list.players && list.players.length) {
             return resolve(players());
         }
-        
+
         var onUpdate = _.debounce(_.once(function () {
-            resolve(players());    
+            resolve(players());
         }), 100);
-        
+
         list.on('update', onUpdate);
         list.update();
     });
@@ -49,11 +49,11 @@ function findPlayer(name) {
         var player = _.find(list.players, function (player) {
             return player.name === name;
         });
-        
+
         if (!player) {
-            return Promise.reject(name + ' not found');    
+            return Promise.reject(name + ' not found');
         }
-        
+
         return Promise.resolve(player);
     });
 }
@@ -68,10 +68,10 @@ function play(body) {
                 if (err) {
                     return reject(err);
                 }
-                
+
                 return resolve();
             });
-            
+
             player.on('error', function (err) {
                 return reject(err);
             });
@@ -86,13 +86,13 @@ function status(body) {
                 if (err) {
                     return reject(err);
                 }
-                
+
                 if (!status) {
                     return resolve({
                         state: 'NO_MEDIA'
                     });
                 }
-                
+
                 var response = {
                     state: status.playerState,
                     resource: status.media ? status.media.contentId : undefined,
@@ -100,7 +100,7 @@ function status(body) {
                     currentTime: status.currentTime,
                     _raw: status
                 };
-                
+
                 return resolve(response);
             });
         });
@@ -117,7 +117,7 @@ module.exports = function (req, res) {
             case 'status':
                 return status(body);
         }
-        
+
         return Promise.reject('invalid command provided');
     }).then(function (obj) {
         if (obj) {
@@ -125,11 +125,11 @@ module.exports = function (req, res) {
         } else {
             res.write('{}');
         }
-        
+
         res.end();
     }).catch(function (err) {
         console.error(err);
-        
+
         res.writeHead(500);
         res.end(JSON.stringify({
             error: err.toString()

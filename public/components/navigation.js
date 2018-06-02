@@ -4,19 +4,19 @@
 (function (window) {
     var STATE = window.STATE;
     var UTIL = window.UTIL;
-    
+
     var navDOM = document.getElementById('contentNav');
-    
+
     STATE.on('navigate', function (path) {
         var sep = '/';
         path = (!path || path === '.') ? '' : path;
-        
+
         var that = this;
         //generate links for nav
         var linker = function(href, display){
             var span = UTIL.elem('span', { className: 'navPart' });
-            
-            span.onclick = function(){ 
+
+            span.onclick = function(){
                 hash.push({
                     resource: href,
                     title: 'root',
@@ -26,7 +26,7 @@
             span.innerHTML = display;
             return span;
         };
-        
+
         //generate nav separators
         var separator = function(){
             var s = UTIL.elem("span");
@@ -35,7 +35,7 @@
         };
 
         var dom = UTIL.elem('div');
-        
+
         if (path) {
             path.split(sep).forEach(function(el, i, arr){
                 //ugh, special case
@@ -51,7 +51,7 @@
                 }
             });
         }
-        
+
         navDOM.innerHTML = '';
         navDOM.appendChild(dom);
     });
