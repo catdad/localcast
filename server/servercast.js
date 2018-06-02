@@ -96,12 +96,12 @@ function play(body) {
             player.play(body.file.resource, {
                 type: 'video/mp4',
                 title: body.file.name
-            }, function (err) {
+            }, function (err, status) {
                 if (err) {
                     return reject(err);
                 }
 
-                return resolve();
+                return resolve(cleanStatus(status));
             });
 
             player.on('error', function (err) {
