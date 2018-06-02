@@ -171,8 +171,6 @@
 
                             initPlay(status);
                         });
-
-//                        addTempControls(name);
                     }
                 });
             });
