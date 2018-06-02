@@ -103,28 +103,22 @@ function play(body) {
 
 function status(body) {
     return findPlayer(body.player).then(function (player) {
-        return new Promise(function (resolve, reject) {
-            player.status(function (err, status) {
-                if (err) {
-                    return reject(err);
-                }
+        return promisify(player.status.bind(player))().then(function (status) {
+            if (!status) {
+                return Promise.resolve({
+                    state: 'NO_MEDIA'
+                });
+            }
 
-                if (!status) {
-                    return resolve({
-                        state: 'NO_MEDIA'
-                    });
-                }
+            var response = {
+                state: status.playerState,
+                resource: status.media ? status.media.contentId : undefined,
+                duration: status.media ? status.media.duration : 0,
+                currentTime: status.currentTime,
+                _raw: status
+            };
 
-                var response = {
-                    state: status.playerState,
-                    resource: status.media ? status.media.contentId : undefined,
-                    duration: status.media ? status.media.duration : 0,
-                    currentTime: status.currentTime,
-                    _raw: status
-                };
-
-                return resolve(response);
-            });
+            return Promise.resolve(response);
         });
     });
 }
