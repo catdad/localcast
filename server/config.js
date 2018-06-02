@@ -1,40 +1,11 @@
-/* jshint node: true, expr: true */
+/* jshint node: true */
 
 var fs = require('fs');
 
-var configFile,
-    configFilePath = './config.json';
+var _ = require('lodash');
 
-// just because I feel better about it
-var forEach = function forEach(obj, cb, context) {
-    // check for a native forEach function
-    var native = [].forEach,
-        hasProp = Object.prototype.hasOwnProperty;
-
-    // if there is a native function, use it
-    if (native && obj.forEach === native) {
-        //don't bother if there is no function
-        cb && obj.forEach(cb, context);
-    }
-    // if the object is array-like
-    else if (obj.length === +obj.length) {
-        // loop though all values
-        for (var i = 0, length = obj.length; i < length; i++) {
-            // call the function with the context and native-like arguments
-            cb && cb.call(context, obj[i], i, obj);
-        }
-    }
-    // it's an object, use the keys
-    else {
-        // loop through all keys
-        for (var name in obj) {
-            // call the function with context and native-like arguments
-            if (hasProp.call(obj, name)) {
-                cb && cb.call(context, obj[name], name, obj);
-            }
-        }
-    }
-};
+var configFilePath = './config.json';
+var configFile;
 
 try {
     // get the config file synchronously this first time, so that we can require the config.js module
@@ -60,8 +31,7 @@ function reload(done) {
         if (err) {
             // return an error if we got one
             // the config options have not changed
-            done(err);
-            return;
+            return done(err);
         }
 
         var data;
@@ -71,12 +41,11 @@ function reload(done) {
         } catch (e) {
             // data is not JSON
             // the config options have not changed
-            done(e);
-            return;
+            return done(e);
         }
 
         // extend the original config file with the options in the new one
-        forEach(data, function(value, key) {
+        _.forEach(data, function(value, key) {
             configFile[key] = value;
         });
 
@@ -84,12 +53,12 @@ function reload(done) {
         buildConfigObject();
 
         // return the newly extended config object
-        done(undefined, config);
+        return done(null, config);
     });
 }
 
 function buildConfigObject() {
-    forEach(configFile, function(value, key) {
+    _.forEach(configFile, function(value, key) {
         // only add a property if one does not exist
         if (!config[key]) {
             // make all the properties read-only
