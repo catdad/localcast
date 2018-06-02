@@ -8,6 +8,10 @@
         console.log.apply(console, arguments);
     }
 
+    function showErr(err) {
+        toast.error(err.toString());
+    }
+
     function castReq(body, done) {
         request.json({
             method: 'POST',
@@ -152,7 +156,7 @@
 
         discover(function (err, list) {
             if (err) {
-                return toast.error(err.message);
+                return showErr(err);
             }
 
             list.forEach(function (name) {
@@ -166,7 +170,7 @@
 
                         play(file, name, function (err, status) {
                             if (err) {
-                                return toast.error(err.toString());
+                                return showErr(err);
                             }
 
                             initPlay(status);
