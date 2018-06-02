@@ -2,42 +2,6 @@
 
 var fs = require("fs");
 var path = require("path");
-var sync = require("./sync.js");
-
-var dirDeprecated = function(dirPath, callback){
-	//store directories and files
-	var dirs = [];
-	var files = [];
-
-	//get everything in desired path
-	fs.readdir(dirPath, function(err, data){
-		//store functions that need synchronication
-		var syncFunctions = [];
-
-		data.forEach(function(el, i, arr){
-			//create async function
-			var asyncFunc = function(next){
-				//get stats on each item
-				fs.stat(path.join(dirPath, el), function(err, stat){
-					if (err || !stat){
-						//console.log(err || "unknown stat error");
-					} else{
-						if (stat.isFile()) files.push(el);
-						else if (stat.isDirectory()) dirs.push(el);
-					}
-					next();
-				});
-			};
-
-			syncFunctions.push(asyncFunc);
-		});
-
-		sync(syncFunctions, function(){
-			console.log("finished!");
-			callback(null, { dirs: dirs, files: files });
-		}); /* */
-	});
-};
 
 var dirStats = function getDir(dir, callback){
     fs.readdir(dir, function(err, data){
@@ -66,5 +30,4 @@ var dirStats = function getDir(dir, callback){
 module.exports = fs;
 
 //add to fs
-module.exports.dirPlus = dirDeprecated;
 module.exports.dirStats = dirStats;
