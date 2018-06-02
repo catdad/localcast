@@ -23,9 +23,9 @@ function stream_fluent(res, vid){
 	var ffmpeg = require('fluent-ffmpeg');
 
 	var startTime = Date.now();
-	
+
 	res.contentType('mp4');
-	
+
 	var command = new ffmpeg({ source: vid, nolog: true })
 		.addOption('-threads', '2')
 		.on('start', function(commandLine){
@@ -51,32 +51,32 @@ function stream_fluent(res, vid){
 
 function thumbnail(fullPath, callback){
     var firstRead = true;
-    
+
     var task = child_process.spawn(ffmpegPath, [
         '-ss', '00:01:11', '-i', fullPath,
         '-y', '-f', 'mjpeg', '-vframes', '1', '-'
     ], {
         stdio: ['ignore', 'pipe', 'pipe']
     });
-    
+
     var file = through(function (chunk, enc, cb) {
         if (firstRead) {
             firstRead = false;
             callback(null, file);
         }
-        
+
         cb(null, chunk);
     });
-    
+
     task.stdout.pipe(file);
-    
+
     task.on('exit', function (code) {
         if (firstRead) {
             firstRead = false;
             callback(new Error('exit code ' + code + ' without read'));
         }
     });
-    
+
     task.on('error', function (err) {
         if (firstRead) {
             firstRead = false;
@@ -87,36 +87,36 @@ function thumbnail(fullPath, callback){
 
 function getMetaAndStream(res, vid){
 	var probe = ffprobePath + ' -of json -show_streams -show_format \"' + vid + '\"';
-	
+
 	var metaCommand = child_process.exec(probe, function (error, stdout, stderr) {
 		//console.log('stdout: ' + stdout);
 		//console.log('stderr: ' + stderr);
 		if (error !== null) {
 			console.log('exec error: ' + error);
 		}
-		
+
 		var metadata = JSON.parse(stdout);
 		console.log('duration:', metadata.format.duration);
-		
+
 		stream_native(res, vid, metadata.format.duration);
 	});
 }
 
 function convert(path, stream){
     var input_file = fs.createReadStream(path);
-	
+
     //temp - disable console
 //    var console = { log: function(){} };
-    
+
 	input_file.on('error', function(err) {
 		console.log('input error', err);
 	});
 
 	var targetFormat = 'mp4';
 	// var targetFormat = 'webm';
-	
+
 	var envVars = [
-        '-i', 'pipe:0', 
+        '-i', 'pipe:0',
         '-f', targetFormat,
 
          '-vcodec', 'libx264', //used for mp4
@@ -132,12 +132,12 @@ function convert(path, stream){
         '-threads', '2',
         'pipe:1'
     ];
-	
+
 	var ffmpeg = child_process.spawn(ffmpegPath, envVars);
-	
+
 	input_file.pipe(ffmpeg.stdin);
 	ffmpeg.stdout.pipe(stream);
-    
+
     ffmpeg.stderr.on('data', function (data) {
 		console.log(data.toString());
 	});
@@ -157,24 +157,24 @@ function convert(path, stream){
 
 function stream_native(res, vid, duration){
 	var input_file = fs.createReadStream(vid);
-	
+
     //temp - disable console
     var console = { log: function(){} };
-    
+
 	input_file.on('error', function(err) {
 		console.log('input error', err);
 	});
 
 	var targetFormat = 'mp4';
 	// var targetFormat = 'webm';
-	
+
 	res.contentType(targetFormat);
 	res.setHeader('X-Content-Duration', duration.toString());
-	
+
 	// var ffmpeg = child_process.spawn(ffmpegPath, ['-i', 'pipe:0', '-f', 'mp4', '-movflags', 'frag_keyframe', 'pipe:1']);
-	
+
 	var envVars = [
-        '-i', 'pipe:0', 
+        '-i', 'pipe:0',
         '-f', targetFormat,
 
         // '-vcodec', 'libx264', //used for mp4
@@ -190,9 +190,9 @@ function stream_native(res, vid, duration){
         '-threads', '2',
         'pipe:1'
     ];
-	
+
 	var ffmpeg = child_process.spawn(ffmpegPath, envVars);
-	
+
 	input_file.pipe(ffmpeg.stdin);
 	ffmpeg.stdout.pipe(res);
 
@@ -221,6 +221,6 @@ module.exports = {
         thumbnail(fullPath, callback);
     },
     convert: function(path, stream){
-        convert(path, stream);   
+        convert(path, stream);
     }
 };
