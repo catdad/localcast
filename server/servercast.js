@@ -58,12 +58,12 @@ function findPlayer(name) {
     });
 }
 
-function play(file, name) {
-    return findPlayer(name).then(function (player) {
+function play(body) {
+    return findPlayer(body.name).then(function (player) {
         return new Promise(function (resolve, reject) {
-            player.play(file.resource, {
+            player.play(body.file.resource, {
                 type: 'video/mp4',
-                title: file.name
+                title: body.file.name
             }, function (err) {
                 if (err) {
                     return reject(err);
@@ -79,8 +79,8 @@ function play(file, name) {
     });
 }
 
-function status(options) {
-    return findPlayer(options.player).then(function (player) {
+function status(body) {
+    return findPlayer(body.player).then(function (player) {
         return new Promise(function (resolve, reject) {
             player.status(function (err, status) {
                 if (err) {
@@ -105,9 +105,9 @@ module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
             case 'play':
-                return play(body.file, body.player);
+                return play(body);
             case 'discover':
-                return discover();
+                return discover(body);
             case 'status':
                 return status(body);
         }
