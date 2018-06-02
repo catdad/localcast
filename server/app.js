@@ -15,7 +15,7 @@ var browse = require('./browse.js');
 var config = require('./config.js');
 var port = config.port;
 
-var servercast4 = require('./servercast4.js');
+var servercast = require('./servercast.js');
 var ip = require('./ip.js');
 
 // set the process title to the package name
@@ -114,9 +114,7 @@ app.get('/virtualthumb/:dir/*', function(req, res) {
     browse.virtual(req.params.dir).thumb(req, res, path.join.apply(path, relativePath));
 });
 
-app.post('/cast', function (req, res) {
-    servercast4(req, res);
-});
+app.post('/cast', servercast);
 
 app.get('/gui*', function(req, res) {
     proxy.web(req, res, {
