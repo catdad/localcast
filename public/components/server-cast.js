@@ -4,6 +4,10 @@
 (function (window) {
     var STATE = window.STATE;
 
+    function noop() {
+        console.log.apply(console, arguments);
+    }
+
     function castReq(body, done) {
         request.json({
             method: 'POST',
@@ -63,6 +67,38 @@
         });
     }
 
+    function pause(player, done) {
+        castReq({
+            command: 'pause',
+            player: player
+        }, done);
+    }
+
+    function resume(player, done) {
+        castReq({
+            command: 'resume',
+            player: player
+        }, done);
+    }
+
+    function addTempControls(player) {
+        toast.info({
+            message: 'ctrl:',
+            timeout: -1,
+            dismissible: false,
+            action: [{
+                name: 'status',
+                onclick: status.bind(null, player, noop)
+            }, {
+                name: 'pause',
+                onclick: pause.bind(null, player, noop)
+            }, {
+                name: 'resume',
+                onclick: resume.bind(null, player, noop)
+            }]
+        });
+    }
+
     STATE.on('servercast:play', function (file) {
         toast.clear();
 
@@ -79,6 +115,8 @@
                         toast.clear();
 
                         play(file, name);
+
+                        addTempControls(name);
                     }
                 });
             });
