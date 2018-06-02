@@ -17,6 +17,28 @@ function parseJson(stream) {
     });
 }
 
+function promisify(func) {
+    return function () {
+        var args = [].slice.call(arguments);
+
+        return new Promise(function (resolve, reject) {
+            args.push(function (err, data) {
+                if (err) {
+                    return reject(err);
+                }
+
+                return resolve(data);
+            });
+
+            try {
+                func.apply(null, args);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    };
+}
+
 function discover() {
     function players() {
         return {
@@ -59,7 +81,7 @@ function findPlayer(name) {
 }
 
 function play(body) {
-    return findPlayer(body.name).then(function (player) {
+    return findPlayer(body.player).then(function (player) {
         return new Promise(function (resolve, reject) {
             player.play(body.file.resource, {
                 type: 'video/mp4',
@@ -107,6 +129,18 @@ function status(body) {
     });
 }
 
+function pause(body) {
+    return findPlayer(body.player).then(function (player) {
+        return promisify(player.pause.bind(player))();
+    });
+}
+
+function resume(body) {
+    return findPlayer(body.player).then(function (player) {
+        return promisify(player.resume.bind(player))();
+    });
+}
+
 module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
@@ -116,6 +150,10 @@ module.exports = function (req, res) {
                 return discover(body);
             case 'status':
                 return status(body);
+            case 'pause':
+                return pause(body);
+            case 'resume':
+                return resume(body);
         }
 
         return Promise.reject('invalid command provided');
