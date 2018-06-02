@@ -87,6 +87,12 @@ function status(body) {
                     return reject(err);
                 }
                 
+                if (!status) {
+                    return resolve({
+                        state: 'NO_MEDIA'
+                    });
+                }
+                
                 var response = {
                     state: status.playerState,
                     resource: status.media ? status.media.contentId : undefined,
