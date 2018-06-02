@@ -1,4 +1,4 @@
-/* jshint browser: true, devel: true */        
+/* jshint browser: true, devel: true */
 
 (function (window) {
     var events = {};
@@ -58,13 +58,13 @@
             obj.wrapped.apply(null, [].slice.call(args, 1));
         });
     };
-    
+
     api.store = function store(name, value) {
         STORE[name] = value;
-        
+
         return api;
     };
-    
+
     api.get = function get(name) {
         return STORE[name] || undefined;
     };
