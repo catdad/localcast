@@ -1,28 +1,12 @@
 @import (reference) "_variables.less";
 @import (reference) "_media.less";
 
-.icon(@name, @pos) {
-    .icon.icon-@{name} {
-        background-position: @pos;
-    }
-}
+.md-36 { font-size: 36px; }
+.md-48 { font-size: 48px; }
 
-.icon {
-    background-image: @iconResource;
-    background-position: top left, 0px 0px;
-    background-origin: content-box;
-    background-clip: content-box;
-    background-size: @iconSpriteSize;
-    width: @iconSize;
-    height: @iconSize;
-    line-height: 1rem;
-    display: inline-block;
-}
+.md-inactive { opacity: 0.26; }
 
-.icon(stop,    32px  0px);
-.icon(pause,   64px  0px);
-.icon(play,    96px  0px);
-.icon(cast,     0px  0px);
-.icon(mute,    96px 32px);
-.icon(unmute,   0px 32px);
-.icon(cast-on, 64px 32px);
+.material-icons {
+    margin: 0 4px;
+    vertical-align: bottom;
+}
