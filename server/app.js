@@ -15,9 +15,6 @@ var browse = require('./browse.js');
 var config = require('./config.js');
 var port = config.port;
 
-var servercast = require('./servercast.js');
-//var servercast2 = require('./servercast2.js');
-var servercast3 = require('./servercast3.js');
 var servercast4 = require('./servercast4.js');
 var ip = require('./ip.js');
 
@@ -59,7 +56,6 @@ app.get('/', function(req, res) {
 
 function send(res, err, data) {
     data = data || {};
-    data.nowPlaying = servercast3.session();
     
     res.send(err || data);
 }
@@ -120,57 +116,6 @@ app.get('/virtualthumb/:dir/*', function(req, res) {
 
 app.post('/cast', function (req, res) {
     servercast4(req, res);
-});
-
-// router the servercast module
-app.get('/session2/:action', function(req, res) {
-    servercast3.router(req.params.action, req.query, res);
-});
-
-//manage servercast sessions
-app.get('/session/:action', function(req, res) {
-    var parsedUrl = url.parse(req.url);
-    var query = parsedUrl.query ? parseQuery(parsedUrl.query) : {};
-    var action = req.params.action;
-    var value = query.value ? unescape(query.value) : undefined;
-    
-    // create the arguments array to send to servercast.control
-    var args = [function(err, control) {
-        if (err) {
-            res.send({
-                success: false,
-                error: err.message,
-                action: action,
-                value: value
-            });
-        } else {
-            var response = {
-                success: true,
-                action: action,
-                value: value
-            };
-            
-            if (action === 'nowPlaying') {
-                response.nowPlaying = control;
-            }
-            
-            res.send(response);
-        }
-    }, value];
-    
-    // get the control method to call
-    var method = servercast.control[action];
-    
-    if (method) {
-        method.apply(servercast.control, args);
-    } else {
-        res.send({
-            success: false,
-            error: action + ' is not valid',
-            action: action,
-            value: value
-        });
-    }
 });
 
 app.get('/gui*', function(req, res) {
