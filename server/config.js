@@ -10,7 +10,7 @@ var forEach = function forEach(obj, cb, context) {
     // check for a native forEach function
     var native = [].forEach,
         hasProp = Object.prototype.hasOwnProperty;
-    
+
     // if there is a native function, use it
     if (native && obj.forEach === native) {
         //don't bother if there is no function
@@ -54,7 +54,7 @@ function reload(done) {
     if (typeof done !== 'function') {
         done = function() {};
     }
-    
+
     // Read the config file again. This time, we can do async.
     var newFile = fs.readFile(configFilePath, function(err, content) {
         if (err) {
@@ -63,7 +63,7 @@ function reload(done) {
             done(err);
             return;
         }
-        
+
         var data;
         try {
             // attempt to read the data as JSON
@@ -74,15 +74,15 @@ function reload(done) {
             done(e);
             return;
         }
-        
+
         // extend the original config file with the options in the new one
         forEach(data, function(value, key) {
             configFile[key] = value;
         });
-        
+
         // rebuild the new read-only config object
         buildConfigObject();
-        
+
         // return the newly extended config object
         done(undefined, config);
     });
@@ -101,7 +101,7 @@ function buildConfigObject() {
             });
         }
     });
-    
+
     // add the reload function, if it does not exist, as a non-enumerable property
     if (!config.reload) {
         Object.defineProperty(config, 'reload', {

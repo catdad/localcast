@@ -8,12 +8,12 @@ var dirDeprecated = function(dirPath, callback){
 	//store directories and files
 	var dirs = [];
 	var files = [];
-	
+
 	//get everything in desired path
 	fs.readdir(dirPath, function(err, data){
 		//store functions that need synchronication
 		var syncFunctions = [];
-		
+
 		data.forEach(function(el, i, arr){
 			//create async function
 			var asyncFunc = function(next){
@@ -28,10 +28,10 @@ var dirDeprecated = function(dirPath, callback){
 					next();
 				});
 			};
-				
+
 			syncFunctions.push(asyncFunc);
-		}); 
-		
+		});
+
 		sync(syncFunctions, function(){
 			console.log("finished!");
 			callback(null, { dirs: dirs, files: files });
