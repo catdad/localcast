@@ -97,6 +97,56 @@
         });
     }
 
+    var controls = {
+        _player: null,
+        play: function () {
+            resume(controls._player, noop);
+        },
+        pause: function () {
+            pause(controls._player, noop);
+        },
+        stop: function () {
+            toast.error('stop not implemented');
+        },
+        mute: function () {
+            toast.error('mute not implemented');
+        },
+        unmute: function () {
+            toast.error('unmute not implemented');
+        },
+        seek: function () {
+            toast.error('seek not implemented');
+        }
+    };
+
+    function initControls() {
+        STATE.on('controls:play', controls.play);
+        STATE.on('controls:pause', controls.pause);
+        STATE.on('controls:stop', controls.stop);
+        STATE.on('controls:mute', controls.mute);
+        STATE.on('controls:unmute', controls.unmute);
+        STATE.on('controls:seek', controls.seek);
+    }
+
+    function destroyControls() {
+        STATE.off('controls:stop', controls.stop);
+        STATE.off('controls:pause', controls.pause);
+        STATE.off('controls:stop', controls.stop);
+        STATE.off('controls:mute', controls.mute);
+        STATE.off('controls:unmute', controls.unmute);
+        STATE.off('controls:seek', controls.seek);
+    }
+
+    function initPlay(status) {
+        initControls();
+
+        STATE.emit('controls:init', {
+            name: 'media',
+            duration: status.duration,
+            state: status.state.toLowerCase()
+        });
+    }
+
     STATE.on('servercast:play', function (file) {
         toast.clear();
 
@@ -112,9 +162,17 @@
                     onclick: function () {
                         toast.clear();
 
-                        play(file, name);
+                        controls._player = name;
 
-                        addTempControls(name);
+                        play(file, name, function (err, status) {
+                            if (err) {
+                                return toast.error(err.toString());
+                            }
+
+                            initPlay(status);
+                        });
+
+//                        addTempControls(name);
                     }
                 });
             });
