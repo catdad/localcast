@@ -6,7 +6,6 @@ var ns = require('node-stream');
 var _ = require('lodash');
 
 var list;
-var status;
 
 function parseJson(stream) {
     return new Promise(function (resolve, reject) {
