@@ -1,7 +1,8 @@
-/*jslint node: true */
+/* jslint node: true */
+/* global Promise */
 
-var fs = require("fs");
-var path = require("path");
+var fs = require('fs');
+var path = require('path');
 
 function statSeries(dir, data, done) {
     var stats = [];
@@ -48,8 +49,8 @@ var dirStats = function getDir(dir, callback){
     });
 };
 
-//set exports to fs
+// set exports to fs
 module.exports = fs;
 
-//add to fs
+// add to fs
 module.exports.dirStats = dirStats;
