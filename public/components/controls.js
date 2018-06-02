@@ -11,6 +11,7 @@
         pause: document.querySelector('#pause'),
         stop: document.querySelector('#stop'),
         volume: document.querySelector('#volume'),
+        volumeMute: document.querySelector('#volume-mute'),
         show: function() {
             dom.controls.classList.remove('disabled');
         },
@@ -24,6 +25,7 @@
             // change play/pause buttons
             dom.play.classList.add('hide');
             dom.pause.classList.remove('hide');
+            dom.stop.classList.remove('hide');
         },
         pause: function(){
             // change play/pause butons
@@ -31,12 +33,12 @@
             dom.pause.classList.add('hide');
         },
         mute: function(){
-            dom.volume.classList.remove('icon-unmute');
-            dom.volume.classList.add('icon-mute');
+            dom.volume.classList.add('hide');
+            dom.volumeMute.classList.remove('hide');
         },
         unmute: function(){
-            dom.volume.classList.add('icon-unmute');
-            dom.volume.classList.remove('icon-mute');
+            dom.volume.classList.remove('hide');
+            dom.volumeMute.classList.add('hide');
         },
         castOn: function(name){
             dom.cast.classList.remove('icon-cast');
@@ -64,13 +66,12 @@
             STATE.emit('controls:stop');
         }, false);
         dom.volume.addEventListener('click', function(){
-            if (dom.volume.classList.contains('icon-mute')) {
-                commands.unmute();
-                STATE.emit('controls:unmute');
-            } else {
-                commands.mute();
-                STATE.emit('controls:mute');
-            }
+            commands.mute();
+            STATE.emit('controls:mute');
+        }, false);
+        dom.volumeMute.addEventListener('click', function (){
+            commands.unmute();
+            STATE.emit('controls:unmute');
         }, false);
     }
 
@@ -277,6 +278,7 @@
             // it is playing... we will handle the 'buffering'
             // case later... requires update to friendlyCast
             commands.play();
+            commands.unmute();
         }
 
         slider.setDuration(metadata.duration);
