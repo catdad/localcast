@@ -17,6 +17,38 @@ function parseJson(stream) {
     });
 }
 
+function promisify(func) {
+    return function () {
+        var args = [].slice.call(arguments);
+
+        return new Promise(function (resolve, reject) {
+            args.push(function (err, data) {
+                if (err) {
+                    return reject(err);
+                }
+
+                return resolve(data);
+            });
+
+            try {
+                func.apply(null, args);
+            } catch(e) {
+                reject(e);
+            }
+        });
+    };
+}
+
+function cleanStatus(status) {
+    return {
+        state: status.playerState,
+        resource: status.media ? status.media.contentId : undefined,
+        duration: status.media ? status.media.duration : 0,
+        currentTime: status.currentTime,
+        _raw: status
+    };
+}
+
 function discover() {
     function players() {
         return {
@@ -59,17 +91,17 @@ function findPlayer(name) {
 }
 
 function play(body) {
-    return findPlayer(body.name).then(function (player) {
+    return findPlayer(body.player).then(function (player) {
         return new Promise(function (resolve, reject) {
             player.play(body.file.resource, {
                 type: 'video/mp4',
                 title: body.file.name
-            }, function (err) {
+            }, function (err, status) {
                 if (err) {
                     return reject(err);
                 }
 
-                return resolve();
+                return resolve(cleanStatus(status));
             });
 
             player.on('error', function (err) {
@@ -81,29 +113,31 @@ function play(body) {
 
 function status(body) {
     return findPlayer(body.player).then(function (player) {
-        return new Promise(function (resolve, reject) {
-            player.status(function (err, status) {
-                if (err) {
-                    return reject(err);
-                }
+        return promisify(player.status.bind(player))().then(function (status) {
+            if (!status) {
+                return Promise.resolve({
+                    state: 'NO_MEDIA'
+                });
+            }
 
-                if (!status) {
-                    return resolve({
-                        state: 'NO_MEDIA'
-                    });
-                }
-
-                var response = {
-                    state: status.playerState,
-                    resource: status.media ? status.media.contentId : undefined,
-                    duration: status.media ? status.media.duration : 0,
-                    currentTime: status.currentTime,
-                    _raw: status
-                };
-
-                return resolve(response);
-            });
+            return Promise.resolve(cleanStatus(status));
         });
+    });
+}
+
+function pause(body) {
+    return findPlayer(body.player).then(function (player) {
+        return promisify(player.pause.bind(player))();
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
+    });
+}
+
+function resume(body) {
+    return findPlayer(body.player).then(function (player) {
+        return promisify(player.resume.bind(player))();
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
     });
 }
 
@@ -116,6 +150,10 @@ module.exports = function (req, res) {
                 return discover(body);
             case 'status':
                 return status(body);
+            case 'pause':
+                return pause(body);
+            case 'resume':
+                return resume(body);
         }
 
         return Promise.reject('invalid command provided');
