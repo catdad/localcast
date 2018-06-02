@@ -44,7 +44,7 @@ function discover() {
     });
 }
 
-function play(file, name) {
+function findPlayer(name) {
     return discover().then(function (players) {
         var player = _.find(list.players, function (player) {
             return player.name === name;
@@ -54,10 +54,16 @@ function play(file, name) {
             return Promise.reject(name + ' not found');    
         }
         
+        return Promise.resolve(player);
+    });
+}
+
+function play(body) {
+    return findPlayer(body.name).then(function (player) {
         return new Promise(function (resolve, reject) {
-            player.play(file.resource, {
+            player.play(body.file.resource, {
                 type: 'video/mp4',
-                title: file.name
+                title: body.file.name
             }, function (err) {
                 if (err) {
                     return reject(err);
@@ -73,13 +79,43 @@ function play(file, name) {
     });
 }
 
+function status(body) {
+    return findPlayer(body.player).then(function (player) {
+        return new Promise(function (resolve, reject) {
+            player.status(function (err, status) {
+                if (err) {
+                    return reject(err);
+                }
+                
+                if (!status) {
+                    return resolve({
+                        state: 'NO_MEDIA'
+                    });
+                }
+                
+                var response = {
+                    state: status.playerState,
+                    resource: status.media ? status.media.contentId : undefined,
+                    duration: status.media ? status.media.duration : 0,
+                    currentTime: status.currentTime,
+                    _raw: status
+                };
+                
+                return resolve(response);
+            });
+        });
+    });
+}
+
 module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
             case 'play':
-                return play(body.file, body.player);
+                return play(body);
             case 'discover':
-                return discover();
+                return discover(body);
+            case 'status':
+                return status(body);
         }
         
         return Promise.reject('invalid command provided');
@@ -93,8 +129,6 @@ module.exports = function (req, res) {
         res.end();
     }).catch(function (err) {
         console.error(err);
-        
-        console.log('returning 500 error');
         
         res.writeHead(500);
         res.end(JSON.stringify({
