@@ -54,6 +54,25 @@
         });
     }
     
+    function status(player, done) {
+        castReq({
+            command: 'status',
+            player: player
+        }, function (err, body) {
+            console.log(err, body);
+        });
+    }
+    
+    function showTempControls(opts) {
+        toast.info({
+            message: 'status',
+            timeout: -1,
+            onclick: function () {
+                status(opts.player, function () {});
+            }
+        });
+    }
+    
     STATE.on('servercast:play', function (file) {
         toast.clear();
         
@@ -70,6 +89,8 @@
                         toast.clear();
                         
                         play(file, name);
+                        
+                        showTempControls({ player: name })
                     }
                 });
             });
