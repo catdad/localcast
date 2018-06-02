@@ -96,8 +96,8 @@ function status(body) {
                 var response = {
                     state: status.playerState,
                     resource: status.media ? status.media.contentId : undefined,
-                    currentTime: status.currentTime,
                     duration: status.media ? status.media.duration : 0,
+                    currentTime: status.currentTime,
                     _raw: status
                 };
                 
@@ -129,8 +129,6 @@ module.exports = function (req, res) {
         res.end();
     }).catch(function (err) {
         console.error(err);
-        
-        console.log('returning 500 error');
         
         res.writeHead(500);
         res.end(JSON.stringify({
