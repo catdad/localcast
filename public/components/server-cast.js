@@ -62,9 +62,7 @@
         castReq({
             command: 'status',
             player: player
-        }, function (err, body) {
-            console.log(err, body);
-        });
+        }, done);
     }
 
     function pause(player, done) {
