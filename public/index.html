@@ -4,7 +4,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
         <title>Local Chromecast</title>
-        
+
         <!--meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/-->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
         <!-- Apple web app tags -->
@@ -14,28 +14,29 @@
         <meta name="mobile-web-app-capable" content="yes">
         <meta name="theme-color" content="#263238">
 
-        <!--link rel="shortcut icon" href="favicon.ico" /--> 
+        <!--link rel="shortcut icon" href="favicon.ico" /-->
         <link rel="apple-touch-icon" sizes="196x196" href="img/cupcake.png">
         <link rel="icon" type="image/png" href="img/cupcake.png" />
         <link rel="shortcut icon" sizes="196x196" href="img/cupcake.png">
-        
-        <link href='http://fonts.googleapis.com/css?family=Roboto:400,400italic,700' rel='stylesheet' type='text/css'>
+
+        <link href="https://fonts.googleapis.com/css?family=Roboto:400,400italic,700" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
         <link href="lib/octicons/octicons.css" type="text/css" rel="stylesheet" />
         <link href="style.css" type="text/css" rel="stylesheet" />
 
     </head>
     <body>
-    
+
         <div id="page">
             <div id='contentSearch' class='card'>
                 <input placeholder='Find something...' type='search' />
             </div>
             <div id='contentNav' class='nav card'></div>
             <div id='contentFiles' class='card'></div>
-            <div id='contentDirs' class='card'></div>            
+            <div id='contentDirs' class='card'></div>
         </div>
-    
+
         <div id="controls" class="disabled">
             <div class="track">
                 <div class="slider">
@@ -44,21 +45,22 @@
                 </div>
             </div>
             <div class="buttons">
-                <span id="prev" class="button mega-octicon octicon-playback-rewind hide"></span>
-                <span id="play" class="button icon icon-play"></span>
-                <span id="pause" class="button icon icon-pause hide"></span>
-                <span id="next" class="button mega-octicon octicon-playback-fast-forward hide"></span>
-                <span id="stop" class="button icon icon-stop"></span>
-                <span id="volume" class="button icon icon-unmute hide"></span>
-                <span id="cast" class="button icon icon-cast hide"></span>
+                <i id="prev" class="material-icons md-36">skip_previous</i>
+                <i id="play" class="material-icons md-36">play_arrow</i>
+                <i id="pause" class="material-icons md-36">pause</i>
+                <i id="next" class="material-icons md-36">skip_next</i>
+                <i id="stop" class="material-icons md-36">stop</i>
+                <i id="volume" class="material-icons md-36">volume_up</i>
+                <i id="volume_mute" class="material-icons md-36">volume_mute</i>
+                <i id="cast" class="material-icons md-36">cast</i>
             </div>
         </div>
-        
+
         <script src="../friendlyCast/src/chromecast.js"></script>
         <script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
         <script src="http://catdad.github.io/tiny.cdn/lib/request/latest/request.min.js"></script>
         <script src="http://catdad.github.io/tiny.cdn/lib/toast/latest/toast.min.js"></script>
-        
+
         <script src="util.js"></script>
         <script src="state.js"></script>
         <script src="components/navigation.js"></script>
@@ -70,13 +72,13 @@
         <script src="components/controls.js"></script>
         <script src="components/browser-cast.js"></script>
         <script src="components/server-cast.js"></script>
-        
+
         <script src="views.js"></script>
         <script src="hash.js"></script>
-        
+
         <script>
             window.chrome && chromecast.setAppId();
-            
+
 //            views.Modal();
         </script>
     </body>
