@@ -5,11 +5,11 @@
     var UTIL = window.UTIL;
     var STATE = window.STATE;
 
-    function createButton(text) {
+    function createButton(text, icon) {
         var type = text.toLowerCase();
 
         var buttonElem = UTIL.elem('button', { className: type });
-        var iconElem = UTIL.elem('span', { className: 'icon icon-' + type });
+        var iconElem = UTIL.elem('i', { className: 'material-icons md-36', text: icon });
         var textElem = document.createTextNode(text);
 
         buttonElem.appendChild(iconElem);
@@ -19,7 +19,7 @@
     }
 
     function createPlayButton(file, elem) {
-        var playLocalButton = createButton('Play');
+        var playLocalButton = createButton('Play', 'play_arrow');
 
         playLocalButton.onclick = function() {
             STATE.emit('video:play', file);
@@ -29,7 +29,7 @@
     }
 
     function createCastButton(file, text, eventName) {
-        var button = createButton(text);
+        var button = createButton(text, 'cast');
 
         button.onclick = function(){
             STATE.emit(eventName, file);
