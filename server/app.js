@@ -1,7 +1,6 @@
 /* jshint node: true */
 /* global unescape */
 
-var fs = require('./utils/fsPlus.js');
 var path = require('path');
 var url = require('url');
 

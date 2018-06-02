@@ -1,70 +1,56 @@
-/*jslint node: true */
+/* jslint node: true */
+/* global Promise */
 
-var fs = require("fs");
-var path = require("path");
-var sync = require("./sync.js");
+var fs = require('fs');
+var path = require('path');
 
-var dirDeprecated = function(dirPath, callback){
-	//store directories and files
-	var dirs = [];
-	var files = [];
+function statSeries(dir, data, done) {
+    var stats = [];
 
-	//get everything in desired path
-	fs.readdir(dirPath, function(err, data){
-		//store functions that need synchronication
-		var syncFunctions = [];
+    function statPromise(filePath) {
+        return new Promise(function (resolve, reject) {
+            fs.stat(filePath, function (err, stat) {
+                if (err) {
+                    return reject(err);
+                }
 
-		data.forEach(function(el, i, arr){
-			//create async function
-			var asyncFunc = function(next){
-				//get stats on each item
-				fs.stat(path.join(dirPath, el), function(err, stat){
-					if (err || !stat){
-						//console.log(err || "unknown stat error");
-					} else{
-						if (stat.isFile()) files.push(el);
-						else if (stat.isDirectory()) dirs.push(el);
-					}
-					next();
-				});
-			};
+                return resolve(stat);
+            });
+        });
+    }
 
-			syncFunctions.push(asyncFunc);
-		});
+    data.reduce(function (prom, el) {
+        var thisPath = path.resolve(dir, el);
 
-		sync(syncFunctions, function(){
-			console.log("finished!");
-			callback(null, { dirs: dirs, files: files });
-		}); /* */
-	});
-};
+        return prom.then(function () {
+            return statPromise(thisPath).then(function (stat) {
+                stats.push({
+                    name: el,
+                    path: thisPath,
+                    isFile: stat.isFile(),
+                    isDirectory: stat.isDirectory()
+                });
+            });
+        });
+    }, Promise.resolve()).then(function () {
+        done(null, stats);
+    }).catch(function (err) {
+        done(err);
+    });
+}
 
 var dirStats = function getDir(dir, callback){
     fs.readdir(dir, function(err, data){
         if (err) {
-            callback(err);
-            return;
+            return callback(err);
         }
 
-        var stats = [];
-        data.forEach(function(el, i, arr){
-            var thisPath = path.resolve(dir, el);
-            var thisStat = fs.statSync( thisPath );
-            stats.push({
-                name: el,
-                path: thisPath,
-                isFile: thisStat.isFile(),
-                isDirectory: thisStat.isDirectory()
-            });
-        });
-
-        callback(null, stats);
+        statSeries(dir, data, callback);
     });
 };
 
-//set exports to fs
+// set exports to fs
 module.exports = fs;
 
-//add to fs
-module.exports.dirPlus = dirDeprecated;
+// add to fs
 module.exports.dirStats = dirStats;
