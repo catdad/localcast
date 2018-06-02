@@ -54,6 +54,15 @@
         });
     }
     
+    function status(player, done) {
+        castReq({
+            command: 'status',
+            player: player
+        }, function (err, body) {
+            console.log(err, body);
+        });
+    }
+    
     STATE.on('servercast:play', function (file) {
         toast.clear();
         
