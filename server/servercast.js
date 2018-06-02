@@ -39,6 +39,16 @@ function promisify(func) {
     };
 }
 
+function cleanStatus(status) {
+    return {
+        state: status.playerState,
+        resource: status.media ? status.media.contentId : undefined,
+        duration: status.media ? status.media.duration : 0,
+        currentTime: status.currentTime,
+        _raw: status
+    };
+}
+
 function discover() {
     function players() {
         return {
@@ -110,15 +120,7 @@ function status(body) {
                 });
             }
 
-            var response = {
-                state: status.playerState,
-                resource: status.media ? status.media.contentId : undefined,
-                duration: status.media ? status.media.duration : 0,
-                currentTime: status.currentTime,
-                _raw: status
-            };
-
-            return Promise.resolve(response);
+            return Promise.resolve(cleanStatus(status));
         });
     });
 }
@@ -126,12 +128,16 @@ function status(body) {
 function pause(body) {
     return findPlayer(body.player).then(function (player) {
         return promisify(player.pause.bind(player))();
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
     });
 }
 
 function resume(body) {
     return findPlayer(body.player).then(function (player) {
         return promisify(player.resume.bind(player))();
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
     });
 }
 
