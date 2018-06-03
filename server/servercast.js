@@ -125,8 +125,16 @@ function status(body) {
     });
 }
 
-function pause(body) {
+function initCommand(body) {
     return findPlayer(body.player).then(function (player) {
+        return status(body).then(function () {
+            return Promise.resolve(player);
+        });
+    });
+}
+
+function pause(body) {
+    return initCommand(body).then(function (player) {
         return promisify(player.pause.bind(player))();
     }).then(function (status) {
         return Promise.resolve(cleanStatus(status));
@@ -134,7 +142,7 @@ function pause(body) {
 }
 
 function resume(body) {
-    return findPlayer(body.player).then(function (player) {
+    return initCommand(body).then(function (player) {
         return promisify(player.resume.bind(player))();
     }).then(function (status) {
         return Promise.resolve(cleanStatus(status));
@@ -142,7 +150,7 @@ function resume(body) {
 }
 
 function seek(body) {
-    return findPlayer(body.player).then(function (player) {
+    return initCommand(body).then(function (player) {
         return promisify(player.seek.bind(player))(body.seconds);
     }).then(function (status) {
         return Promise.resolve(cleanStatus(status));
