@@ -299,18 +299,30 @@
         };
     })();
 
+    function setControlsState(metadata) {
+        switch (metadata.state) {
+            case 'paused':
+                STATE.emit('controls:_internal:pause');
+                break;
+            case 'playing':
+            case 'buffering':
+                // TODO: we are assuming that if it is not paused,
+                // it is playing... we will handle the 'buffering'
+                // case later... requires update to friendlyCast
+                STATE.emit('controls:_internal:play');
+                break;
+            case 'stopped':
+            case 'no_media':
+                STATE.emit('controls:_internal:stop');
+                break;
+        }
+    }
+
     initEvents();
     addEvents();
 
     STATE.on('controls:init', function (metadata) {
-        if (metadata.state === 'paused') {
-            STATE.emit('controls:_internal:pause');
-        } else {
-            // TODO: we are assuming that if it is not paused,
-            // it is playing... we will handle the 'buffering'
-            // case later... requires update to friendlyCast
-            STATE.emit('controls:_internal:play');
-        }
+        setControlsState(metadata);
 
         slider.setDuration(metadata.duration);
         slider.setProgress(0);
@@ -321,18 +333,7 @@
     });
 
     STATE.on('controls:update', function (metadata) {
-        switch (metadata.state) {
-            case 'paused':
-                STATE.emit('controls:_internal:pause');
-                break;
-            case 'playing':
-            case 'buffering':
-                STATE.emit('controls:_internal:play');
-                break;
-            case 'stopped':
-                STATE.emit('controls:_internal:stop');
-                break;
-        }
+        setControlsState(metadata);
 
         if (metadata.duration) {
             slider.setDuration(metadata.duration);
