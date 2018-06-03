@@ -112,6 +112,10 @@
             updateTooltip(percent, showTooltip);
         }
 
+        function setSeekSeconds(seconds) {
+            setBarPercent(seconds / duration);
+        }
+
         var updateTooltip = function(percent, show) {
             if (show) {
                 UTIL.throttle(function () {
@@ -267,7 +271,8 @@
             },
             setDuration: function (val) {
                 duration = +val || 0;
-            }
+            },
+            setSeekSeconds: setSeekSeconds
         };
     })();
 
@@ -292,5 +297,28 @@
         // TODO start this once the media is done buffering
         // and is playing
         slider.autoTrack();
+    });
+
+    STATE.on('controls:update', function (metadata) {
+        switch (metadata.state) {
+            case 'paused':
+                commands.pause();
+                break;
+            case 'playing':
+            case 'buffering':
+                commands.play();
+                break;
+            case 'stopped':
+                dom.hide();
+                break;
+        }
+
+        if (metadata.duration) {
+            slider.setDuration(metadata.duration);
+        }
+
+        if (metadata.currentTime) {
+            slider.setSeekSeconds(metadata.currentTime);
+        }
     });
 }(window));
