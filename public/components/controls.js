@@ -264,10 +264,6 @@
             function onSeedEnd() {
                 isPlaying = false;
                 clearTimer();
-
-                dom.hide();
-
-                destroy();
             }
 
             function destroy() {
