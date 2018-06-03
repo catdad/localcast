@@ -131,7 +131,7 @@
 
     function createClientStatus(status) {
         return {
-            name: 'media',
+            title: status.title || 'unknown media',
             state: status.state.toLowerCase(),
             duration: status.duration,
             currentTime: status.currentTime
@@ -192,8 +192,8 @@
 
                     initPlay(status);
 
-                    if (clientStatus && clientStatus.name) {
-                        toast.info('playing: ' + clientStatus.name);
+                    if (clientStatus && clientStatus.title) {
+                        toast.info('playing: ' + clientStatus.title);
                     }
 
                     onStatusCallback(null, status);
