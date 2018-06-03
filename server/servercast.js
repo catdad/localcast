@@ -141,6 +141,14 @@ function resume(body) {
     });
 }
 
+function seek(body) {
+    return findPlayer(body.player).then(function (player) {
+        return promisify(player.seek.bind(player))(body.seconds);
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
+    });
+}
+
 module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
@@ -154,6 +162,8 @@ module.exports = function (req, res) {
                 return pause(body);
             case 'resume':
                 return resume(body);
+            case 'seek':
+                return seek(body);
         }
 
         return Promise.reject('invalid command provided');
