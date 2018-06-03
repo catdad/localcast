@@ -4,6 +4,14 @@
     var STATE = window.STATE;
     var UTIL = window.UTIL;
 
+    function emit(name) {
+        var args = [].slice.call(arguments);
+        args.shift();
+
+        STATE.emit.apply(STATE, ['controls:_internal:' + name].concat(args));
+        STATE.emit.apply(STATE, ['controls:' + name].concat(args));
+    }
+
     // parse the document for the interesting buttons
     var dom = {
         controls: document.querySelector('#controls'),
@@ -53,29 +61,44 @@
         }
     };
 
+    function addEvents() {
+        STATE.on('controls:_internal:play', function () {
+            dom.show();
+            commands.play();
+        }, false);
+        STATE.on('controls:_internal:pause', function () {
+            commands.pause();
+        }, false);
+        STATE.on('controls:_internal:stop', function () {
+            dom.hide();
+        }, false);
+        STATE.on('controls:_internal:mute', function () {
+            commands.mute();
+        }, false);
+        STATE.on('controls:_internal:unmute', function () {
+            commands.unmute();
+        }, false);
+    }
+
     function initEvents() {
         // add button events
         dom.play.addEventListener('click', function () {
-            commands.play();
-            STATE.emit('controls:play');
+            emit('play');
         }, false);
         dom.pause.addEventListener('click', function () {
-            commands.pause();
-            STATE.emit('controls:pause');
+            emit('pause');
         }, false);
         dom.stop.addEventListener('click', function () {
-            STATE.emit('controls:stop');
+            emit('stop');
         }, false);
         dom.volume.addEventListener('click', function () {
-            commands.mute();
-            STATE.emit('controls:mute');
+            emit('mute');
         }, false);
         dom.volumeMute.addEventListener('click', function () {
-            commands.unmute();
-            STATE.emit('controls:unmute');
+            emit('unmute');
         }, false);
         dom.status.addEventListener('click', function () {
-            STATE.emit('controls:status');
+            emit('status');
         }, false);
     }
 
@@ -99,7 +122,7 @@
 
         function setBarPercent(percent) {
             if (percent >= 1) {
-                STATE.emit('controls:seek-end');
+                emit('seek-end');
                 percent = 1;
             }
 
@@ -183,7 +206,7 @@
             window.removeEventListener('touchmove', handleSeekEvent, false);
             window.removeEventListener('touchend', seekEnd, false);
 
-            STATE.emit('controls:seek', {
+            emit('seek', {
                 percent: getSeekPercent(ev)
             });
         };
@@ -249,16 +272,16 @@
             }
 
             function destroy() {
-                STATE.off('controls:play', onPlay);
-                STATE.off('controls:pause', onPause);
-                STATE.off('controls:seek-end', onSeedEnd);
-                STATE.off('controls:stop', destroy);
+                STATE.off('controls:_internal:play', onPlay);
+                STATE.off('controls:_internal:pause', onPause);
+                STATE.off('controls:_internal:seek-end', onSeedEnd);
+                STATE.off('controls:_internal:stop', destroy);
             }
 
-            STATE.on('controls:play', onPlay);
-            STATE.on('controls:pause', onPause);
-            STATE.on('controls:seek-end', onSeedEnd);
-            STATE.on('controls:stop', destroy);
+            STATE.on('controls:_internal:play', onPlay);
+            STATE.on('controls:_internal:pause', onPause);
+            STATE.on('controls:_internal:seek-end', onSeedEnd);
+            STATE.on('controls:_internal:stop', destroy);
 
             onPlay();
         }
@@ -277,18 +300,16 @@
     })();
 
     initEvents();
+    addEvents();
 
     STATE.on('controls:init', function (metadata) {
-        dom.show();
-
         if (metadata.state === 'paused') {
-            commands.pause();
+            STATE.emit('controls:_internal:pause');
         } else {
             // TODO: we are assuming that if it is not paused,
             // it is playing... we will handle the 'buffering'
             // case later... requires update to friendlyCast
-            commands.play();
-            commands.unmute();
+            STATE.emit('controls:_internal:play');
         }
 
         slider.setDuration(metadata.duration);
@@ -302,14 +323,14 @@
     STATE.on('controls:update', function (metadata) {
         switch (metadata.state) {
             case 'paused':
-                commands.pause();
+                STATE.emit('controls:_internal:pause');
                 break;
             case 'playing':
             case 'buffering':
-                commands.play();
+                STATE.emit('controls:_internal:play');
                 break;
             case 'stopped':
-                dom.hide();
+                STATE.emit('controls:_internal:stop');
                 break;
         }
 
