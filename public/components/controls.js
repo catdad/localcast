@@ -44,6 +44,7 @@
             // change play/pause butons
             dom.play.classList.remove('hide');
             dom.pause.classList.add('hide');
+            dom.stop.classList.remove('hide');
         },
         mute: function () {
             dom.volume.classList.add('hide');
