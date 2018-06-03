@@ -83,6 +83,14 @@
         }, done);
     }
 
+    function seek(player, seconds, done) {
+        castReq({
+            command: 'seek',
+            player: player,
+            seconds: seconds
+        }, done);
+    }
+
     function addTempControls(player) {
         toast.info({
             message: 'ctrl:',
@@ -103,6 +111,7 @@
 
     var controls = {
         _player: null,
+        _duration: 0,
         play: function () {
             resume(controls._player, noop);
         },
@@ -118,8 +127,9 @@
         unmute: function () {
             toast.error('unmute not implemented');
         },
-        seek: function () {
-            toast.error('seek not implemented');
+        seek: function (ev) {
+            var seconds = controls._duration * ev.percent;
+            seek(controls._player, seconds, noop);
         }
     };
 
@@ -142,7 +152,10 @@
     }
 
     function initPlay(status) {
+        destroyControls();
         initControls();
+
+        controls._duration = status.duration;
 
         STATE.emit('controls:init', {
             name: 'media',
