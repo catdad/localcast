@@ -41,6 +41,26 @@
         });
     }
 
+    function discoverUserSelect(done) {
+        discover(function (err, list) {
+            if (err) {
+                return done(err);
+            }
+
+            list.forEach(function (name) {
+                toast.log({
+                    message: name,
+                    timeout: -1,
+                    onclick: function () {
+                        toast.clear();
+
+                        done(null, name);
+                    }
+                });
+            });
+        });
+    }
+
     function play(file, player, done) {
         castReq({
             command: 'play',
@@ -150,8 +170,40 @@
         },
         status: function () {
             status(controls._player, onStatusCallback);
+        },
+        discover: function () {
+            discoverUserSelect(function (err, player) {
+                if (err) {
+                    return showErr(err);
+                }
+
+                controls._player = player;
+
+                status(player, function (err, status) {
+                    if (err) {
+                        return onStatusCallback(err);
+                    }
+
+                    var clientStatus = createClientStatus(status);
+
+                    if (clientStatus.state !== 'no_media') {
+                        initPlay(status);
+                    }
+
+                    if (clientStatus && clientStatus.name) {
+                        toast.info('playing: ' + clientStatus.name);
+                    }
+
+                    onStatusCallback(null, status);
+                });
+            });
         }
     };
+
+    function initAlwaysOnControls() {
+        STATE.on('controls:status', controls.status);
+        STATE.on('controls:discover', controls.discover);
+    }
 
     function initControls() {
         STATE.on('controls:play', controls.play);
@@ -160,7 +212,6 @@
         STATE.on('controls:mute', controls.mute);
         STATE.on('controls:unmute', controls.unmute);
         STATE.on('controls:seek', controls.seek);
-        STATE.on('controls:status', controls.status);
     }
 
     function destroyControls() {
@@ -170,7 +221,6 @@
         STATE.off('controls:mute', controls.mute);
         STATE.off('controls:unmute', controls.unmute);
         STATE.off('controls:seek', controls.seek);
-        STATE.off('controls:status', controls.status);
     }
 
     function initPlay(status) {
@@ -182,32 +232,24 @@
         STATE.emit('controls:init', createClientStatus(status));
     }
 
+    initAlwaysOnControls();
+
     STATE.on('servercast:play', function (file) {
         toast.clear();
 
-        discover(function (err, list) {
+        discoverUserSelect(function (err, player) {
             if (err) {
                 return showErr(err);
             }
 
-            list.forEach(function (name) {
-                toast.log({
-                    message: name,
-                    timeout: -1,
-                    onclick: function () {
-                        toast.clear();
+            controls._player = player;
 
-                        controls._player = name;
+            play(file, player, function (err, status) {
+                if (err) {
+                    return showErr(err);
+                }
 
-                        play(file, name, function (err, status) {
-                            if (err) {
-                                return showErr(err);
-                            }
-
-                            initPlay(status);
-                        });
-                    }
-                });
+                initPlay(status);
             });
         });
     });
