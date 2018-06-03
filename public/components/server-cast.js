@@ -109,14 +109,31 @@
         });
     }
 
+    function createClientStatus(status) {
+        return {
+            name: 'media',
+            state: status.state.toLowerCase(),
+            duration: status.duration,
+            currentTime: status.currentTime
+        };
+    }
+
+    function onStatusCallback(err, status) {
+        if (err) {
+            return showErr(err);
+        }
+
+        STATE.emit('controls:update', createClientStatus(status));
+    }
+
     var controls = {
         _player: null,
         _duration: 0,
         play: function () {
-            resume(controls._player, noop);
+            resume(controls._player, onStatusCallback);
         },
         pause: function () {
-            pause(controls._player, noop);
+            pause(controls._player, onStatusCallback);
         },
         stop: function () {
             toast.error('stop not implemented');
@@ -129,10 +146,10 @@
         },
         seek: function (ev) {
             var seconds = controls._duration * ev.percent;
-            seek(controls._player, seconds, noop);
+            seek(controls._player, seconds, onStatusCallback);
         },
         status: function () {
-            status(controls._player, noop);
+            status(controls._player, onStatusCallback);
         }
     };
 
@@ -162,11 +179,7 @@
 
         controls._duration = status.duration;
 
-        STATE.emit('controls:init', {
-            name: 'media',
-            duration: status.duration,
-            state: status.state.toLowerCase()
-        });
+        STATE.emit('controls:init', createClientStatus(status));
     }
 
     STATE.on('servercast:play', function (file) {
