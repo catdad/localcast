@@ -130,6 +130,9 @@
         seek: function (ev) {
             var seconds = controls._duration * ev.percent;
             seek(controls._player, seconds, noop);
+        },
+        status: function () {
+            status(controls._player, noop);
         }
     };
 
@@ -140,6 +143,7 @@
         STATE.on('controls:mute', controls.mute);
         STATE.on('controls:unmute', controls.unmute);
         STATE.on('controls:seek', controls.seek);
+        STATE.on('controls:status', controls.status);
     }
 
     function destroyControls() {
@@ -149,6 +153,7 @@
         STATE.off('controls:mute', controls.mute);
         STATE.off('controls:unmute', controls.unmute);
         STATE.off('controls:seek', controls.seek);
+        STATE.off('controls:status', controls.status);
     }
 
     function initPlay(status) {
