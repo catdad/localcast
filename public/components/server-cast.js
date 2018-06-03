@@ -187,7 +187,7 @@
                     var clientStatus = createClientStatus(status);
 
                     if (clientStatus.state === 'no_media') {
-                        return;
+                        return toast.info('nothing is playing');
                     }
 
                     initPlay(status);
