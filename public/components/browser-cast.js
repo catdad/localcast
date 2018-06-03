@@ -47,6 +47,7 @@
 
         console.log('media discovered event', chromecast.media.media);
 
+        destroyControls();
         initControls();
 
         STATE.emit('controls:init', {
