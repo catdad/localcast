@@ -12,6 +12,7 @@
         stop: document.querySelector('#stop'),
         volume: document.querySelector('#volume'),
         volumeMute: document.querySelector('#volume-mute'),
+        status: document.querySelector('#status'),
         show: function () {
             dom.controls.classList.remove('disabled');
         },
@@ -72,6 +73,9 @@
         dom.volumeMute.addEventListener('click', function () {
             commands.unmute();
             STATE.emit('controls:unmute');
+        }, false);
+        dom.status.addEventListener('click', function () {
+            STATE.emit('controls:status');
         }, false);
     }
 
@@ -267,8 +271,9 @@
         };
     })();
 
+    initEvents();
+
     STATE.on('controls:init', function (metadata) {
-        initEvents();
         dom.show();
 
         if (metadata.state === 'paused') {
