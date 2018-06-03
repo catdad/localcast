@@ -186,9 +186,11 @@
 
                     var clientStatus = createClientStatus(status);
 
-                    if (clientStatus.state !== 'no_media') {
-                        initPlay(status);
+                    if (clientStatus.state === 'no_media') {
+                        return;
                     }
+
+                    initPlay(status);
 
                     if (clientStatus && clientStatus.name) {
                         toast.info('playing: ' + clientStatus.name);
