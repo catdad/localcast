@@ -142,6 +142,7 @@
     }
 
     function initPlay(status) {
+        destroyControls();
         initControls();
 
         STATE.emit('controls:init', {
