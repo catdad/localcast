@@ -93,20 +93,24 @@ function findPlayer(name) {
 function play(body) {
     return findPlayer(body.player).then(function (player) {
         return new Promise(function (resolve, reject) {
+            function onErr(err) {
+                player.removeListener('error', onErr);
+
+                reject(err);
+            }
+
             player.play(body.file.resource, {
                 type: 'video/mp4',
                 title: body.file.name
             }, function (err, status) {
                 if (err) {
-                    return reject(err);
+                    return onErr(err);
                 }
 
                 return resolve(cleanStatus(status));
             });
 
-            player.on('error', function (err) {
-                return reject(err);
-            });
+            player.on('error', onErr);
         });
     });
 }
