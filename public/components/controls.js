@@ -66,7 +66,8 @@
         }
     };
 
-    function addEvents() {
+    function initEvents() {
+        // add internal controls events
         STATE.on('controls:_internal:play', function () {
             dom.show();
             commands.play();
@@ -83,9 +84,7 @@
         STATE.on('controls:_internal:unmute', function () {
             commands.unmute();
         }, false);
-    }
 
-    function initEvents() {
         // add button events
         dom.play.addEventListener('click', function () {
             emit('play');
@@ -324,7 +323,6 @@
     }
 
     initEvents();
-    addEvents();
 
     STATE.on('controls:init', function (metadata) {
         setControlsState(metadata);
