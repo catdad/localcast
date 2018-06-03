@@ -305,9 +305,6 @@
                 break;
             case 'playing':
             case 'buffering':
-                // TODO: we are assuming that if it is not paused,
-                // it is playing... we will handle the 'buffering'
-                // case later... requires update to friendlyCast
                 STATE.emit('controls:_internal:play');
                 break;
             case 'stopped':
