@@ -217,7 +217,7 @@
     }
 
     function destroyControls() {
-        STATE.off('controls:stop', controls.stop);
+        STATE.off('controls:play', controls.play);
         STATE.off('controls:pause', controls.pause);
         STATE.off('controls:stop', controls.stop);
         STATE.off('controls:mute', controls.mute);
