@@ -125,35 +125,31 @@ function status(body) {
     });
 }
 
-function initCommand(body) {
+function execCommand(body, func) {
     return findPlayer(body.player).then(function (player) {
         return status(body).then(function () {
-            return Promise.resolve(player);
+            return func(player);
         });
+    }).then(function (status) {
+        return Promise.resolve(cleanStatus(status));
     });
 }
 
 function pause(body) {
-    return initCommand(body).then(function (player) {
+    return execCommand(body, function (player) {
         return promisify(player.pause.bind(player))();
-    }).then(function (status) {
-        return Promise.resolve(cleanStatus(status));
     });
 }
 
 function resume(body) {
-    return initCommand(body).then(function (player) {
+    return execCommand(body, function (player) {
         return promisify(player.resume.bind(player))();
-    }).then(function (status) {
-        return Promise.resolve(cleanStatus(status));
     });
 }
 
 function seek(body) {
-    return initCommand(body).then(function (player) {
+    return execCommand(body, function (player) {
         return promisify(player.seek.bind(player))(body.seconds);
-    }).then(function (status) {
-        return Promise.resolve(cleanStatus(status));
     });
 }
 
