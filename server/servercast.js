@@ -42,9 +42,10 @@ function promisify(func) {
 function cleanStatus(status) {
     return {
         state: status.playerState,
-        resource: status.media ? status.media.contentId : undefined,
-        duration: status.media ? status.media.duration : 0,
+        resource: _.get(status, 'media.contentId', undefined),
+        duration: _.get(status, 'media.duration', 0),
         currentTime: status.currentTime,
+        title: _.get(status, 'media.metadata.title', undefined),
         _raw: status
     };
 }
