@@ -12,40 +12,40 @@
         stop: document.querySelector('#stop'),
         volume: document.querySelector('#volume'),
         volumeMute: document.querySelector('#volume-mute'),
-        show: function() {
+        show: function () {
             dom.controls.classList.remove('disabled');
         },
-        hide: function() {
+        hide: function () {
             dom.controls.classList.add('disabled');
         }
     };
 
     var commands = {
-        play: function(){
+        play: function () {
             // change play/pause buttons
             dom.play.classList.add('hide');
             dom.pause.classList.remove('hide');
             dom.stop.classList.remove('hide');
         },
-        pause: function(){
+        pause: function () {
             // change play/pause butons
             dom.play.classList.remove('hide');
             dom.pause.classList.add('hide');
         },
-        mute: function(){
+        mute: function () {
             dom.volume.classList.add('hide');
             dom.volumeMute.classList.remove('hide');
         },
-        unmute: function(){
+        unmute: function () {
             dom.volume.classList.remove('hide');
             dom.volumeMute.classList.add('hide');
         },
-        castOn: function(name){
+        castOn: function (name) {
             dom.cast.classList.remove('icon-cast');
             dom.cast.classList.add('icon-cast-on');
             dom.cast.setAttribute('data-device', name);
         },
-        castOff: function(){
+        castOff: function () {
             dom.cast.classList.add('icon-cast');
             dom.cast.classList.remove('icon-cast-on');
             dom.cast.removeAttribute('data-device');
@@ -54,29 +54,29 @@
 
     function initEvents() {
         // add button events
-        dom.play.addEventListener('click', function(){
+        dom.play.addEventListener('click', function () {
             commands.play();
             STATE.emit('controls:play');
         }, false);
-        dom.pause.addEventListener('click', function(){
+        dom.pause.addEventListener('click', function () {
             commands.pause();
             STATE.emit('controls:pause');
         }, false);
-        dom.stop.addEventListener('click', function(){
+        dom.stop.addEventListener('click', function () {
             STATE.emit('controls:stop');
         }, false);
-        dom.volume.addEventListener('click', function(){
+        dom.volume.addEventListener('click', function () {
             commands.mute();
             STATE.emit('controls:mute');
         }, false);
-        dom.volumeMute.addEventListener('click', function (){
+        dom.volumeMute.addEventListener('click', function () {
             commands.unmute();
             STATE.emit('controls:unmute');
         }, false);
     }
 
     // monitor the slider
-    var slider = (function(){
+    var slider = (function () {
         var track = dom.controls.querySelector('.track'),
             slider = dom.controls.querySelector('.slider'),
             tooltip = dom.controls.querySelector('.tooltip'),
@@ -89,7 +89,7 @@
             lastPercent = 0;
 
         // needs to update on window resize
-        window.addEventListener('resize', function(){
+        window.addEventListener('resize', function () {
             width = slider.offsetWidth;
         }, false);
 
@@ -108,7 +108,7 @@
             updateTooltip(percent, showTooltip);
         }
 
-        var updateTooltip = function(percent, show){
+        var updateTooltip = function(percent, show) {
             if (show) {
                 UTIL.throttle(function () {
                     var text = '';
@@ -123,7 +123,7 @@
                         text = parseInt(percent * 100) + '%';
                     }
 
-                    if (!tooltip.classList.contains('show')){
+                    if (!tooltip.classList.contains('show')) {
                         tooltip.classList.add('show');
                     }
                     tooltip.innerHTML = text;
@@ -133,7 +133,7 @@
             }
         };
 
-        var getSeekPercent = function(ev) {
+        var getSeekPercent = function (ev) {
             var offset = 0;
 
             if (ev.changedTouches) {
@@ -145,7 +145,7 @@
             return offset / width;
         };
 
-        var handleSeekEvent = function(ev){
+        var handleSeekEvent = function (ev){
             ev.preventDefault();
 
             var seekPercent = getSeekPercent(ev);
@@ -159,7 +159,7 @@
 
             // set a timeout to clear the tooltip display
             tooltipTimeout && clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(function(){
+            tooltipTimeout = setTimeout(function () {
                 tooltipTimeout = undefined;
                 showTooltip = false;
             }, 2500);
@@ -168,7 +168,7 @@
 //            events.asyncTrigger('seeking', { percent: seekPercent });
         };
 
-        var seekEnd = function(ev){
+        var seekEnd = function (ev) {
             // remove events
             window.removeEventListener('mousemove', handleSeekEvent, false);
             window.removeEventListener('mouseup', seekEnd, false);
@@ -180,7 +180,7 @@
             });
         };
 
-        var seekStart = function(ev){
+        var seekStart = function (ev) {
             handleSeekEvent(ev);
 
             // add additional event listeners
@@ -258,10 +258,10 @@
         return {
             autoTrack: automaticTracking,
             setProgress: setBarPercent,
-            getProgress: function() {
+            getProgress: function () {
                 return lastPercent;
             },
-            setDuration: function(val){
+            setDuration: function (val) {
                 duration = +val || 0;
             }
         };
