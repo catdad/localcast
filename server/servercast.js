@@ -72,6 +72,8 @@ function discover() {
             resolve(players());
         }), 100);
 
+        // TODO if there are no devices, this will never resolve,
+        // since update only fires when devices are discovered
         list.on('update', onUpdate);
         list.update();
     });
