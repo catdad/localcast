@@ -225,7 +225,7 @@
         track.addEventListener('touchstart', seekStart, false);
 
         // track the progress using a timer... ew
-        function automaticTracking() {
+        (function automaticTracking() {
             var isPlaying = false,
                 time = 1000,
                 timer;
@@ -281,12 +281,9 @@
             STATE.on('controls:_internal:pause', onPause);
             STATE.on('controls:_internal:seek-end', onSeedEnd);
             STATE.on('controls:_internal:stop', destroy);
-
-            onPlay();
-        }
+        }());
 
         return {
-            autoTrack: automaticTracking,
             setProgress: setBarPercent,
             getProgress: function () {
                 return lastPercent;
@@ -317,19 +314,13 @@
     initEvents();
 
     STATE.on('controls:init', function (metadata) {
-        setControlsState(metadata);
-
         slider.setDuration(metadata.duration);
         slider.setProgress(0);
 
-        // TODO start this once the media is done buffering
-        // and is playing
-        slider.autoTrack();
+        setControlsState(metadata);
     });
 
     STATE.on('controls:update', function (metadata) {
-        setControlsState(metadata);
-
         if (metadata.duration) {
             slider.setDuration(metadata.duration);
         }
@@ -337,5 +328,7 @@
         if (metadata.currentTime) {
             slider.setSeekSeconds(metadata.currentTime);
         }
+
+        setControlsState(metadata);
     });
 }(window));
