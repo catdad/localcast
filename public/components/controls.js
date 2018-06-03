@@ -21,6 +21,8 @@
         volume: document.querySelector('#volume'),
         volumeMute: document.querySelector('#volume-mute'),
         status: document.querySelector('#status'),
+        cast: document.querySelector('#cast'),
+        castOn: document.querySelector('#cast-filled'),
         show: function () {
             dom.controls.classList.remove('disabled');
         },
@@ -53,16 +55,6 @@
         unmute: function () {
             dom.volume.classList.remove('hide');
             dom.volumeMute.classList.add('hide');
-        },
-        castOn: function (name) {
-            dom.cast.classList.remove('icon-cast');
-            dom.cast.classList.add('icon-cast-on');
-            dom.cast.setAttribute('data-device', name);
-        },
-        castOff: function () {
-            dom.cast.classList.add('icon-cast');
-            dom.cast.classList.remove('icon-cast-on');
-            dom.cast.removeAttribute('data-device');
         }
     };
 
@@ -103,6 +95,9 @@
         }, false);
         dom.status.addEventListener('click', function () {
             emit('status');
+        }, false);
+        dom.cast.addEventListener('click', function () {
+            emit('discover');
         }, false);
     }
 
