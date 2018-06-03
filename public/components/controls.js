@@ -26,6 +26,10 @@
         },
         hide: function () {
             dom.controls.classList.add('disabled');
+
+            ['play', 'pause', 'stop', 'volume', 'volumeMute'].forEach(function (name) {
+                dom[name].classList.add('hide');
+            });
         }
     };
 
