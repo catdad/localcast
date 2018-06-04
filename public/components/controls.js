@@ -219,6 +219,7 @@
 
             function flush() {
                 timer = null;
+                seeking = false;
 
                 tooltip.hide();
                 seekToPercent(calcSeekPercent(seekOffset));
@@ -232,6 +233,7 @@
                 }
 
                 tooltip.show();
+                seeking = true;
                 timer = setTimeout(flush, 400);
                 showBarChange(calcSeekPercent(seekOffset));
             }
@@ -311,7 +313,7 @@
                 timer;
 
             function tick() {
-                if (!isPlaying) {
+                if (isPlaying === false || seeking === true) {
                     return;
                 }
 
