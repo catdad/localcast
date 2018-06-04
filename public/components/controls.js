@@ -121,7 +121,6 @@
             slider = dom.controls.querySelector('.slider'),
             tooltip = dom.controls.querySelector('.tooltip'),
             width = slider.offsetWidth,
-            seekFunction,
             duration = 0,
             showTooltip = false,
             tooltipTimeout,
@@ -203,7 +202,6 @@
 
             // update the position and trigger the seek event
             setSeekPercent(seekPercent);
-            seekFunction && seekFunction(seekPercent);
 
             // show the time tooltip
             updateTooltip(seekPercent);
