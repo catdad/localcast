@@ -280,6 +280,7 @@
 
         var seekEnd = function (ev) {
             tooltip.hide();
+            seeking = false;
 
             // remove events
             window.removeEventListener('mousemove', handleSeekEvent, false);
@@ -294,6 +295,7 @@
             handleSeekEvent(ev);
 
             tooltip.show();
+            seeking = true;
 
             // add additional event listeners
             window.addEventListener('mousemove', handleSeekEvent, false);
