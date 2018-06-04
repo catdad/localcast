@@ -298,7 +298,7 @@
                     return;
                 }
 
-                var newPercent = ((lastPercent * duration) + 1) / duration;
+                var newPercent = ((lastPercent * duration) + (time / 1000)) / duration;
 
                 setSeekPercent(newPercent);
 
