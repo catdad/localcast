@@ -213,6 +213,46 @@
             };
         }());
 
+        var quickSeek = (function () {
+            var seekOffset = 0;
+            var timer = null;
+
+
+            function flush() {
+                timer = null;
+
+                tooltip.hide();
+                seekToPercent(calcSeekPercent(seekOffset));
+
+                seekOffset = 0;
+            }
+
+            function queue() {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                tooltip.show();
+                timer = setTimeout(flush, 400);
+                showBarChange(calcSeekPercent(seekOffset));
+            }
+
+            function back() {
+                seekOffset -= 30;
+                queue();
+            }
+
+            function forward() {
+                seekOffset += 30;
+                queue();
+            }
+
+            return {
+                forward: forward,
+                back: back
+            };
+        }());
+
         var getSeekPercent = function (ev) {
             var offset = 0;
 
@@ -264,46 +304,6 @@
         // listen to mouse and touch start
         track.addEventListener('mousedown', seekStart, false);
         track.addEventListener('touchstart', seekStart, false);
-
-        var quickSeek = (function () {
-            var seekOffset = 0;
-            var timer = null;
-
-
-            function flush() {
-                timer = null;
-
-                tooltip.hide();
-                seekToPercent(calcSeekPercent(seekOffset));
-
-                seekOffset = 0;
-            }
-
-            function queue() {
-                if (timer) {
-                    clearTimeout(timer);
-                }
-
-                tooltip.show();
-                timer = setTimeout(flush, 400);
-                showBarChange(calcSeekPercent(seekOffset));
-            }
-
-            function back() {
-                seekOffset -= 30;
-                queue();
-            }
-
-            function forward() {
-                seekOffset += 30;
-                queue();
-            }
-
-            return {
-                forward: forward,
-                back: back
-            };
-        }());
 
         // track the progress using a timer... ew
         (function automaticTracking() {
