@@ -119,11 +119,9 @@
     var slider = (function () {
         var track = dom.controls.querySelector('.track'),
             slider = dom.controls.querySelector('.slider'),
-            tooltip = dom.controls.querySelector('.tooltip'),
             width = slider.offsetWidth,
             duration = 0,
-            showTooltip = false,
-            tooltipTimeout,
+            seeking = false,
             lastPercent = 0;
 
         // needs to update on window resize
@@ -135,7 +133,7 @@
             slider.style.transform = 'translateX(' + width * percent + 'px)';
 
             // update tooltip if still visible
-            updateTooltip(percent, showTooltip);
+            tooltip.update(percent);
         }
 
         function setSeekPercent(percent) {
@@ -158,30 +156,62 @@
             emit('seek', { percent: percent });
         }
 
-        var updateTooltip = function(percent) {
-            if (showTooltip) {
-                UTIL.throttle(function () {
-                    var text = '';
+        function calcSeekPercent(offsetSeconds) {
+            var currentSeconds = (lastPercent * duration);
+            var seekSeconds = currentSeconds + offsetSeconds;
+            var finalPercent = seekSeconds / duration;
 
-                    if (duration) {
-                        var totalSeconds = percent * duration,
-                            mins = parseInt(totalSeconds / 60),
-                            seconds = UTIL.padNumber(parseInt(totalSeconds - (mins * 60)));
+            return finalPercent;
+        }
 
-                        text = mins + ':' + seconds;
-                    } else {
-                        text = parseInt(percent * 100) + '%';
-                    }
+        var tooltip = (function () {
+            var showTooltip = false;
+            var timer = null;
+            var elem = dom.controls.querySelector('.tooltip');
 
-                    if (!tooltip.classList.contains('show')) {
-                        tooltip.classList.add('show');
-                    }
-                    tooltip.innerHTML = text;
-                });
-            } else if (tooltip.classList.contains('show')) {
-                tooltip.classList.remove('show');
+            function update(percent) {
+                if (showTooltip) {
+                    UTIL.throttle(function () {
+                        var text = '';
+
+                        if (duration) {
+                            var totalSeconds = percent * duration,
+                                mins = parseInt(totalSeconds / 60),
+                                seconds = UTIL.padNumber(parseInt(totalSeconds - (mins * 60)));
+
+                            text = mins + ':' + seconds;
+                        } else {
+                            text = parseInt(percent * 100) + '%';
+                        }
+
+                        if (!elem.classList.contains('show')) {
+                            elem.classList.add('show');
+                        }
+                        elem.innerHTML = text;
+                    });
+                } else if (elem.classList.contains('show')) {
+                    elem.classList.remove('show');
+                }
             }
-        };
+
+            return {
+                show: function show() {
+                    showTooltip = true;
+                },
+                hide: function hide() {
+                    // set a timeout to clear the tooltip display
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+
+                    timer = setTimeout(function () {
+                        timer = null;
+                        showTooltip = false;
+                    }, 4000);
+                },
+                update: update
+            };
+        }());
 
         var getSeekPercent = function (ev) {
             var offset = 0;
@@ -204,16 +234,11 @@
             setSeekPercent(seekPercent);
 
             // show the time tooltip
-            updateTooltip(seekPercent);
+            tooltip.update(seekPercent);
         };
 
         var seekEnd = function (ev) {
-            // set a timeout to clear the tooltip display
-            tooltipTimeout && clearTimeout(tooltipTimeout);
-            tooltipTimeout = setTimeout(function () {
-                tooltipTimeout = undefined;
-                showTooltip = false;
-            }, 2500);
+            tooltip.hide();
 
             // remove events
             window.removeEventListener('mousemove', handleSeekEvent, false);
@@ -227,7 +252,7 @@
         var seekStart = function (ev) {
             handleSeekEvent(ev);
 
-            showTooltip = true;
+            tooltip.show();
 
             // add additional event listeners
             window.addEventListener('mousemove', handleSeekEvent, false);
@@ -244,19 +269,12 @@
             var seekOffset = 0;
             var timer = null;
 
-            function calcSeekPercent() {
-                var currentSeconds = (lastPercent * duration);
-                var seekSeconds = currentSeconds + seekOffset;
-                var finalPercent = seekSeconds / duration;
-
-                return finalPercent;
-            }
 
             function flush() {
                 timer = null;
-                showTooltip = false;
 
-                seekToPercent(calcSeekPercent());
+                tooltip.hide();
+                seekToPercent(calcSeekPercent(seekOffset));
 
                 seekOffset = 0;
             }
@@ -266,9 +284,9 @@
                     clearTimeout(timer);
                 }
 
-                showTooltip = true;
+                tooltip.show();
                 timer = setTimeout(flush, 400);
-                showBarChange(calcSeekPercent());
+                showBarChange(calcSeekPercent(seekOffset));
             }
 
             function back() {
@@ -298,9 +316,7 @@
                     return;
                 }
 
-                var newPercent = ((lastPercent * duration) + (time / 1000)) / duration;
-
-                setSeekPercent(newPercent);
+                setSeekPercent(calcSeekPercent((time / 1000)));
 
                 timer = setTimeout(tick, time);
             }
