@@ -217,7 +217,6 @@
             var seekOffset = 0;
             var timer = null;
 
-
             function flush() {
                 timer = null;
 
