@@ -23,13 +23,19 @@
         status: document.querySelector('#status'),
         cast: document.querySelector('#cast'),
         castOn: document.querySelector('#cast-filled'),
+        rewind30: document.querySelector('#rewind-30'),
+        forward30: document.querySelector('#forward-30'),
         show: function () {
             dom.controls.classList.remove('disabled');
+
+            ['play', 'pause', 'stop', 'rewind30', 'forward30'].forEach(function (name) {
+                dom[name].classList.remove('hide');
+            });
         },
         hide: function () {
             dom.controls.classList.add('disabled');
 
-            ['play', 'pause', 'stop', 'volume', 'volumeMute'].forEach(function (name) {
+            ['play', 'pause', 'stop', 'volume', 'volumeMute', 'rewind30', 'forward30'].forEach(function (name) {
                 dom[name].classList.add('hide');
             });
         }
@@ -37,16 +43,18 @@
 
     var commands = {
         play: function () {
+            dom.show();
+
             // change play/pause buttons
             dom.play.classList.add('hide');
             dom.pause.classList.remove('hide');
-            dom.stop.classList.remove('hide');
         },
         pause: function () {
+            dom.show();
+
             // change play/pause butons
             dom.play.classList.remove('hide');
             dom.pause.classList.add('hide');
-            dom.stop.classList.remove('hide');
         },
         mute: function () {
             dom.volume.classList.add('hide');
@@ -61,7 +69,6 @@
     function initEvents() {
         // add internal controls events
         STATE.on('controls:_internal:play', function () {
-            dom.show();
             commands.play();
         }, false);
         STATE.on('controls:_internal:pause', function () {
@@ -99,6 +106,13 @@
         dom.cast.addEventListener('click', function () {
             emit('discover');
         }, false);
+
+        dom.rewind30.addEventListener('click', function () {
+            STATE.emit('controls:_internal:rewind30');
+        }, false);
+        dom.forward30.addEventListener('click', function () {
+            STATE.emit('controls:_internal:forward30');
+        }, false);
     }
 
     // monitor the slider
@@ -107,7 +121,6 @@
             slider = dom.controls.querySelector('.slider'),
             tooltip = dom.controls.querySelector('.tooltip'),
             width = slider.offsetWidth,
-            transform = 0,
             seekFunction,
             duration = 0,
             showTooltip = false,
@@ -119,27 +132,35 @@
             width = slider.offsetWidth;
         }, false);
 
-        function setBarPercent(percent) {
-            if (percent >= 1) {
-                emit('seek-end');
-                percent = 1;
-            }
-
-            transform = width * percent;
-            slider.style.transform = 'translateX(' + transform + 'px)';
-
-            lastPercent = percent;
+        function showBarChange(percent) {
+            slider.style.transform = 'translateX(' + width * percent + 'px)';
 
             // update tooltip if still visible
             updateTooltip(percent, showTooltip);
         }
 
-        function setSeekSeconds(seconds) {
-            setBarPercent(seconds / duration);
+        function setSeekPercent(percent) {
+            showBarChange(percent);
+            lastPercent = percent;
         }
 
-        var updateTooltip = function(percent, show) {
-            if (show) {
+        function setSeekSeconds(seconds) {
+            setSeekPercent(seconds / duration);
+        }
+
+        function seekToPercent(percent) {
+            if (percent >= 1) {
+                emit('seek-end');
+                percent = 1;
+
+                return;
+            }
+
+            emit('seek', { percent: percent });
+        }
+
+        var updateTooltip = function(percent) {
+            if (showTooltip) {
                 UTIL.throttle(function () {
                     var text = '';
 
@@ -181,12 +202,14 @@
             var seekPercent = getSeekPercent(ev);
 
             // update the position and trigger the seek event
-            setBarPercent(seekPercent);
+            setSeekPercent(seekPercent);
             seekFunction && seekFunction(seekPercent);
 
             // show the time tooltip
-            updateTooltip(seekPercent, showTooltip = true);
+            updateTooltip(seekPercent);
+        };
 
+        var seekEnd = function (ev) {
             // set a timeout to clear the tooltip display
             tooltipTimeout && clearTimeout(tooltipTimeout);
             tooltipTimeout = setTimeout(function () {
@@ -194,24 +217,19 @@
                 showTooltip = false;
             }, 2500);
 
-            // TODO is this needed
-//            events.asyncTrigger('seeking', { percent: seekPercent });
-        };
-
-        var seekEnd = function (ev) {
             // remove events
             window.removeEventListener('mousemove', handleSeekEvent, false);
             window.removeEventListener('mouseup', seekEnd, false);
             window.removeEventListener('touchmove', handleSeekEvent, false);
             window.removeEventListener('touchend', seekEnd, false);
 
-            emit('seek', {
-                percent: getSeekPercent(ev)
-            });
+            seekToPercent(getSeekPercent(ev));
         };
 
         var seekStart = function (ev) {
             handleSeekEvent(ev);
+
+            showTooltip = true;
 
             // add additional event listeners
             window.addEventListener('mousemove', handleSeekEvent, false);
@@ -223,6 +241,53 @@
         // listen to mouse and touch start
         track.addEventListener('mousedown', seekStart, false);
         track.addEventListener('touchstart', seekStart, false);
+
+        var quickSeek = (function () {
+            var seekOffset = 0;
+            var timer = null;
+
+            function calcSeekPercent() {
+                var currentSeconds = (lastPercent * duration);
+                var seekSeconds = currentSeconds + seekOffset;
+                var finalPercent = seekSeconds / duration;
+
+                return finalPercent;
+            }
+
+            function flush() {
+                timer = null;
+                showTooltip = false;
+
+                seekToPercent(calcSeekPercent());
+
+                seekOffset = 0;
+            }
+
+            function queue() {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+
+                showTooltip = true;
+                timer = setTimeout(flush, 400);
+                showBarChange(calcSeekPercent());
+            }
+
+            function back() {
+                seekOffset -= 30;
+                queue();
+            }
+
+            function forward() {
+                seekOffset += 30;
+                queue();
+            }
+
+            return {
+                forward: forward,
+                back: back
+            };
+        }());
 
         // track the progress using a timer... ew
         (function automaticTracking() {
@@ -237,7 +302,7 @@
 
                 var newPercent = ((lastPercent * duration) + 1) / duration;
 
-                setBarPercent(newPercent);
+                setSeekPercent(newPercent);
 
                 timer = setTimeout(tick, time);
             }
@@ -271,16 +336,20 @@
                 STATE.off('controls:_internal:pause', onPause);
                 STATE.off('controls:_internal:seek-end', onSeedEnd);
                 STATE.off('controls:_internal:stop', destroy);
+                STATE.off('controls:_internal:rewind30', quickSeek.back);
+                STATE.off('controls:_internal:forward30', quickSeek.forward);
             }
 
             STATE.on('controls:_internal:play', onPlay);
             STATE.on('controls:_internal:pause', onPause);
             STATE.on('controls:_internal:seek-end', onSeedEnd);
             STATE.on('controls:_internal:stop', destroy);
+            STATE.on('controls:_internal:rewind30', quickSeek.back);
+            STATE.on('controls:_internal:forward30', quickSeek.forward);
         }());
 
         return {
-            setProgress: setBarPercent,
+            setProgress: setSeekPercent,
             getProgress: function () {
                 return lastPercent;
             },
