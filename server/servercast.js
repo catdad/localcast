@@ -82,12 +82,15 @@ function discover() {
 
         }), 100);
 
+        // set a timeout to handle not finding any devices
+        // note: I checked chromecasts lib, and it seems that
+        // due to the use of node-ssdp, which has no callback
+        // on search, there isn't a really good way to add
+        // a callback to the update method
         setTimeout(function () {
             done(new Error('the query timed out'));
         }, 1000);
 
-        // TODO if there are no devices, this will never resolve,
-        // since update only fires when devices are discovered
         list.on('update', onUpdate);
         list.update();
     });
