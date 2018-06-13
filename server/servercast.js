@@ -60,17 +60,31 @@ function discover() {
     }
 
     return new Promise(function (resolve, reject) {
+        var done = _.once(function (err, result) {
+            if (err) {
+                return reject(err);
+            }
+
+            return resolve(result);
+        });
+
         if (!list) {
             list = chromecasts();
         }
 
         if (list.players && list.players.length) {
-            return resolve(players());
+            return done(null, players());
         }
 
         var onUpdate = _.debounce(_.once(function () {
-            resolve(players());
+
+            done(null, players());
+
         }), 100);
+
+        setTimeout(function () {
+            done(new Error('the query timed out'));
+        }, 1000);
 
         // TODO if there are no devices, this will never resolve,
         // since update only fires when devices are discovered
