@@ -103,6 +103,13 @@
         }, done);
     }
 
+    function stop(player, done) {
+        castReq({
+            command: 'stop',
+            player: player
+        }, done);
+    }
+
     function seek(player, seconds, done) {
         castReq({
             command: 'seek',
@@ -156,7 +163,7 @@
             pause(controls._player, onStatusCallback);
         },
         stop: function () {
-            toast.error('stop not implemented');
+            stop(controls._player, onStatusCallback);
         },
         mute: function () {
             toast.error('mute not implemented');
