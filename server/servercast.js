@@ -160,6 +160,12 @@ function seek(body) {
     });
 }
 
+function stop(body) {
+    return execCommand(body, function (player) {
+        return promisify(player.stop.bind(player))();
+    });
+}
+
 module.exports = function (req, res) {
     parseJson(req).then(function (body) {
         switch (body.command) {
@@ -173,6 +179,8 @@ module.exports = function (req, res) {
                 return pause(body);
             case 'resume':
                 return resume(body);
+            case 'stop':
+                return stop(body);
             case 'seek':
                 return seek(body);
         }
