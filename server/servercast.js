@@ -60,20 +60,35 @@ function discover() {
     }
 
     return new Promise(function (resolve, reject) {
+        var done = _.once(function (err, result) {
+            if (err) {
+                return reject(err);
+            }
+
+            return resolve(result);
+        });
+
         if (!list) {
             list = chromecasts();
         }
 
         if (list.players && list.players.length) {
-            return resolve(players());
+            return done(null, players());
         }
 
         var onUpdate = _.debounce(_.once(function () {
-            resolve(players());
+            done(null, players());
         }), 100);
 
-        // TODO if there are no devices, this will never resolve,
-        // since update only fires when devices are discovered
+        // set a timeout to handle not finding any devices
+        // note: I checked chromecasts lib, and it seems that
+        // due to the use of node-ssdp, which has no callback
+        // on search, there isn't a really good way to add
+        // a callback to the update method
+        setTimeout(function () {
+            done(new Error('the query timed out'));
+        }, 1000);
+
         list.on('update', onUpdate);
         list.update();
     });
@@ -199,7 +214,7 @@ module.exports = function (req, res) {
 
         res.writeHead(500);
         res.end(JSON.stringify({
-            error: err.toString()
+            error: err.message || err.toString()
         }));
     });
 };
