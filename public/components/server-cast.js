@@ -12,6 +12,20 @@
         toast.error(err.toString());
     }
 
+    function getRequestErr(err, res) {
+        if (res && res.responseText && res.responseText.length) {
+            try {
+                var body = JSON.parse(res.responseText);
+
+                if (body.error) {
+                    return new Error(body.error);
+                }
+            } catch(e) { }
+        }
+
+        return err;
+    }
+
     function castReq(body, done) {
         request.json({
             method: 'POST',
@@ -20,9 +34,9 @@
             headers: {
                 'content-type': 'application/json'
             }
-        }, function (err, body) {
+        }, function (err, body, res) {
             if (err) {
-                return done(err);
+                return done(getRequestErr(err, res));
             }
 
             return done(null, body);
@@ -32,7 +46,7 @@
     function discover(done) {
         castReq({
             command: 'discover'
-        }, function (err, body, res) {
+        }, function (err, body) {
             if (err) {
                 return done(err);
             }
