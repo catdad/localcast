@@ -216,7 +216,7 @@ module.exports = function (req, res) {
 
         res.writeHead(500);
         res.end(JSON.stringify({
-            error: err.toString()
+            error: err.message || err.toString()
         }));
     });
 };
