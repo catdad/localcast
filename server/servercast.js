@@ -77,9 +77,7 @@ function discover() {
         }
 
         var onUpdate = _.debounce(_.once(function () {
-
             done(null, players());
-
         }), 100);
 
         // set a timeout to handle not finding any devices
