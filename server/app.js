@@ -147,5 +147,6 @@ app.get('*', function(req, res, next) {
 // init
 //--------------
 
-app.listen(port);
-console.log('listening at', ip() + ':' + port);
+app.listen(port, function () {
+    console.log('listening at', ip() + ':' + port);
+});
