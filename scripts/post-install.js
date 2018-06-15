@@ -11,10 +11,20 @@ var mkdirp = require('mkdirp');
 var unzip = require('unzip');
 
 var destination = 'bin/ffmpeg';
-var cache = 'bin/ffmpeg.zip';
 
 mkdirp.sync(destination);
 
+var cache = (function (platform) {
+    if (platform === 'darwin') {
+        return 'bin/darwin-ffmpeg.zip';
+    }
+
+    if (platform === 'win32') {
+        return 'bin/win-ffmpeg.zip';
+    }
+
+    return null;
+}(os.platform()));
 var url = (function (platform) {
     if (platform === 'darwin') {
         return 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.0-macos64-static.zip';
@@ -131,7 +141,7 @@ function unzipArchive(stream) {
 }
 
 if (url) {
-    getArchive(url.win).then(unzipArchive).then(function () {
+    getArchive(url).then(unzipArchive).then(function () {
         console.log('ffmpeg installed successfully');
     }).catch(function (err) {
         console.error(err);
