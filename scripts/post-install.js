@@ -1,6 +1,7 @@
 /* jshint node: true */
 /* global Promise */
 
+var os = require('os');
 var fs = require('fs');
 var path = require('path');
 var http = require('http');
@@ -14,10 +15,17 @@ var cache = 'bin/ffmpeg.zip';
 
 mkdirp.sync(destination);
 
-var url = {
-    win: 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip',
-    darwin: 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.0-macos64-static.zip'
-};
+var url = (function (platform) {
+    if (platform === 'darwin') {
+        return 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.0-macos64-static.zip';
+    }
+
+    if (platform === 'win32') {
+        return 'https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip';
+    }
+
+    return null;
+}(os.platform()));
 
 function get(url) {
     var httpx = /^https/.test(url) ? https : http;
@@ -122,9 +130,14 @@ function unzipArchive(stream) {
     });
 }
 
-getArchive(url.win).then(unzipArchive).then(function () {
-    console.log('ffmpeg installed successfully');
-}).catch(function (err) {
-    console.error(err);
-    process.exitCode = 1;
-});
+if (url) {
+    getArchive(url.win).then(unzipArchive).then(function () {
+        console.log('ffmpeg installed successfully');
+    }).catch(function (err) {
+        console.error(err);
+        process.exitCode = 1;
+    });
+} else {
+    console.log('ffmpeg download is not implemented for this operating system');
+    console.log('download the ffmpeg and ffprobe binaries and place them in', destination);
+}
