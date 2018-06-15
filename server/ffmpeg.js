@@ -11,8 +11,11 @@ var through = require('through2');
 // root is one up from the running dir
 var dir = path.resolve(__dirname, '..');
 
-var ffmpegPath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffmpeg.exe');
-var ffprobePath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffprobe.exe');
+//var ffmpegPath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffmpeg.exe');
+//var ffprobePath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffprobe.exe');
+
+var ffmpegPath = path.resolve('.', 'bin', 'ffmpeg', 'ffmpeg.exe');
+var ffprobePath = path.resolve('.', 'bin', 'ffmpeg', 'ffprobe.exe');
 
 //enable these if needed in the environment
 //var Fluent = require('fluent-ffmpeg');
@@ -166,27 +169,23 @@ function stream_native(res, vid, duration){
 	});
 
 	var targetFormat = 'mp4';
-	// var targetFormat = 'webm';
 
-	res.contentType(targetFormat);
+	res.contentType('video/' + targetFormat);
 	res.setHeader('X-Content-Duration', duration.toString());
-
-	// var ffmpeg = child_process.spawn(ffmpegPath, ['-i', 'pipe:0', '-f', 'mp4', '-movflags', 'frag_keyframe', 'pipe:1']);
 
 	var envVars = [
         '-i', 'pipe:0',
         '-f', targetFormat,
 
-        // '-vcodec', 'libx264', //used for mp4
-        // '-acodec', 'libmp3lame', //used for mp4
-
-        '-acodec', 'libvo_aacenc',
-        '-ab', '64k',
-        '-vcodec', 'libx264',
+        '-vcodec', 'libx264', //used for mp4
         '-vb', '448k',
+        '-acodec', 'libmp3lame', //used for mp4
+//        '-acodec', 'libvo_aacenc', // doesn't work with ffmpeg 4
+        '-ab', '64k',
+
         '-movflags', 'frag_keyframe+empty_moov',
 
-        //		'-movflags', 'frag_keyframe+faststart',
+//		'-movflags', 'frag_keyframe+faststart',
         '-threads', '2',
         'pipe:1'
     ];
