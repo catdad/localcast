@@ -43,6 +43,16 @@ function get(url) {
     return httpx.get(url);
 }
 
+function writeFile(rs, ws) {
+    return new Promise(function (resolve, reject) {
+        rs.pipe(ws);
+
+        rs.on('error', reject);
+        ws.on('error', reject);
+        ws.on('finish', resolve);
+    });
+}
+
 function zipStream() {
     return new Promise(function (resolve, reject) {
         var stream = fs.createReadStream(cache);
@@ -59,6 +69,7 @@ function zipStream() {
 
 function requestStream(url) {
     console.log('downloading from', url);
+
     return new Promise(function (resolve, reject) {
         // cache on the filesystem
         try {
@@ -66,16 +77,6 @@ function requestStream(url) {
         } catch(e) {
             reject(e);
         }
-    });
-}
-
-function writeFile(rs, ws) {
-    return new Promise(function (resolve, reject) {
-        rs.pipe(ws);
-
-        rs.on('error', reject);
-        ws.on('error', reject);
-        ws.on('finish', resolve);
     });
 }
 
@@ -141,9 +142,12 @@ function unzipArchive(stream) {
 }
 
 if (url) {
-    getArchive(url).then(unzipArchive).then(function () {
+    getArchive(url)
+    .then(unzipArchive)
+    .then(function () {
         console.log('ffmpeg installed successfully');
-    }).catch(function (err) {
+    })
+    .catch(function (err) {
         console.error(err);
         process.exitCode = 1;
     });
