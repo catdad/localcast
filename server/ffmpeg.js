@@ -169,12 +169,9 @@ function stream_native(res, vid, duration){
 	});
 
 	var targetFormat = 'mp4';
-	// var targetFormat = 'webm';
 
-	res.contentType(targetFormat);
+	res.contentType('video/' + targetFormat);
 	res.setHeader('X-Content-Duration', duration.toString());
-
-	// var ffmpeg = child_process.spawn(ffmpegPath, ['-i', 'pipe:0', '-f', 'mp4', '-movflags', 'frag_keyframe', 'pipe:1']);
 
 	var envVars = [
         '-i', 'pipe:0',
