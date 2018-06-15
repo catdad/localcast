@@ -25,6 +25,7 @@ var cache = (function (platform) {
 
     return null;
 }(os.platform()));
+
 var url = (function (platform) {
     if (platform === 'darwin') {
         return 'https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.0-macos64-static.zip';
