@@ -6,11 +6,7 @@ var _ = require('lodash');
 
 function transformSessions(sessions) {
     return _.isArray(sessions) ? sessions.map(function (session) {
-        if (session.appId === castv2.DefaultMediaReceiver.APP_ID) {
-            session.isDefaultReceiver = true;
-        } else {
-            session.isDefaultReceiver = false;
-        }
+        session.isDefaultReceiver = (session.appId === castv2.DefaultMediaReceiver.APP_ID);
 
         return session;
     }) : [];
