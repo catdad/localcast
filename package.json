@@ -13,6 +13,7 @@
   "author": "Kiril Vatev",
   "license": "MIT",
   "dependencies": {
+    "castv2-client": "^1.1.2",
     "chromecasts": "^1.9.1",
     "express": "~4.2.0",
     "fluent-ffmpeg": "~1.7.2",
