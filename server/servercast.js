@@ -181,7 +181,6 @@ function execCommand(body, func) {
     });
 }
 
-
 function pause(body) {
     return execCommand(body, function (player) {
         return promisify(player.pause.bind(player))();
