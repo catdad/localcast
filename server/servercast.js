@@ -145,6 +145,18 @@ function play(body) {
     });
 }
 
+function session(body) {
+    return findPlayer(body.player).then(function (player) {
+        return client.sessions(player.host);
+    }).then(function (sessions) {
+        if (sessions.length) {
+            return Promise.resolve(cleanSession(sessions[0]));
+        }
+
+        return Promise.reject('did not find session');
+    });
+}
+
 function status(body) {
     return findPlayer(body.player).then(function (player) {
         return promisify(player.status.bind(player))().then(function (status) {
@@ -156,18 +168,6 @@ function status(body) {
 
             return Promise.resolve(cleanStatus(status));
         });
-    });
-}
-
-function session(body) {
-    return findPlayer(body.player).then(function (player) {
-        return client.sessions(player.host);
-    }).then(function (sessions) {
-        if (sessions.length) {
-            return Promise.resolve(cleanSession(sessions[0]));
-        }
-
-        return Promise.reject('did not find session');
     });
 }
 
@@ -212,6 +212,8 @@ module.exports = function (req, res) {
                 return play(body);
             case 'discover':
                 return discover(body);
+            case 'session':
+                return session(body);
             case 'status':
                 return status(body);
             case 'pause':
@@ -222,8 +224,6 @@ module.exports = function (req, res) {
                 return stop(body);
             case 'seek':
                 return seek(body);
-            case 'session':
-                return session(body);
         }
 
         return Promise.reject('invalid command provided');
