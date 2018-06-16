@@ -5,6 +5,8 @@ var chromecasts = require('chromecasts');
 var ns = require('node-stream');
 var _ = require('lodash');
 
+var client = require('./servercast-client.js');
+
 var list;
 
 function parseJson(stream) {
@@ -47,6 +49,16 @@ function cleanStatus(status) {
         currentTime: status.currentTime,
         title: _.get(status, 'media.metadata.title', undefined),
         _raw: status
+    };
+}
+
+function cleanSession(session) {
+    return {
+        app: session.displayName,
+        info: session.statusText,
+        isIdleScreen: session.isIdleScreen,
+        isDefaultReceiver: session.isDefaultReceiver,
+        _raw: session
     };
 }
 
@@ -133,6 +145,18 @@ function play(body) {
     });
 }
 
+function session(body) {
+    return findPlayer(body.player).then(function (player) {
+        return client.sessions(player.host);
+    }).then(function (sessions) {
+        if (sessions.length) {
+            return Promise.resolve(cleanSession(sessions[0]));
+        }
+
+        return Promise.reject('did not find session');
+    });
+}
+
 function status(body) {
     return findPlayer(body.player).then(function (player) {
         return promisify(player.status.bind(player))().then(function (status) {
@@ -188,6 +212,8 @@ module.exports = function (req, res) {
                 return play(body);
             case 'discover':
                 return discover(body);
+            case 'session':
+                return session(body);
             case 'status':
                 return status(body);
             case 'pause':
