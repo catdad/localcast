@@ -155,7 +155,9 @@
             title: status.title || 'unknown media',
             state: status.state.toLowerCase(),
             duration: status.duration,
-            currentTime: status.currentTime
+            currentTime: status.currentTime,
+            isDefaultReceiver: status.isDefaultReceiver,
+            app: status.app
         };
     }
 
