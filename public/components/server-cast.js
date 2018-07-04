@@ -155,7 +155,10 @@
             title: status.title || 'unknown media',
             state: status.state.toLowerCase(),
             duration: status.duration,
-            currentTime: status.currentTime
+            currentTime: status.currentTime,
+            isDefaultReceiver: status.isDefaultReceiver,
+            isIdleScreen: status.isIdleScreen,
+            app: status.app
         };
     }
 
@@ -207,10 +210,21 @@
 
                     var clientStatus = createClientStatus(status);
 
-                    if (clientStatus.state === 'no_media') {
-                        return toast.info('nothing is playing');
+                    console.log(clientStatus);
+
+                    switch(true) {
+                        case !clientStatus.isDefaultReceiver && !clientStatus.isIdleScreen:
+                            // some other app is playing
+                            return toast.warning('currently playing ' + clientStatus.app);
+                        case clientStatus.state === 'no_media':
+                        case clientStatus.isIdleScreen:
+                            // default receiver has no media or we are
+                            // on the idle screen
+                            return toast.info('nothing is playing');
                     }
 
+                    // the default media receiver is playing something, so
+                    // let's init controls
                     initPlay(status);
 
                     if (clientStatus && clientStatus.title) {

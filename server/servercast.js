@@ -48,6 +48,7 @@ function cleanStatus(status) {
         duration: _.get(status, 'media.duration', 0),
         currentTime: status.currentTime,
         title: _.get(status, 'media.metadata.title', undefined),
+        isDefaultReceiver: true,
         _raw: status
     };
 }
@@ -58,6 +59,7 @@ function cleanSession(session) {
         info: session.statusText,
         isIdleScreen: session.isIdleScreen,
         isDefaultReceiver: session.isDefaultReceiver,
+        state: 'NO_MEDIA',
         _raw: session
     };
 }
@@ -170,15 +172,28 @@ function session(body) {
 }
 
 function status(body) {
-    return findPlayer(body.player).then(function (player) {
-        return promisify(player.status.bind(player))().then(function (status) {
-            if (!status) {
-                return Promise.resolve({
-                    state: 'NO_MEDIA'
-                });
-            }
+    return session(body).then(function (session) {
+        // if the default player is not already open,
+        // do not open it, something else might be
+        // playing and it will get interrupted
+        if (!session.isDefaultReceiver) {
+            return session;
+        }
 
-            return Promise.resolve(cleanStatus(status));
+        // the dfefault media player is open, so
+        // we can connect to the existing session
+        // and start controlling it
+        return findPlayer(body.player).then(function (player) {
+            return promisify(player.status.bind(player))().then(function (status) {
+                if (!status) {
+                    return Promise.resolve(session);
+                }
+
+                var response = cleanStatus(status);
+                response._rawSession = session._raw;
+
+                return Promise.resolve(response);
+            });
         });
     });
 }
