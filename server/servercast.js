@@ -62,6 +62,13 @@ function cleanSession(session) {
     };
 }
 
+function handleErrors(player) {
+    player.on('error', function (err) {
+        console.log('player % error', player.name);
+        console.log(err);
+    });
+}
+
 function discover() {
     function players() {
         return {
@@ -92,6 +99,11 @@ function discover() {
             done(null, players());
         }), 100);
 
+        var onEachUpdate = function (player) {
+            handleErrors(player);
+            onUpdate(player);
+        };
+
         // set a timeout to handle not finding any devices
         // note: I checked chromecasts lib, and it seems that
         // due to the use of node-ssdp, which has no callback
@@ -101,7 +113,7 @@ function discover() {
             done(new Error('the query timed out'));
         }, 1000);
 
-        list.on('update', onUpdate);
+        list.on('update', onEachUpdate);
         list.update();
     });
 }
