@@ -347,36 +347,33 @@
                 }
             }
 
-            function onPlay() {
+            function onPlaying() {
                 isPlaying = true;
                 clearTimer();
 
                 timer = setTimeout(tick, time);
             }
 
-            function onPause() {
-                isPlaying = false;
-                clearTimer();
-            }
-
-            function onSeedEnd() {
+            function onNotPlaying() {
                 isPlaying = false;
                 clearTimer();
             }
 
             function destroy() {
-                STATE.off('controls:_internal:play', onPlay);
-                STATE.off('controls:_internal:pause', onPause);
-                STATE.off('controls:_internal:seek-end', onSeedEnd);
+                onNotPlaying();
+
+                STATE.off('controls:_internal:play', onPlaying);
+                STATE.off('controls:_internal:pause', onNotPlaying);
+                STATE.off('controls:_internal:seek-end', onNotPlaying);
                 STATE.off('controls:_internal:stop', destroy);
                 STATE.off('controls:_internal:rewind30', quickSeek.back);
                 STATE.off('controls:_internal:forward30', quickSeek.forward);
             }
 
-            STATE.on('controls:_internal:play', onPlay);
-            STATE.on('controls:_internal:pause', onPause);
-            STATE.on('controls:_internal:seek-end', onSeedEnd);
-            STATE.on('controls:_internal:stop', destroy);
+            STATE.on('controls:_internal:play', onPlaying);
+            STATE.on('controls:_internal:pause', onNotPlaying);
+            STATE.on('controls:_internal:seek-end', onNotPlaying);
+            STATE.on('controls:_internal:stop', onNotPlaying);
             STATE.on('controls:_internal:rewind30', quickSeek.back);
             STATE.on('controls:_internal:forward30', quickSeek.forward);
         }());
