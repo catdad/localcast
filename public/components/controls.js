@@ -149,6 +149,10 @@
         }
 
         function setSeekPercent(percent) {
+            if (percent >= 1) {
+                percent = 1;
+            }
+
             showBarChange(percent);
             lastPercent = percent;
         }
