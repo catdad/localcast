@@ -28,14 +28,14 @@
         show: function () {
             dom.controls.classList.remove('disabled');
 
-            ['play', 'pause', 'stop', 'rewind30', 'forward30', 'status'].forEach(function (name) {
+            ['play', 'pause', 'stop', 'rewind30', 'forward30'].forEach(function (name) {
                 dom[name].classList.remove('hide');
             });
         },
         hide: function () {
             dom.controls.classList.add('disabled');
 
-            ['play', 'pause', 'stop', 'volume', 'volumeMute', 'rewind30', 'forward30', 'status'].forEach(function (name) {
+            ['play', 'pause', 'stop', 'volume', 'volumeMute', 'rewind30', 'forward30'].forEach(function (name) {
                 dom[name].classList.add('hide');
             });
         },
@@ -43,9 +43,11 @@
             if (state === 'on') {
                 dom.cast.classList.add('hide');
                 dom.castOn.classList.remove('hide');
+                dom.status.classList.remove('hide');
             } else {
                 dom.cast.classList.remove('hide');
                 dom.castOn.classList.add('hide');
+                dom.status.classList.add('hide');
             }
         }
     };
@@ -84,6 +86,9 @@
             commands.pause();
         }, false);
         STATE.on('controls:_internal:stop', function () {
+            dom.hide();
+        }, false);
+        STATE.on('controls:_internal:seek-end', function () {
             dom.hide();
         }, false);
         STATE.on('controls:_internal:mute', function () {
@@ -151,6 +156,7 @@
         function setSeekPercent(percent) {
             if (percent >= 1) {
                 percent = 1;
+                emit('seek-end');
             }
 
             showBarChange(percent);
@@ -163,8 +169,8 @@
 
         function seekToPercent(percent) {
             if (percent >= 1) {
-                emit('seek-end');
                 percent = 1;
+                emit('seek-end');
 
                 return;
             }
