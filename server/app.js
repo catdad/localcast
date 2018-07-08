@@ -150,12 +150,3 @@ app.get('*', function(req, res, next) {
 app.listen(port, function () {
     console.log('listening at', ip() + ':' + port);
 });
-
-// debugging for #67
-process.on('uncaughtException', function (err) {
-    console.error('unhandled err');
-    console.error(err);
-    console.trace('stack trace');
-
-    process.exit(1);
-});
