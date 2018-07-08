@@ -28,16 +28,25 @@
         show: function () {
             dom.controls.classList.remove('disabled');
 
-            ['play', 'pause', 'stop', 'rewind30', 'forward30'].forEach(function (name) {
+            ['play', 'pause', 'stop', 'rewind30', 'forward30', 'status'].forEach(function (name) {
                 dom[name].classList.remove('hide');
             });
         },
         hide: function () {
             dom.controls.classList.add('disabled');
 
-            ['play', 'pause', 'stop', 'volume', 'volumeMute', 'rewind30', 'forward30'].forEach(function (name) {
+            ['play', 'pause', 'stop', 'volume', 'volumeMute', 'rewind30', 'forward30', 'status'].forEach(function (name) {
                 dom[name].classList.add('hide');
             });
+        },
+        setCast: function (state) {
+            if (state === 'on') {
+                dom.cast.classList.add('hide');
+                dom.castOn.classList.remove('hide');
+            } else {
+                dom.cast.classList.remove('hide');
+                dom.castOn.classList.add('hide');
+            }
         }
     };
 
@@ -104,7 +113,10 @@
             emit('status');
         }, false);
         dom.cast.addEventListener('click', function () {
-            emit('discover');
+            emit('connect');
+        }, false);
+        dom.castOn.addEventListener('click', function () {
+            emit('disconnect');
         }, false);
 
         dom.rewind30.addEventListener('click', function () {
@@ -412,5 +424,12 @@
         }
 
         setControlsState(metadata);
+    });
+
+    STATE.on('cast:connected', function () {
+        dom.setCast('on');
+    });
+    STATE.on('cast:disconnected', function () {
+        dom.setCast('off');
     });
 }(window));

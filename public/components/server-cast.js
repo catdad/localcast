@@ -173,6 +173,15 @@
     var controls = {
         _player: null,
         _duration: 0,
+        setPlayer: function (player) {
+            controls._player = player;
+
+            if (player === null) {
+                return STATE.emit('cast:disconnected');
+            }
+
+            return STATE.emit('cast:connected', { name: player });
+        },
         play: function () {
             resume(controls._player, onStatusCallback);
         },
@@ -195,13 +204,13 @@
         status: function () {
             status(controls._player, onStatusCallback);
         },
-        discover: function () {
+        connect: function () {
             discoverUserSelect(function (err, player) {
                 if (err) {
                     return showErr(err);
                 }
 
-                controls._player = player;
+                controls.setPlayer(player);
 
                 status(player, function (err, status) {
                     if (err) {
@@ -234,15 +243,41 @@
                     onStatusCallback(null, status);
                 });
             });
+        },
+        disconnect: function () {
+            function clear() {
+                toast.clear();
+            }
+
+            toast.alert({
+                message: 'disconnect from ' + controls._player + '?',
+                timeout: -1
+            });
+            toast.log({
+                message: 'yes',
+                onclick: function () {
+                    controls.setPlayer(null);
+                    clear();
+                },
+                timeout: -1
+            });
+            toast.log({
+                message: 'no',
+                onclick: function () {
+                    clear();
+                },
+                timeout: -1
+            });
         }
     };
 
     function initAlwaysOnControls() {
-        STATE.on('controls:status', controls.status);
-        STATE.on('controls:discover', controls.discover);
+        STATE.on('controls:connect', controls.connect);
+        STATE.on('controls:disconnect', controls.disconnect);
     }
 
     function initControls() {
+        STATE.on('controls:status', controls.status);
         STATE.on('controls:play', controls.play);
         STATE.on('controls:pause', controls.pause);
         STATE.on('controls:stop', controls.stop);
@@ -252,6 +287,7 @@
     }
 
     function destroyControls() {
+        STATE.off('controls:status', controls.status);
         STATE.off('controls:play', controls.play);
         STATE.off('controls:pause', controls.pause);
         STATE.off('controls:stop', controls.stop);
