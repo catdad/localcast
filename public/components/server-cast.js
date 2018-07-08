@@ -167,12 +167,40 @@
             return showErr(err);
         }
 
-        STATE.emit('controls:update', createClientStatus(status));
+        var metadata = createClientStatus(status);
+
+        STATE.emit('controls:update', metadata);
+
+        if (status.title) {
+            toast.info('playing: ' + status.title);
+        }
     }
 
     var controls = {
         _player: null,
         _duration: 0,
+        setPlayer: function (player) {
+            controls._player = player;
+
+            if (player === null) {
+                return STATE.emit('cast:disconnected');
+            }
+
+            return STATE.emit('cast:connected', { name: player });
+        },
+        activePlayer: function (done) {
+            if (controls._player) {
+                return done(null, controls._player);
+            }
+
+            discoverUserSelect(function (err, player) {
+                if (!err && player) {
+                    controls.setPlayer(player);
+                }
+
+                done(err, player);
+            });
+        },
         play: function () {
             resume(controls._player, onStatusCallback);
         },
@@ -195,13 +223,13 @@
         status: function () {
             status(controls._player, onStatusCallback);
         },
-        discover: function () {
-            discoverUserSelect(function (err, player) {
+        connect: function () {
+            controls.activePlayer(function (err, player) {
                 if (err) {
                     return showErr(err);
                 }
 
-                controls._player = player;
+                controls.setPlayer(player);
 
                 status(player, function (err, status) {
                     if (err) {
@@ -209,8 +237,6 @@
                     }
 
                     var clientStatus = createClientStatus(status);
-
-                    console.log(clientStatus);
 
                     switch(true) {
                         case !clientStatus.isDefaultReceiver && !clientStatus.isIdleScreen:
@@ -226,23 +252,43 @@
                     // the default media receiver is playing something, so
                     // let's init controls
                     initPlay(status);
-
-                    if (clientStatus && clientStatus.title) {
-                        toast.info('playing: ' + clientStatus.title);
-                    }
-
-                    onStatusCallback(null, status);
                 });
+            });
+        },
+        disconnect: function () {
+            function clear() {
+                toast.clear();
+            }
+
+            toast.alert({
+                message: 'disconnect from ' + controls._player + '?',
+                timeout: -1
+            });
+            toast.log({
+                message: 'yes',
+                onclick: function () {
+                    controls.setPlayer(null);
+                    clear();
+                },
+                timeout: -1
+            });
+            toast.log({
+                message: 'no',
+                onclick: function () {
+                    clear();
+                },
+                timeout: -1
             });
         }
     };
 
     function initAlwaysOnControls() {
-        STATE.on('controls:status', controls.status);
-        STATE.on('controls:discover', controls.discover);
+        STATE.on('controls:connect', controls.connect);
+        STATE.on('controls:disconnect', controls.disconnect);
     }
 
     function initControls() {
+        STATE.on('controls:status', controls.status);
         STATE.on('controls:play', controls.play);
         STATE.on('controls:pause', controls.pause);
         STATE.on('controls:stop', controls.stop);
@@ -252,6 +298,7 @@
     }
 
     function destroyControls() {
+        STATE.off('controls:status', controls.status);
         STATE.off('controls:play', controls.play);
         STATE.off('controls:pause', controls.pause);
         STATE.off('controls:stop', controls.stop);
@@ -267,6 +314,7 @@
         controls._duration = status.duration;
 
         STATE.emit('controls:init', createClientStatus(status));
+        onStatusCallback(null, status);
     }
 
     initAlwaysOnControls();
@@ -274,12 +322,10 @@
     STATE.on('servercast:play', function (file) {
         toast.clear();
 
-        discoverUserSelect(function (err, player) {
+        controls.activePlayer(function (err, player) {
             if (err) {
                 return showErr(err);
             }
-
-            controls._player = player;
 
             play(file, player, function (err, status) {
                 if (err) {
