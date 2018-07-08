@@ -187,7 +187,13 @@
                 return done(null, controls._player);
             }
 
-            discoverUserSelect(done);
+            discoverUserSelect(function (err, player) {
+                if (!err && player) {
+                    controls.setPlayer(player);
+                }
+
+                done(err, player);
+            });
         },
         play: function () {
             resume(controls._player, onStatusCallback);
@@ -321,8 +327,6 @@
             if (err) {
                 return showErr(err);
             }
-
-            controls._player = player;
 
             play(file, player, function (err, status) {
                 if (err) {
