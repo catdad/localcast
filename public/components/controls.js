@@ -431,5 +431,6 @@
     });
     STATE.on('cast:disconnected', function () {
         dom.setCast('off');
+        STATE.emit('controls:_internal:stop');
     });
 }(window));
