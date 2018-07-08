@@ -167,7 +167,13 @@
             return showErr(err);
         }
 
-        STATE.emit('controls:update', createClientStatus(status));
+        var metadata = createClientStatus(status);
+
+        STATE.emit('controls:update', metadata);
+
+        if (status.title) {
+            toast.info('playing: ' + status.title);
+        }
     }
 
     var controls = {
@@ -232,8 +238,6 @@
 
                     var clientStatus = createClientStatus(status);
 
-                    console.log(clientStatus);
-
                     switch(true) {
                         case !clientStatus.isDefaultReceiver && !clientStatus.isIdleScreen:
                             // some other app is playing
@@ -248,12 +252,6 @@
                     // the default media receiver is playing something, so
                     // let's init controls
                     initPlay(status);
-
-                    if (clientStatus && clientStatus.title) {
-                        toast.info('playing: ' + clientStatus.title);
-                    }
-
-                    onStatusCallback(null, status);
                 });
             });
         },
@@ -316,6 +314,7 @@
         controls._duration = status.duration;
 
         STATE.emit('controls:init', createClientStatus(status));
+        onStatusCallback(null, status);
     }
 
     initAlwaysOnControls();
