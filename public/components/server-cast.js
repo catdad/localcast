@@ -182,6 +182,13 @@
 
             return STATE.emit('cast:connected', { name: player });
         },
+        activePlayer: function (done) {
+            if (controls._player) {
+                return done(null, controls._player);
+            }
+
+            discoverUserSelect(done);
+        },
         play: function () {
             resume(controls._player, onStatusCallback);
         },
@@ -205,7 +212,7 @@
             status(controls._player, onStatusCallback);
         },
         connect: function () {
-            discoverUserSelect(function (err, player) {
+            controls.activePlayer(function (err, player) {
                 if (err) {
                     return showErr(err);
                 }
@@ -310,7 +317,7 @@
     STATE.on('servercast:play', function (file) {
         toast.clear();
 
-        discoverUserSelect(function (err, player) {
+        controls.activePlayer(function (err, player) {
             if (err) {
                 return showErr(err);
             }
