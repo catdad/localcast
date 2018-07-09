@@ -152,7 +152,7 @@
 
     function createClientStatus(status) {
         return {
-            title: status.title || 'unknown media',
+            title: status.title,
             state: status.state.toLowerCase(),
             duration: status.duration,
             currentTime: status.currentTime,
@@ -171,8 +171,19 @@
 
         STATE.emit('controls:update', metadata);
 
-        if (status.title) {
-            toast.info('playing: ' + status.title);
+        switch(true) {
+            case !metadata.isDefaultReceiver && !metadata.isIdleScreen:
+                // some other app is playing
+                return toast.info('currently playing ' + metadata.app + ' app');
+            case metadata.isIdleScreen:
+                // default receiver has no media or we are
+                // on the idle screen
+                return toast.info('nothing is playing');
+            case metadata.isDefaultReceiver && !metadata.title:
+                // the default media player has no media
+                return toast.info('no media playing on Default Media Receiver app');
+            case metadata.isDefaultReceiver && !!metadata.title:
+                return toast.info('currently playing ' + metadata.title);
         }
     }
 
@@ -236,21 +247,6 @@
                         return onStatusCallback(err);
                     }
 
-                    var clientStatus = createClientStatus(status);
-
-                    switch(true) {
-                        case !clientStatus.isDefaultReceiver && !clientStatus.isIdleScreen:
-                            // some other app is playing
-                            return toast.warning('currently playing ' + clientStatus.app);
-                        case clientStatus.state === 'no_media':
-                        case clientStatus.isIdleScreen:
-                            // default receiver has no media or we are
-                            // on the idle screen
-                            return toast.info('nothing is playing');
-                    }
-
-                    // the default media receiver is playing something, so
-                    // let's init controls
                     initPlay(status);
                 });
             });
@@ -311,10 +307,17 @@
         destroyControls();
         initControls();
 
-        controls._duration = status.duration;
+        var clientStatus = createClientStatus(status);
 
-        STATE.emit('controls:init', createClientStatus(status));
         onStatusCallback(null, status);
+
+        if (clientStatus.isDefaultReceiver && clientStatus.state !== 'no_media') {
+            // the default media receiver is playing something, so
+            // let's init controls
+            controls._duration = status.duration;
+
+            STATE.emit('controls:init', createClientStatus(status));
+        }
     }
 
     initAlwaysOnControls();
