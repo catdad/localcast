@@ -171,29 +171,19 @@
 
         STATE.emit('controls:update', metadata);
 
-        var msg;
-
         switch(true) {
             case !metadata.isDefaultReceiver && !metadata.isIdleScreen:
                 // some other app is playing
-                msg = 'currently playing ' + metadata.app + ' app';
-                break;
+                return toast.info('currently playing ' + metadata.app + ' app');
             case metadata.isIdleScreen:
                 // default receiver has no media or we are
                 // on the idle screen
-                msg = 'nothing is playing';
-                break;
+                return toast.info('nothing is playing');
             case metadata.isDefaultReceiver && !metadata.title:
                 // the default media player has no media
-                msg = 'no media playing on Default Media Receiver app';
-                break;
+                return toast.info('no media playing on Default Media Receiver app');
             case metadata.isDefaultReceiver && !!metadata.title:
-                msg = 'currently playing ' + metadata.title;
-                break;
-        }
-
-        if (msg) {
-            toast.info(msg);
+                return toast.info('currently playing ' + metadata.title);
         }
     }
 
