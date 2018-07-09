@@ -171,8 +171,29 @@
 
         STATE.emit('controls:update', metadata);
 
-        if (status.title) {
-            toast.info('playing: ' + status.title);
+        var msg;
+
+        switch(true) {
+            case !metadata.isDefaultReceiver && !metadata.isIdleScreen:
+                // some other app is playing
+                msg = 'currently playing ' + metadata.app + ' app';
+                break;
+            case metadata.state === 'no_media' && metadata.isDefaultReceiver:
+                // the default media player has no media
+                msg = 'no media playing on Default Media Receiver app';
+                break;
+            case metadata.isIdleScreen:
+                // default receiver has no media or we are
+                // on the idle screen
+                msg = 'nothing is playing';
+                break;
+            case metadata.isDefaultReceiver && metadata.title:
+                msg = 'currently playing ' + metadata.title;
+                break;
+        }
+
+        if (msg) {
+            toast.info(msg);
         }
     }
 
@@ -236,21 +257,6 @@
                         return onStatusCallback(err);
                     }
 
-                    var clientStatus = createClientStatus(status);
-
-                    switch(true) {
-                        case !clientStatus.isDefaultReceiver && !clientStatus.isIdleScreen:
-                            // some other app is playing
-                            return toast.warning('currently playing ' + clientStatus.app);
-                        case clientStatus.state === 'no_media':
-                        case clientStatus.isIdleScreen:
-                            // default receiver has no media or we are
-                            // on the idle screen
-                            return toast.info('nothing is playing');
-                    }
-
-                    // the default media receiver is playing something, so
-                    // let's init controls
                     initPlay(status);
                 });
             });
@@ -311,10 +317,17 @@
         destroyControls();
         initControls();
 
-        controls._duration = status.duration;
+        var clientStatus = createClientStatus(status);
 
-        STATE.emit('controls:init', createClientStatus(status));
         onStatusCallback(null, status);
+
+        if (clientStatus.isDefaultReceiver && clientStatus.state !== 'no_media') {
+            // the default media receiver is playing something, so
+            // let's init controls
+            controls._duration = status.duration;
+
+            STATE.emit('controls:init', createClientStatus(status));
+        }
     }
 
     initAlwaysOnControls();
