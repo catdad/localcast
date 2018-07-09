@@ -152,7 +152,7 @@
 
     function createClientStatus(status) {
         return {
-            title: status.title || 'unknown media',
+            title: status.title,
             state: status.state.toLowerCase(),
             duration: status.duration,
             currentTime: status.currentTime,
@@ -178,16 +178,16 @@
                 // some other app is playing
                 msg = 'currently playing ' + metadata.app + ' app';
                 break;
-            case metadata.state === 'no_media' && metadata.isDefaultReceiver:
-                // the default media player has no media
-                msg = 'no media playing on Default Media Receiver app';
-                break;
             case metadata.isIdleScreen:
                 // default receiver has no media or we are
                 // on the idle screen
                 msg = 'nothing is playing';
                 break;
-            case metadata.isDefaultReceiver && metadata.title:
+            case metadata.isDefaultReceiver && !metadata.title:
+                // the default media player has no media
+                msg = 'no media playing on Default Media Receiver app';
+                break;
+            case metadata.isDefaultReceiver && !!metadata.title:
                 msg = 'currently playing ' + metadata.title;
                 break;
         }
