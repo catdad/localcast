@@ -200,8 +200,8 @@ function status(body) {
 
 function execCommand(body, func) {
     return findPlayer(body.player).then(function (player) {
-        return status(body).then(function () {
-            return func(player);
+        return status(body).then(function (session) {
+            return func(player, session);
         });
     }).then(function (status) {
         return Promise.resolve(cleanStatus(status));
@@ -227,7 +227,12 @@ function seek(body) {
 }
 
 function stop(body) {
-    return execCommand(body, function (player) {
+    return execCommand(body, function (player, session) {
+        if (!session.isDefaultReceiver) {
+            // we are already stopped, do nothing
+            return status(body);
+        }
+
         return promisify(player.stop.bind(player))();
     });
 }
