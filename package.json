@@ -15,7 +15,7 @@
   "dependencies": {
     "castv2-client": "^1.1.2",
     "chromecasts": "^1.9.1",
-    "express": "~4.2.0",
+    "express": "^4.5.0",
     "fluent-ffmpeg": "~1.7.2",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
