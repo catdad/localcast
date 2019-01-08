@@ -180,7 +180,7 @@ function status(body) {
             return session;
         }
 
-        // the dfefault media player is open, so
+        // the default media player is open, so
         // we can connect to the existing session
         // and start controlling it
         return findPlayer(body.player).then(function (player) {
