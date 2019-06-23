@@ -49,7 +49,7 @@ app.use(function(req, res, next) {
 
 app.get('/', function(req, res) {
     //browse to index
-    res.sendfile(path.resolve(rootDir, 'public', 'index.html'));
+    res.sendFile(path.resolve(rootDir, 'public', 'index.html'));
 });
 
 function send(res, err, data) {
