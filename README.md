@@ -16,7 +16,7 @@ You will need to add a JSON config file at `server/config.json`. Mine looks like
 }
 ```
 
-Then, you will need node. I developed this with node 4, and currently run node 10.
+Then, you will need node. I developed this with node 4, and currently run node 10 -- this project is quite old actually.
 
 ```bash
 npm install
