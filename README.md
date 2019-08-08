@@ -31,4 +31,6 @@ listening at 192.168.1.100:8999
 
 You can then go to this URL on any device on your network (try it on your phone from the couch, it's great). The UI should be self-explanatory (if you are adventurous and willing to just click buttons without a tutorial).
 
+H264/X264 MP4 video work best, but if you have anything else, the server will attempt to convert it at realtime.
+
 Also, and I can't stress this enough, **use at your own risk**.
