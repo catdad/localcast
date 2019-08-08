@@ -14,7 +14,7 @@
   "license": "MIT",
   "dependencies": {
     "castv2-client": "^1.1.2",
-    "chromecasts": "^1.9.1",
+    "chromecasts": "https://github.com/catdad/chromecasts/tarball/b599a6bce2081674f234ec98e15d45918457f8f3",
     "express": "^4.5.0",
     "fluent-ffmpeg": "~1.7.2",
     "lodash": "^4.17.10",
