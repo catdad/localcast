@@ -90,6 +90,7 @@ function discover() {
         });
 
         var onError = function (err) {
+            list = null;
             console.log('chromecasts list error', err);
             done(err);
         };
