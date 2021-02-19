@@ -89,6 +89,11 @@ function discover() {
             return resolve(result);
         });
 
+        var onError = function (err) {
+            console.log('chromecasts list error', err);
+            done(err);
+        };
+
         if (!list) {
             list = chromecasts();
         }
@@ -115,6 +120,7 @@ function discover() {
             done(new Error('the query timed out'));
         }, 1000);
 
+        list.on('error', onError);
         list.on('update', onEachUpdate);
         list.update();
     });
