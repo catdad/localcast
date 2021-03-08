@@ -11,46 +11,8 @@ var through = require('through2');
 // root is one up from the running dir
 var dir = path.resolve(__dirname, '..');
 
-//var ffmpegPath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffmpeg.exe');
-//var ffprobePath = path.resolve('.', 'lib', 'ffmpeg-20140517', 'bin', 'ffprobe.exe');
-
 var ffmpegPath = path.resolve('.', 'bin', 'ffmpeg', 'ffmpeg.exe');
 var ffprobePath = path.resolve('.', 'bin', 'ffmpeg', 'ffprobe.exe');
-
-//enable these if needed in the environment
-//var Fluent = require('fluent-ffmpeg');
-//process.env['FFMPEG_PATH'] = ffmpegPath;
-//process.env['FFPROBE_PATH'] = ffprobePath;
-
-function stream_fluent(res, vid){
-	var ffmpeg = require('fluent-ffmpeg');
-
-	var startTime = Date.now();
-
-	res.contentType('mp4');
-
-	var command = new ffmpeg({ source: vid, nolog: true })
-		.addOption('-threads', '2')
-		.on('start', function(commandLine){
-			console.log('start', commandLine);
-		})
-		.on('progress', function(progress){
-			// console.log('progress', progress);
-		})
-		.on('error', function(err){
-			console.log('error', err);
-		})
-		.on('end', function(){
-			var endTime = Date.now();
-			console.log('end', (endTime - startTime) + 'ms');
-		})
-		.withAudioCodec('libmp3lame')
-        .withVideoCodec('libx264')
-		.addOption('-movflags', 'frag_keyframe+faststart')
-		.toFormat('mp4')
-		.writeToStream(res, {end: true});
-		// .saveToFile(path.resolve(dir, 'scrubs.mp4'));
-}
 
 function thumbnail(fullPath, callback){
     var firstRead = true;
