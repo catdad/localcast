@@ -1,4 +1,4 @@
-/*jslint node: true, expr: true */
+/* jslint node: true, expr: true */
 
 var path = require('path');
 var url = require('url');
