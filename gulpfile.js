@@ -14,55 +14,55 @@ var watchboy = require('watchboy');
 
 var pkg = require('./package.json');
 
-var _server;
+const server = ((_server) => {
+    const stop = () => Promise.resolve().then(() => {
+        if (!_server) {
+            return;
+        }
 
-const serverKill = async () => {
-    if (!_server) {
-        return;
-    }
+        var temp = _server;
+        _server = null;
 
-    var temp = _server;
-    _server = null;
-
-    await Promise.all([
-        new Promise(function (resolve, reject) {
-            temp.on('exit', function (code) {
+        return Promise.all([
+            new Promise(function (resolve, reject) {
+                temp.on('exit', function (code) {
+                    resolve();
+                });
+            }),
+            new Promise(function (resolve, reject) {
+                temp.on('close', function () {
+                    resolve();
+                });
+            }),
+            new Promise(function (resolve, reject) {
+                temp.kill();
                 resolve();
-            });
-        }),
-        new Promise(function (resolve, reject) {
-            temp.on('close', function () {
-                resolve();
-            });
-        }),
-        new Promise(function (resolve, reject) {
-            temp.kill();
-            resolve();
-        })
-    ]);
-};
-
-const serverStart = () => {
-    return new Promise(function (resolve, reject) {
-        _server = spawn(process.execPath, [ pkg.main ], {
-            stdio: 'inherit',
-            cwd: __dirname
-        });
-
-        _server.on('exit', function (code) {
-            if (_server) {
-                console.log('server exited with code', code);
-                console.log('waiting for a change to restart it');
-            }
-
-            _server = null;
-        });
-
-        return resolve();
+            })
+        ]);
     });
-};
 
-const server = gulp.series(serverKill, serverStart);
+    const start = () => {
+        return new Promise(function (resolve, reject) {
+            _server = spawn(process.execPath, [ pkg.main ], {
+                stdio: 'inherit',
+                cwd: __dirname
+            });
+
+            _server.on('exit', function (code) {
+                if (_server) {
+                    console.log('server exited with code', code);
+                    console.log('waiting for a change to restart it');
+                }
+
+                _server = null;
+            });
+
+            return resolve();
+        });
+    };
+
+    return { stop, start, restart: gulp.series(stop, start) };
+})(null);
 
 const buildLess = function() {
     return gulp.src('./less/style.less')
@@ -73,12 +73,12 @@ const buildLess = function() {
         .pipe(gulp.dest('./build'));
 };
 
-const watch = gulp.series(buildLess, server, () => {
+const watch = gulp.series(buildLess, server.restart, () => {
     watchboy(['**/*.less'], { cwd: path.resolve('./less') }).on('change', () => {
         exports.build();
     });
     watchboy(['**/*'], { cwd: path.resolve('./server') }).on('change', () => {
-        server();
+        server.restart();
     });
 });
 
