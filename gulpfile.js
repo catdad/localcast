@@ -1,28 +1,30 @@
-/* jshint node: true */
+/* jshint node: true, esversion: 6 */
 /* global Promise */
 
 var module = require('module');
 var spawn = require('child_process').spawn;
+var path = require('path');
 
 var gulp = require('gulp');
 var less = require('gulp-less');
 var sourcemaps = require('gulp-sourcemaps');
 var plumber = require('gulp-plumber');
 var sequence = require('run-sequence');
+var watchboy = require('watchboy');
 
 var pkg = require('./package.json');
 
-var server;
+var _server;
 
-gulp.task('server:kill', function () {
-    if (!server) {
+const serverKill = async () => {
+    if (!_server) {
         return;
     }
 
-    var temp = server;
-    server = null;
+    var temp = _server;
+    _server = null;
 
-    return Promise.all([
+    await Promise.all([
         new Promise(function (resolve, reject) {
             temp.on('exit', function (code) {
                 resolve();
@@ -38,46 +40,47 @@ gulp.task('server:kill', function () {
             resolve();
         })
     ]);
-});
+};
 
-gulp.task('server:start', function () {
+const serverStart = () => {
     return new Promise(function (resolve, reject) {
-        server = spawn(process.execPath, [ pkg.main ], {
+        _server = spawn(process.execPath, [ pkg.main ], {
             stdio: 'inherit',
             cwd: __dirname
         });
 
-        server.on('exit', function (code) {
-            if (server) {
+        _server.on('exit', function (code) {
+            if (_server) {
                 console.log('server exited with code', code);
                 console.log('waiting for a change to restart it');
             }
 
-            server = null;
+            _server = null;
         });
 
         return resolve();
     });
-});
+};
 
-gulp.task('server', function (done) {
-    sequence('server:kill', 'server:start', done);
-});
+const server = gulp.series(serverKill, serverStart);
 
-gulp.task('less', function() {
+const buildLess = function() {
     return gulp.src('./less/style.less')
         .pipe(plumber())
         .pipe(sourcemaps.init())
         .pipe(less())
         .pipe(sourcemaps.write())
         .pipe(gulp.dest('./build'));
+};
+
+const watch = gulp.series(buildLess, server, () => {
+    watchboy(['**/*.less'], { cwd: path.resolve('./less') }).on('change', () => {
+        exports.build();
+    });
+    watchboy(['**/*'], { cwd: path.resolve('./server') }).on('change', () => {
+        server();
+    });
 });
 
-gulp.task('watch', ['less', 'server'], function() {
-    gulp.watch('./less/**/*.less', ['less']);
-    gulp.watch('./server/**/*', ['server']);
-});
-
-gulp.task('build', ['less']);
-gulp.task('dev', ['watch']);
-gulp.task('default', ['dev']);
+exports.default = exports.dev = watch;
+exports.build = gulp.series(buildLess);

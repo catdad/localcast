@@ -16,7 +16,6 @@
     "castv2-client": "^1.1.2",
     "chromecasts": "https://github.com/catdad/chromecasts/tarball/b599a6bce2081674f234ec98e15d45918457f8f3",
     "express": "^4.5.0",
-    "fluent-ffmpeg": "~1.7.2",
     "lodash": "^4.17.10",
     "mkdirp": "^0.5.1",
     "node-stream": "^1.7.0",
@@ -26,10 +25,11 @@
     "unzip": "^0.1.11"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-less": "^3.0.2",
+    "gulp": "^4.0.2",
+    "gulp-less": "^4.0.1",
     "gulp-plumber": "^1.0.0",
     "gulp-sourcemaps": "^1.5.1",
-    "run-sequence": "^2.2.1"
+    "run-sequence": "^2.2.1",
+    "watchboy": "^0.4.2"
   }
 }
