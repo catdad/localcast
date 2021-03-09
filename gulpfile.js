@@ -15,29 +15,21 @@ var watchboy = require('watchboy');
 var pkg = require('./package.json');
 
 const server = ((_server = null, lastStart = 0) => {
-    const stop = () => Promise.resolve().then(() => {
+    const stop = () => Promise.resolve(_server).then((temp) => {
         if (!_server) {
             return;
         }
 
-        var temp = _server;
         _server = null;
 
         return Promise.all([
-            new Promise(function (resolve, reject) {
-                temp.on('exit', function (code) {
-                    resolve();
-                });
+            new Promise(resolve => {
+                temp.on('exit', () => resolve());
             }),
-            new Promise(function (resolve, reject) {
-                temp.on('close', function () {
-                    resolve();
-                });
+            new Promise(resolve => {
+                temp.on('close', () => resolve());
             }),
-            new Promise(function (resolve, reject) {
-                temp.kill();
-                resolve();
-            })
+            Promise.resolve().then(() => temp.kill())
         ]);
     });
 
