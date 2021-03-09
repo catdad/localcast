@@ -14,7 +14,7 @@ var watchboy = require('watchboy');
 
 var pkg = require('./package.json');
 
-const server = ((_server) => {
+const server = ((_server = null, lastStart = 0) => {
     const stop = () => Promise.resolve().then(() => {
         if (!_server) {
             return;
@@ -43,26 +43,38 @@ const server = ((_server) => {
 
     const start = () => {
         return new Promise(function (resolve, reject) {
+            lastStart = Date.now();
+
             _server = spawn(process.execPath, [ pkg.main ], {
                 stdio: 'inherit',
                 cwd: __dirname
             });
 
             _server.on('exit', function (code) {
-                if (_server) {
-                    console.log('server exited with code', code);
-                    console.log('waiting for a change to restart it');
+                if (!_server) {
+                    return;
                 }
 
                 _server = null;
+
+                console.log(`server exited with code ${code}`);
+
+                if (Date.now() - lastStart > 15 * 1000) {
+                    console.log(`it has been running for a while, so restarting immediately`);
+                    restart();
+                } else {
+                    console.log('it crashed on startup, waiting for a change to restart it');
+                }
             });
 
             return resolve();
         });
     };
 
-    return { stop, start, restart: gulp.series(stop, start) };
-})(null);
+    const restart = gulp.series(stop, start);
+
+    return { stop, start, restart };
+})();
 
 const buildLess = () => {
     return gulp.src('./less/style.less')
