@@ -64,7 +64,7 @@ const server = ((_server) => {
     return { stop, start, restart: gulp.series(stop, start) };
 })(null);
 
-const buildLess = function() {
+const buildLess = () => {
     return gulp.src('./less/style.less')
         .pipe(plumber())
         .pipe(sourcemaps.init())
@@ -73,14 +73,14 @@ const buildLess = function() {
         .pipe(gulp.dest('./build'));
 };
 
-const watch = gulp.series(buildLess, server.restart, () => {
+const watch = () => {
     watchboy(['**/*.less'], { cwd: path.resolve('./less') }).on('change', () => {
         exports.build();
     });
     watchboy(['**/*'], { cwd: path.resolve('./server') }).on('change', () => {
         server.restart();
     });
-});
+};
 
-exports.default = exports.dev = watch;
+exports.default = exports.dev = gulp.series(buildLess, server.restart, watch);
 exports.build = gulp.series(buildLess);
