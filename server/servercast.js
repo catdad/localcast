@@ -64,13 +64,6 @@ function cleanSession(session) {
     };
 }
 
-function handleErrors(player) {
-    player.on('error', function (err) {
-        console.log('player % error', player.name);
-        console.log(err);
-    });
-}
-
 function discover() {
     function players() {
         return {
@@ -107,8 +100,15 @@ function discover() {
             done(null, players());
         }), 100);
 
+        var onPlayerError = function (player) {
+            player.on('error', function (err) {
+                console.log('player "%s" error\n', player.name, err);
+                list = null;
+            });
+        };
+
         var onEachUpdate = function (player) {
-            handleErrors(player);
+            onPlayerError(player);
             onUpdate(player);
         };
 
