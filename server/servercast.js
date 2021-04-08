@@ -82,12 +82,6 @@ function discover() {
             return resolve(result);
         });
 
-        var onError = function (err) {
-            list = null;
-            console.log('chromecasts list error', err);
-            done(err);
-        };
-
         if (!list) {
             list = chromecasts();
         }
@@ -107,11 +101,6 @@ function discover() {
             });
         };
 
-        var onEachUpdate = function (player) {
-            onPlayerError(player);
-            onUpdate(player);
-        };
-
         // set a timeout to handle not finding any devices
         // note: I checked chromecasts lib, and it seems that
         // due to the use of node-ssdp, which has no callback
@@ -121,8 +110,15 @@ function discover() {
             done(new Error('the query timed out'));
         }, 1000);
 
-        list.on('error', onError);
-        list.on('update', onEachUpdate);
+        list.on('error', function (err) {
+            list = null;
+            console.log('chromecasts list error', err);
+            done(err);
+        });
+        list.on('update', function (player) {
+            onPlayerError(player);
+            onUpdate(player);
+        });
         list.update();
     });
 }
