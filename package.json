@@ -16,7 +16,7 @@
     "castv2-client": "^1.1.2",
     "chromecasts": "https://github.com/catdad/chromecasts/tarball/fdf3114b3d60ae08b2073ca8d623a3f316c1ab04",
     "express": "^4.5.0",
-    "lodash": "^4.17.10",
+    "lodash": "^4.17.21",
     "mkdirp": "^0.5.1",
     "node-stream": "^1.7.0",
     "qr-image": "~2.0.0",
